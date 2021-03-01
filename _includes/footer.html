@@ -5,13 +5,13 @@
     site.middle_name }} {{
     site.last_name
     }}.
-    {% if site.last_updated %}
-    <small>Last updated: {{ "now" | date: '%B %d, %Y' }}.</small>
-    {% endif %}
-    <br />
+    <span class="mr-auto"></span>
     {{ site.footer_text }}
     {% if site.impressum_path %}
     <a href="{{ site.url }}{{ site.baseurl }}{{ site.impressum_path }}">Impressum</a>.
+    {% endif %}
+    {% if site.last_updated %}
+    <small>Last updated: {{ "now" | date: '%B %d, %Y' }}.</small>
     {% endif %}
 
   </div>
