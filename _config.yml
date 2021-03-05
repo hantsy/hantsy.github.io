@@ -129,6 +129,9 @@ plugins:
   - jekyll/scholar
   - jekyll-twitter-plugin
   - jemoji
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
 
 # -----------------------------------------------------------------------------
 # Jekyll Scholar
