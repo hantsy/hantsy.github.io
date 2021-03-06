@@ -7,5 +7,5 @@ nav: true
 ---
 
 * Application development
-* Technonical consulting service
-* Team coaching
+* Technical consulting service
+* Startup team coaching
