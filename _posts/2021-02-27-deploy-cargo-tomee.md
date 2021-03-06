@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  Deploying Jakarta EE 9 applications to Apache TomEE using Cargo maven plugin
-date:   2021-03-06 14:06:00+800
+date:   2021-02-27 19:35:00+800
 description: An alternative approache to deploy Jakarta EE 9 application to Apache TOMEE by Cargo maven plugin.
 comments: true
 ---
