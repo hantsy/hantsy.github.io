@@ -88,6 +88,8 @@ collections:
   projects:
     output: true
     permalink: /projects/:path/
+  medium_posts:
+    output: true
 
 news_limit: 5
 
