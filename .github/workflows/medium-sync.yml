@@ -8,14 +8,9 @@
 name: rss
 
 on:
-  push:
-    branches:
-      - master
-      - source
-  pull_request:
-    branches:
-      - master
-      - source
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: "0 1 * * *"
 
 jobs:
   rss:
