@@ -33,7 +33,11 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Import Medium Feed
         run: |
-          ruby -r rubygems -e 'require "jekyll-import"; JekyllImport::Importers::RSS.run({"source" => "https://medium.com/feed/@hantsy"})'
+          gem install jekyll-import
+          ruby -r rubygems -e 'require "jekyll-import";
+            JekyllImport::Importers::RSS.run({
+              "source" => "https://medium.com/feed/@hantsy"
+            })'
       - uses: EndBug/add-and-commit@v7.0.0
         with:
           author_name: github-actions
