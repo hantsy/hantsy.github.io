@@ -13,29 +13,29 @@ while [[ $# > 0 ]]; do
     key="$1"
 
     case $key in
-        -h|--help)
+    -h | --help)
         echo $USAGE_MSG
         exit 0
         ;;
-        -u|--user)
+    -u | --user)
         SRC_BRANCH="source"
         DEPLOY_BRANCH="master"
         ;;
-        -s|--src)
+    -s | --src)
         SRC_BRANCH="$2"
         shift
         ;;
-        -d|--deploy)
+    -d | --deploy)
         DEPLOY_BRANCH="$2"
         shift
         ;;
-        --verbose)
+    --verbose)
         set -x
         ;;
-        --no-push)
+    --no-push)
         NO_PUSH="--no-push"
         ;;
-        *)
+    *)
         echo "Option $1 is unknown." >&2
         echo $USAGE_MSG >&2
         exit 1
@@ -52,8 +52,7 @@ echo "Source branch: $SRC_BRANCH"
 echo "Deploy branch: $DEPLOY_BRANCH"
 
 read -r -p "Do you want to proceed? [y/N] " response
-if [[ ! $response =~ ^([yY][eE][sS]|[yY])+$ ]]
-then
+if [[ ! $response =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     echo "Aborting."
     [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1
 fi
@@ -77,17 +76,15 @@ if ! test -z "$(git ls-files --exclude-standard --others)"; then
 fi
 
 # Switch to source branch (creates it if necessary from the current branch)
-if [ `git branch | grep $SRC_BRANCH | tr ' ' '\n' | tail -1` ]
-then
+if [ $(git branch | grep $SRC_BRANCH | tr ' ' '\n' | tail -1) ]; then
     git checkout $SRC_BRANCH
 else
     git checkout -b $SRC_BRANCH
 fi
 
 # Checkout DEPLOY_BRANCH branch
-if [ `git branch | grep $DEPLOY_BRANCH` ]
-then
-  git branch -D $DEPLOY_BRANCH
+if [ $(git branch | grep $DEPLOY_BRANCH) ]; then
+    git branch -D $DEPLOY_BRANCH
 fi
 git checkout -b $DEPLOY_BRANCH
 
@@ -95,7 +92,7 @@ git checkout -b $DEPLOY_BRANCH
 bundle exec jekyll build
 
 # Delete and move files
-find . -maxdepth 1 ! -name '_site' ! -name '.git' ! -name 'CNAME' ! -name '.gitignore' -exec rm -rf {} \;
+find . -maxdepth 1 ! -name '_site' ! -name '.git' ! -name 'CNAME' ! -name '.gitignore' ! -name '.github/workflows/medium-sync.yml' -exec rm -rf {} \;
 mv _site/* .
 rm -R _site/
 

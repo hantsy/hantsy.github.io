@@ -6,7 +6,8 @@
 # For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
 
 name: rss
-
+# Scheduled workflows are only exectued on default branch.
+# https://stackoverflow.com/questions/63436541/github-action-workflow-schedule-not-working-on-non-default-branch
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
@@ -17,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Git checkout
+        uses: actions/checkout@v2
+        with: { ref: source }
       - name: Set up Ruby
         # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
         # change this to (see https://github.com/ruby/setup-ruby#versioning):

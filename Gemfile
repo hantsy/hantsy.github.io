@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # gem 'dotenv'
-gem 'jekyll-import'
+# gem 'jekyll-import'
 
 group :jekyll_plugins do
     gem 'github-pages'
