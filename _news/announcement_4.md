@@ -5,5 +5,5 @@ inline: false
 title: I am a Jakarta EE contributor
 ---
 
-![]({{ site.baseurl }}/assets/img/jakarta-ee-contributor-card.png)
+![contributor](/assets/img/jakarta-ee-contributor-card.png)
 
