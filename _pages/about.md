@@ -21,11 +21,14 @@ Currently, I live in Guangzhou, China.
 
 My dream job is :
 
-* Embrace engineering culture and geek culture,  result-oriented,  no meetings.
+* Work anywhere on the earth. 
+* Embrace engineering culture,  no meetings.
 
-* Build great Agile/Scrum principles at your pace, not obeyed all of  the rules from a Scrum master course.
+* Always be agile, build  a compatible Agile/Scrum principles at your pace, not obeyed all of  the rules from a Scrum master course.
 
-* Believe in smart collaboration tools(including paid cloud service) is the key of effective communication and high productivity.
+* Effective communication is key to produce high productivity, believe in great collaboration tools(including paid cloud service) is more important than face-to-face distributed chat.
+
+* Embrace challenges in daily work, always try to update the latest tech stack and give a shot to the new things.
 
   
 
