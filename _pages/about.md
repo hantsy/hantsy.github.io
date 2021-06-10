@@ -22,16 +22,13 @@ Currently, I live in Guangzhou, China.
 My dream job is :
 
 * Work anywhere on the earth. 
-* Embrace engineering culture,  no meetings.
-
-* Always be agile, build  a compatible Agile/Scrum principles at your pace, not obeyed all of  the rules from a Scrum master course.
-
-* Effective communication is key to produce high productivity, believe in great collaboration tools(including paid cloud service) is more important than face-to-face distributed chat.
-
+* Always be agile, build  your own Agile/Scrum principle at your pace, not obeyed all of  the rules from a Scrum master course.
+* Effective communication is the key to produce high productivity, use the great collaboration tools including paid cloud service to replace the tedious chat or vedio call.
 * Embrace challenges in daily work, always try to update the latest tech stack and give a shot to the new things.
+* Embrace engineering culture, emphasize time management and self-management,  no meetings.
 
   
 
-<p class="text-secondary display-5">I am available for new opportunities.</p>
+<p class="text-secondary display-4">I am available for new opportunities.</p>
 
 [Check my CV in pdf]({{ site.baseurl }}/assets/pdf/cv.pdf) or browse on [LinkedIN](https://www.linkedin.com/in/hantsy).
