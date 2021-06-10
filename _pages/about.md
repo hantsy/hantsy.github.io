@@ -19,6 +19,16 @@ In 2012, I was invited to attend the JBoss User and Developer Conference in Bost
 
 Currently, I live in Guangzhou, China.
 
+My dream job is :
+
+* Embrace engineering culture and geek culture,  result-oriented,  no meetings.
+
+* Build great Agile/Scrum principles at your pace, not obeyed all of  the rules from a Scrum master course.
+
+* Believe in smart collaboration tools(including paid cloud service) is the key of effective communication and high productivity.
+
+  
+
 <p class="text-secondary display-5">I am available for new opportunities.</p>
 
 [Check my CV in pdf]({{ site.baseurl }}/assets/pdf/cv.pdf) or browse on [LinkedIN](https://www.linkedin.com/in/hantsy).
