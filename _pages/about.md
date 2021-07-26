@@ -19,13 +19,13 @@ In 2012, I was invited to attend the JBoss User and Developer Conference in Bost
 
 Currently, I live in Guangzhou, China.
 
-Some characteristics  of my dream job:
+What is my dream job?
 
-* Possibly work anywhere you like on the earth. 
-* Always be agile, build your own Agile/Scrum principle at your pace, not obey all rules from a Scrum master course.
-* Effective communication is the key to produce high productivity, eager to use the cutting-edge collaboration tools including paid cloud service to replace the tedious chat or video call.
-* Embrace challenges in daily work, always try to update the latest tech stack and give a shot to the new things.
-* Embrace engineering culture, emphasize time management and self-management,  no meetings.
+* Work anywhere on the earth.
+* Alwasy be agile, build your own Agile/Scrum principle at your pace, not obey all rules from a Scrum master course.
+* Embrace engineering culture, no meetings, always use the cutting-edge collaboration tools including paid cloud service to replace the tedious chat or video call.
+* Embrace geek culture - always face challenges in daily work, always try to update the latest tech stack and give a shot to the new things.
+* Emphasize time management and self-management, not follow stupid project management certification course.
 
 
 <p class="text-primary  display-5">I am available for new opportunities.</p>
