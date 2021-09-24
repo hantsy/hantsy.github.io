@@ -24,7 +24,7 @@ What is my dream job?
 * Work anywhere on the earth.
 * Alwasy be agile, build your own Agile/Scrum principle at your pace, not obey all rules from a Scrum master course.
 * Embrace engineering culture, no meetings, always use the cutting-edge collaboration tools including paid cloud service to replace the tedious chat or video call.
-* Embrace geek culture - always face challenges in daily work, always try to update the latest tech stack and give a shot to the new things.
+* Embrace geek culture, like challenges in daily work and always try to update the latest tech stack and give a shot to the new things.
 * Emphasize time management and self-management, not follow stupid project management certification course.
 
 
