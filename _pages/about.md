@@ -21,12 +21,11 @@ Currently, I live in Guangzhou, China.
 
 What is my dream job?
 
-* Work anywhere on the earth.
-* Alwasy be agile, build your own Agile/Scrum principle at your pace, not obey all rules from a Scrum master course.
-* Embrace engineering culture, no meetings, always use the cutting-edge collaboration tools including paid cloud service to replace the tedious chat or video call.
-* Embrace geek culture, like challenges in daily work and always try to update the latest tech stack and give a shot to the new things.
-* Emphasize time management and self-management, not follow stupid project management certification course.
-
+* Be able to work anywhere on the earth.
+* Always be agile, build your own Agile/Scrum principle at your pace, not obey all rules from a Scrum Master course.
+* Believe in engineering culture, no meetings, always use the cutting-edge collaboration tools including paid service to replace the tedious chat or video call.
+* Advocate geek culture, embrace challenges in daily work and always try to update the latest tech stack and give a shot to the new things.
+* Emphasize on time management and self-management, flexible working time.
 
 <p class="text-primary  display-5">I am available for new opportunities.</p>
 
