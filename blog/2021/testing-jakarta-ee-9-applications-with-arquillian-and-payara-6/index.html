@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  Hantsy
+  
+  Bai
+  
+  
+  | Testing Jakarta EE 9 Applications with Arquillian and Payara 6
+  
+</title>
+<meta name="description" content="My personal website focusing on Java EE/Jakarta EE and Spring.
+">
+
+<!-- Open Graph -->
+
+
+<!-- Bootstrap & MDB -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css"
+  integrity="sha512-RO38pBRxYH3SoOprtPTD86JFOclM51/XTIdEPh5j8sj4tp8jmQIx26twG52UaLi//hQldfrh7e51WzP9wuP32Q==" crossorigin="anonymous" />
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.0/css/academicons.min.css"
+  integrity="sha512-W4yqoT1+8NLkinBLBZko+dFB2ZbHsYLDdr50VElllRcNt2Q4/GSs6u71UHKxB7S6JEMCp5Ve4xjh3eGQl/HRvg==" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+
+<!-- Code Syntax Highlighting -->
+<link rel="stylesheet"
+  href="https://gitcdn.link/repo/jwarby/jekyll-pygments-themes/master/github.css" />
+
+<!-- Styles -->
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<link rel="canonical" href="/blog/2021/testing-jakarta-ee-9-applications-with-arquillian-and-payara-6/">
+
+<!-- JQuery -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+
+<!-- Theming-->
+
+<script src="/assets/js/theme.js"></script>
+<!-- Load DarkMode JS -->
+<script src="/assets/js/dark_mode.js"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-18SZ2W3GXD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-18SZ2W3GXD');
+</script>
+
+
+
+
+  
+<!-- MathJax -->
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+<script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"></script>
+<script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="blank" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Testing Jakarta EE 9 Applications with Arquillian and Payara 6" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In the latest stable Payara 5, it added the early Jakarta EE 9 support. Payara 6.2021.Alpha1 brought full Jakarta EE 9/9.1 support by default. As Arquillian support for Payara 6 issue was fixed, testing Jakarta EE 9 applications against Payara servers is available. Photo by Qingbao Meng on Unsplash Payara Arquillian project provides several Arquillian Container adapters for Payara Server. Payara Managed Container AdapterPayara Remote Container AdapterPayara Embedded Container AdapterPayara Micro Managed Container Adapter Example Codes The example codes are shared via my Github. The Arquillian configuration for these 4 adapters are provided via 4 Maven profiles. Prerequisites Java 11 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Configuring Payara Managed Container Adapter Add arquillian-payara-server-managed dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;!-- Payara Server Container adaptor --&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-managed&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Create a container configuration in the arquillian.xml file. &lt;container qualifier=&quot;payara-managed&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;enableH2&quot;&gt;${enableDerby:true}&lt;/property&gt; &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; Configure maven-dependency-plugin to download a copy of Payara distribution, and use it to run your tests. This is a great option to run the tests continuously in your CI servers. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;unpack&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;fish.payara.distributions&lt;/groupId&gt; &lt;artifactId&gt;payara&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;type&gt;zip&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;payara.home&gt;${project.build.directory}/payara6&lt;/payara.home&gt; &lt;arquillian.launch&gt;payara-managed&lt;/arquillian.launch&gt; &lt;/systemPropertyVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Run the following command to run the tests. mvn clean verify -Parq-payara-managed In this case, Arquillian is responsible for starting and stopping the Payara container. Configuring Payara Remote Container Adapter With Arquillian Payara remote container, you can run the tests against a running Payara server, esp. it is running on a different host. Adding the following arquillian-payara-server-remote dependency instead. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-remote&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And add a container section in the arquillian.xml file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value. &lt;container qualifier=&quot;payara-remote&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt; &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt; &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt; &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt; &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt; &lt;!-- default is empty --&gt; &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt; &lt;/configuration&gt; &lt;/container&gt; Before executing the tests, make sure the target Payara server is running. Run the following command to run tests against the running Payara server. mvn clean verfiy -Parq-payara-managed Configuring Payara Embedded Container Adapter With the Payara embedded container adapter, you can run tests on an embedded Payara server. Add the following dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt; &lt;artifactId&gt;payara-embedded-all&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-embedded&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Then run the following command to run tests. mvn clean verfiy -Parq-payara-embdded Configuring Payara Micro Managed Container Adapter With the Payara Micro managed container adapter, you can run tests on an Payara Micro fat JAR. Add the following dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; &lt;!-- Payara Micro Managed Container Adaptor --&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-micro-managed&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Download a copy of Payara Micro via maven dependency plugin, and set a system property payara.microJar to point to the location of the downloaded Payara Micro JAR. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;copy&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt; &lt;artifactId&gt;payara-micro&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;type&gt;jar&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;destFileName&gt;payara-micro.jar&lt;/destFileName&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;payara.microJar&gt;${project.build.directory}/payara-micro.jar&lt;/payara.microJar&gt; &lt;/systemPropertyVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Then run the following command to run tests. mvn clean verfiy -Parq-payara-micro Get the source codes from my Github." />
+<meta property="og:description" content="In the latest stable Payara 5, it added the early Jakarta EE 9 support. Payara 6.2021.Alpha1 brought full Jakarta EE 9/9.1 support by default. As Arquillian support for Payara 6 issue was fixed, testing Jakarta EE 9 applications against Payara servers is available. Photo by Qingbao Meng on Unsplash Payara Arquillian project provides several Arquillian Container adapters for Payara Server. Payara Managed Container AdapterPayara Remote Container AdapterPayara Embedded Container AdapterPayara Micro Managed Container Adapter Example Codes The example codes are shared via my Github. The Arquillian configuration for these 4 adapters are provided via 4 Maven profiles. Prerequisites Java 11 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Configuring Payara Managed Container Adapter Add arquillian-payara-server-managed dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;!-- Payara Server Container adaptor --&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-managed&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Create a container configuration in the arquillian.xml file. &lt;container qualifier=&quot;payara-managed&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;enableH2&quot;&gt;${enableDerby:true}&lt;/property&gt; &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; Configure maven-dependency-plugin to download a copy of Payara distribution, and use it to run your tests. This is a great option to run the tests continuously in your CI servers. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;unpack&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;fish.payara.distributions&lt;/groupId&gt; &lt;artifactId&gt;payara&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;type&gt;zip&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;payara.home&gt;${project.build.directory}/payara6&lt;/payara.home&gt; &lt;arquillian.launch&gt;payara-managed&lt;/arquillian.launch&gt; &lt;/systemPropertyVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Run the following command to run the tests. mvn clean verify -Parq-payara-managed In this case, Arquillian is responsible for starting and stopping the Payara container. Configuring Payara Remote Container Adapter With Arquillian Payara remote container, you can run the tests against a running Payara server, esp. it is running on a different host. Adding the following arquillian-payara-server-remote dependency instead. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-remote&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And add a container section in the arquillian.xml file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value. &lt;container qualifier=&quot;payara-remote&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt; &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt; &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt; &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt; &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt; &lt;!-- default is empty --&gt; &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt; &lt;/configuration&gt; &lt;/container&gt; Before executing the tests, make sure the target Payara server is running. Run the following command to run tests against the running Payara server. mvn clean verfiy -Parq-payara-managed Configuring Payara Embedded Container Adapter With the Payara embedded container adapter, you can run tests on an embedded Payara server. Add the following dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt; &lt;artifactId&gt;payara-embedded-all&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-embedded&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Then run the following command to run tests. mvn clean verfiy -Parq-payara-embdded Configuring Payara Micro Managed Container Adapter With the Payara Micro managed container adapter, you can run tests on an Payara Micro fat JAR. Add the following dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; &lt;!-- Payara Micro Managed Container Adaptor --&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-micro-managed&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Download a copy of Payara Micro via maven dependency plugin, and set a system property payara.microJar to point to the location of the downloaded Payara Micro JAR. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;copy&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt; &lt;artifactId&gt;payara-micro&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;type&gt;jar&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;destFileName&gt;payara-micro.jar&lt;/destFileName&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;payara.microJar&gt;${project.build.directory}/payara-micro.jar&lt;/payara.microJar&gt; &lt;/systemPropertyVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Then run the following command to run tests. mvn clean verfiy -Parq-payara-micro Get the source codes from my Github." />
+<meta property="og:site_name" content="blank" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-23T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Testing Jakarta EE 9 Applications with Arquillian and Payara 6" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2021-07-23T00:00:00+00:00","datePublished":"2021-07-23T00:00:00+00:00","description":"In the latest stable Payara 5, it added the early Jakarta EE 9 support. Payara 6.2021.Alpha1 brought full Jakarta EE 9/9.1 support by default. As Arquillian support for Payara 6 issue was fixed, testing Jakarta EE 9 applications against Payara servers is available. Photo by Qingbao Meng on Unsplash Payara Arquillian project provides several Arquillian Container adapters for Payara Server. Payara Managed Container AdapterPayara Remote Container AdapterPayara Embedded Container AdapterPayara Micro Managed Container Adapter Example Codes The example codes are shared via my Github. The Arquillian configuration for these 4 adapters are provided via 4 Maven profiles. Prerequisites Java 11 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Configuring Payara Managed Container Adapter Add arquillian-payara-server-managed dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;!-- Payara Server Container adaptor --&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-managed&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Create a container configuration in the arquillian.xml file. &lt;container qualifier=&quot;payara-managed&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;enableH2&quot;&gt;${enableDerby:true}&lt;/property&gt; &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; Configure maven-dependency-plugin to download a copy of Payara distribution, and use it to run your tests. This is a great option to run the tests continuously in your CI servers. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;unpack&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;fish.payara.distributions&lt;/groupId&gt; &lt;artifactId&gt;payara&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;type&gt;zip&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;payara.home&gt;${project.build.directory}/payara6&lt;/payara.home&gt; &lt;arquillian.launch&gt;payara-managed&lt;/arquillian.launch&gt; &lt;/systemPropertyVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Run the following command to run the tests. mvn clean verify -Parq-payara-managed In this case, Arquillian is responsible for starting and stopping the Payara container. Configuring Payara Remote Container Adapter With Arquillian Payara remote container, you can run the tests against a running Payara server, esp. it is running on a different host. Adding the following arquillian-payara-server-remote dependency instead. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-remote&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And add a container section in the arquillian.xml file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value. &lt;container qualifier=&quot;payara-remote&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt; &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt; &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt; &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt; &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt; &lt;!-- default is empty --&gt; &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt; &lt;/configuration&gt; &lt;/container&gt; Before executing the tests, make sure the target Payara server is running. Run the following command to run tests against the running Payara server. mvn clean verfiy -Parq-payara-managed Configuring Payara Embedded Container Adapter With the Payara embedded container adapter, you can run tests on an embedded Payara server. Add the following dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt; &lt;artifactId&gt;payara-embedded-all&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-server-embedded&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Then run the following command to run tests. mvn clean verfiy -Parq-payara-embdded Configuring Payara Micro Managed Container Adapter With the Payara Micro managed container adapter, you can run tests on an Payara Micro fat JAR. Add the following dependency into your project. &lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; &lt;!-- Payara Micro Managed Container Adaptor --&gt;&lt;dependency&gt; &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt; &lt;artifactId&gt;arquillian-payara-micro-managed&lt;/artifactId&gt; &lt;version&gt;${arquillian-payara.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Download a copy of Payara Micro via maven dependency plugin, and set a system property payara.microJar to point to the location of the downloaded Payara Micro JAR. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;copy&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt; &lt;artifactId&gt;payara-micro&lt;/artifactId&gt; &lt;version&gt;${payara.version}&lt;/version&gt; &lt;type&gt;jar&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;destFileName&gt;payara-micro.jar&lt;/destFileName&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;payara.microJar&gt;${project.build.directory}/payara-micro.jar&lt;/payara.microJar&gt; &lt;/systemPropertyVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Then run the following command to run tests. mvn clean verfiy -Parq-payara-micro Get the source codes from my Github.","headline":"Testing Jakarta EE 9 Applications with Arquillian and Payara 6","mainEntityOfPage":{"@type":"WebPage","@id":"/blog/2021/testing-jakarta-ee-9-applications-with-arquillian-and-payara-6/"},"url":"/blog/2021/testing-jakarta-ee-9-applications-with-arquillian-and-payara-6/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body
+  class="fixed-top-nav ">
+
+  <!-- Header -->
+
+  <header>
+
+    <!-- Nav Bar -->
+    <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+    <div class="container">
+      
+      <a class="navbar-brand title font-weight-lighter" href="/">
+       <span class="font-weight-bold">Hantsy</span>   Bai
+      </a>
+      
+      <!-- Navbar Toggle -->
+      <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar top-bar"></span>
+        <span class="icon-bar middle-bar"></span>
+        <span class="icon-bar bottom-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-nowrap">
+          <!-- About -->
+          <li class="nav-item ">
+            <a class="nav-link" href="/">
+              about
+              
+            </a>
+          </li>
+          
+          <!-- Blog -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/blog/">
+              blog
+              
+            </a>
+          </li>
+          
+          <!-- Other pages -->
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/projects/">
+                projects
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/publications/">
+                publications
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/service/">
+                service
+                
+              </a>
+          </li>
+          
+          
+          
+            <div class = "toggle-container">
+              <a id = "light-toggle">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+              </a>
+            </div>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+</header>
+
+
+  <!-- Content -->
+
+  <div class="container mt-5">
+    
+
+<div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Testing Jakarta EE 9 Applications with Arquillian and Payara 6</h1>
+    <p class="post-meta">July 23, 2021</p>
+  </header>
+
+  <article class="post-content">
+    <p>In the latest stable Payara 5, it added the early Jakarta EE 9 support. Payara 6.2021.Alpha1 brought full Jakarta EE 9/9.1 support by default. As <a href="https://github.com/payara/ecosystem-support/issues/28">Arquillian support for Payara 6 issue</a> was fixed, testing Jakarta EE 9 applications against Payara servers is available.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/1*CEAbGIiTXGzYMRZfy4JHOA.jpeg" /><figcaption>Photo by <a href="https://unsplash.com/@ideasboom?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Qingbao Meng</a> on <a href="https://unsplash.com/s/photos/china-landscape?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></figcaption></figure><p>Payara Arquillian project provides several Arquillian Container adapters for Payara Server.</p><ul><li>Payara Managed Container Adapter</li><li>Payara Remote Container Adapter</li><li>Payara Embedded Container Adapter</li><li>Payara Micro Managed Container Adapter</li></ul><h3>Example Codes</h3><p>The <a href="https://github.com/hantsy/jakartaee9-starter-boilerplate">example codes</a> are shared via my Github. The Arquillian configuration for these 4 adapters are provided via 4 Maven profiles.</p><h3>Prerequisites</h3><ul><li>Java 11 (<a href="https://openjdk.java.net/install/">OpenJDK</a> or <a href="https://adoptopenjdk.net/installation.html">AdoptOpenJDK</a>)</li><li>The latest <a href="http://maven.apache.org/download.cgi">Apache Maven</a></li><li>The basic knowledge of <a href="https://junit.org/junit5/">JUnit 5</a></li><li>Get to know <a href="http://arquillian.org/guides/">the basic of Arquillian</a></li></ul><h3>Configuring Payara Managed Container Adapter</h3><p>Add arquillian-payara-server-managed dependency into your project.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt;<br>    &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-payara.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;<br>&lt;!-- Payara Server Container adaptor --&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-payara-server-managed&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-payara.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>Create a container configuration in the <em>arquillian.xml</em> file.</p><pre>&lt;container qualifier=&quot;payara-managed&quot;&gt;<br>    &lt;configuration&gt;<br>        &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt;<br>        &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt;<br>        &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt;<br>        &lt;property name=&quot;enableH2&quot;&gt;${enableDerby:true}&lt;/property&gt;<br>        &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt;<br>    &lt;/configuration&gt;<br>&lt;/container&gt;</pre><p>Configure maven-dependency-plugin to download a copy of Payara distribution, and use it to run your tests. This is a great option to run the tests continuously in your CI servers.</p><pre>&lt;plugin&gt;<br>    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br>    &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt;<br>    &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt;<br>    &lt;executions&gt;<br>        &lt;execution&gt;<br>            &lt;id&gt;unpack&lt;/id&gt;<br>            &lt;phase&gt;pre-integration-test&lt;/phase&gt;<br>            &lt;goals&gt;<br>                &lt;goal&gt;unpack&lt;/goal&gt;<br>            &lt;/goals&gt;<br>            &lt;configuration&gt;<br>                &lt;artifactItems&gt;<br>                    &lt;artifactItem&gt;<br>                        &lt;groupId&gt;fish.payara.distributions&lt;/groupId&gt;<br>                        &lt;artifactId&gt;payara&lt;/artifactId&gt;<br>                        &lt;version&gt;${payara.version}&lt;/version&gt;<br>                        &lt;type&gt;zip&lt;/type&gt;<br>                        &lt;overWrite&gt;false&lt;/overWrite&gt;<br>                        &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt;<br>                    &lt;/artifactItem&gt;<br>                &lt;/artifactItems&gt;<br>            &lt;/configuration&gt;<br>        &lt;/execution&gt;<br>    &lt;/executions&gt;<br>&lt;/plugin&gt;<br>&lt;plugin&gt;<br>    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br>    &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;<br>    &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt;<br>    &lt;configuration&gt;<br>        &lt;systemPropertyVariables&gt;<br>            &lt;payara.home&gt;${project.build.directory}/payara6&lt;/payara.home&gt;<br>            &lt;arquillian.launch&gt;payara-managed&lt;/arquillian.launch&gt;<br>        &lt;/systemPropertyVariables&gt;<br>    &lt;/configuration&gt;<br>&lt;/plugin&gt;</pre><p>Run the following command to run the tests.</p><pre>mvn clean verify -Parq-payara-managed</pre><p>In this case, Arquillian is responsible for starting and stopping the Payara container.</p><h3>Configuring Payara Remote Container Adapter</h3><p>With Arquillian Payara remote container, you can run the tests against a running Payara server, esp. it is running on a different host.</p><p>Adding the following arquillian-payara-server-remote dependency instead.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt;<br>    &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-payara.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-payara-server-remote&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-payara.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>And add a <em>container</em> section in the <em>arquillian.xml</em> file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value.</p><pre>&lt;container qualifier=&quot;payara-remote&quot;&gt;<br>        &lt;configuration&gt;<br>            &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt;<br>            &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt;<br>            &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt;<br>            &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt;<br>            &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt;<br>            &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt;<br>            &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt;<br>            &lt;!-- default is empty --&gt;<br>            &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt;<br>        &lt;/configuration&gt;<br>    &lt;/container&gt;</pre><p>Before executing the tests, make sure the target Payara server is running.</p><p>Run the following command to run tests against the running Payara server.</p><pre>mvn clean verfiy -Parq-payara-managed</pre><h3>Configuring Payara Embedded Container Adapter</h3><p>With the Payara embedded container adapter, you can run tests on an embedded Payara server.</p><p>Add the following dependency into your project.</p><pre>&lt;dependency&gt;<br>     &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt;<br>     &lt;artifactId&gt;payara-embedded-all&lt;/artifactId&gt;<br>     &lt;version&gt;${payara.version}&lt;/version&gt;<br>     &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-payara-server-embedded&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-payara.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>Then run the following command to run tests.</p><pre>mvn clean verfiy -Parq-payara-embdded</pre><h3>Configuring Payara Micro Managed Container Adapter</h3><p>With the Payara Micro managed container adapter, you can run tests on an Payara Micro fat JAR.</p><p>Add the following dependency into your project.</p><pre>&lt;dependency&gt;<br>      &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt;<br>      &lt;artifactId&gt;payara-client-ee9&lt;/artifactId&gt;<br>      &lt;version&gt;${arquillian-payara.version}&lt;/version&gt;<br>      &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><pre>&lt;!-- Payara Micro Managed Container Adaptor --&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;fish.payara.arquillian&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-payara-micro-managed&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-payara.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>Download a copy of Payara Micro via maven dependency plugin, and set a system property payara.microJar to point to the location of the downloaded Payara Micro JAR.</p><pre>&lt;plugin&gt;<br>    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br>    &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt;<br>    &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt;<br>    &lt;executions&gt;<br>        &lt;execution&gt;<br>            &lt;id&gt;unpack&lt;/id&gt;<br>            &lt;phase&gt;pre-integration-test&lt;/phase&gt;<br>            &lt;goals&gt;<br>                &lt;goal&gt;copy&lt;/goal&gt;<br>            &lt;/goals&gt;<br>            &lt;configuration&gt;<br>                &lt;artifactItems&gt;<br>                    &lt;artifactItem&gt;<br>                        &lt;groupId&gt;fish.payara.extras&lt;/groupId&gt;<br>                        &lt;artifactId&gt;payara-micro&lt;/artifactId&gt;<br>                        &lt;version&gt;${payara.version}&lt;/version&gt;<br>                        &lt;type&gt;jar&lt;/type&gt;<br>                        &lt;overWrite&gt;false&lt;/overWrite&gt;<br>                        &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt;<br>                        &lt;destFileName&gt;payara-micro.jar&lt;/destFileName&gt;<br>                    &lt;/artifactItem&gt;<br>                &lt;/artifactItems&gt;<br>            &lt;/configuration&gt;<br>        &lt;/execution&gt;<br>    &lt;/executions&gt;<br>&lt;/plugin&gt;<br>&lt;plugin&gt;<br>    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br>    &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;<br>    &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt;<br>    &lt;configuration&gt;<br>        &lt;systemPropertyVariables&gt;<br>            &lt;payara.microJar&gt;${project.build.directory}/payara-micro.jar&lt;/payara.microJar&gt;<br>        &lt;/systemPropertyVariables&gt;<br>    &lt;/configuration&gt;<br>&lt;/plugin&gt;</pre><p>Then run the following command to run tests.</p><pre>mvn clean verfiy -Parq-payara-micro</pre><p>Get <a href="https://github.com/hantsy/jakartaee9-starter-boilerplate">the source codes from my Github</a>.</p><img src="https://medium.com/_/stat?event=post.clientViewed&referrerSource=full_rss&postId=52fd153d8d9" width="1" height="1" alt="">
+
+  </article>
+
+  
+
+</div>
+
+  </div>
+
+  <!-- Footer -->
+
+  
+<footer class="fixed-bottom">
+  <div class="container mt-0">
+    &copy; Copyright 2022 Hantsy  Bai.
+    <span class="mr-auto"></span>
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+
+    
+    
+
+  </div>
+</footer>
+
+
+
+</body>
+
+<!-- Bootsrap & MDB scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js" integrity="sha512-eUQ9hGdLjBjY3F41CScH3UX+4JDSI9zXeroz7hJ+RteoCaY+GP/LDoM8AO+Pt+DRFw3nXqsjh9Zsts8hnYv8/A==" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js" integrity="sha512-Mug9KHKmroQFMLm93zGrjhibM2z2Obg9l6qFG2qKjXEXkMp/VDkI4uju9m4QKPjWSwQ6O2qzZEnJDEeCw0Blcw==" crossorigin="anonymous"></script>
+
+
+<!-- Mansory & imagesLoaded -->
+<script defer src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script defer src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script defer src="/assets/js/mansory.js" type="text/javascript"></script>
+
+
+
+
+
+<!-- Load Common JS -->
+<script src="/assets/js/common.js"></script>
+
+
+</html>

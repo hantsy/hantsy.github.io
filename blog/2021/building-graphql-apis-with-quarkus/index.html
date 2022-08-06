@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  Hantsy
+  
+  Bai
+  
+  
+  | Building GraphQL APIs with Quarkus
+  
+</title>
+<meta name="description" content="My personal website focusing on Java EE/Jakarta EE and Spring.
+">
+
+<!-- Open Graph -->
+
+
+<!-- Bootstrap & MDB -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css"
+  integrity="sha512-RO38pBRxYH3SoOprtPTD86JFOclM51/XTIdEPh5j8sj4tp8jmQIx26twG52UaLi//hQldfrh7e51WzP9wuP32Q==" crossorigin="anonymous" />
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.0/css/academicons.min.css"
+  integrity="sha512-W4yqoT1+8NLkinBLBZko+dFB2ZbHsYLDdr50VElllRcNt2Q4/GSs6u71UHKxB7S6JEMCp5Ve4xjh3eGQl/HRvg==" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+
+<!-- Code Syntax Highlighting -->
+<link rel="stylesheet"
+  href="https://gitcdn.link/repo/jwarby/jekyll-pygments-themes/master/github.css" />
+
+<!-- Styles -->
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<link rel="canonical" href="/blog/2021/building-graphql-apis-with-quarkus/">
+
+<!-- JQuery -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+
+<!-- Theming-->
+
+<script src="/assets/js/theme.js"></script>
+<!-- Load DarkMode JS -->
+<script src="/assets/js/dark_mode.js"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-18SZ2W3GXD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-18SZ2W3GXD');
+</script>
+
+
+
+
+  
+<!-- MathJax -->
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+<script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"></script>
+<script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="blank" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Building GraphQL APIs with Quarkus" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="GraphQL is used as an alternative of REST to build Web APIs and becomes more and more popular in these days. What is GraphQL? The initial GraphQL protocol is created by Facebook, and now it is maintained by the GraphQL Foundation. From the home page of the official GraphQL website, GraphQL was described as: GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools. Go to the GraphQL Code page, it lists the current GraphQL tools and libraries implemented in different languages. The latest Quarkus adds an extra MicroProfile GraphQL implementation (via SmallRye GraphQL) to replace the original Vertx implementation. In this post, we will create a Quarkus project and experience this built-in GraphQL feature. Generating Project Skeleton Open your browser, navigate to Quarkus Code page, add SmallRye GraphQL into the project dependencies, then hit the Generate your application to generate the project skeleton. Download the generated archive and extract the files in your disc, and import the project into your IDE. For the existing Quarkus project, open a terminal and switch to the project root folder, and run the following command to add SmallRye GraphQL extension. mvn quarkus:add-extension -Dextensions=&quot;smallrye-graphql&quot; Finally, you will find the following dependency is added in the pom.xml file. &lt;dependency&gt; &lt;groupId&gt;io.quarkus&lt;/groupId&gt; &lt;artifactId&gt;quarkus-smallrye-graphql&lt;/artifactId&gt;&lt;/dependency&gt; Next, let’s cook the GraphQL API. Similar to building RESTful APIs, there are two principles to choose, code first or schema first. SmallRye GraphQL follows the code first principle and generate the GraphQL schema from codes at runtime. Declaring GraphQL API Create a class and add a @GraphQLApi annotation on the class to declare the GraphQL API. @GraphQLApi@RequiredArgsConstructorpublic class GraphQLResource { final PostService postService; @Query @Description(&quot;Get all posts&quot;) public List&lt;Post&gt; getAllPosts() { return this.postService.getAllPosts(); } @Query @Description(&quot;Get a specific post by providing an id&quot;) public Optional&lt;Post&gt; getPostById(@Name(&quot;postId&quot;) String id) { return this.postService.getPostById(id); } @Mutation @Description(&quot;Create a new post&quot;) public Post createPost(@Valid CreatePost createPostInput) { return this.postService.createPost(createPostInput); }} In the above code snippets, @RequiredArgsConstructor is a Lombok annotation(do not forget add org.projectlombok:lombok into your dependencies). The PostService is a CDI bean to handle the certain business logic. The @Query defines a query operation, Post is mapped to a GraphQL ObjectType, @Name(&quot;postId&quot;) defines the name of a GraphQL Argument, and @Mutation is a mutation operation, CreatePost is mapped to a GraphQL Input type. More about the concept of GraphQL, such as Query, Mutation, Object Type, and Input Type, please refer to the GraphQL Learn page. Let’s have a look at the content of Post, Comment, and CreatePost. @Data@Builder@ToString@Type@NoArgsConstructor@AllArgsConstructorpublic class Post { @Id String id; String title; String content; int countOfComments; @Builder.Default List&lt;Comment&gt; comments = new ArrayList&lt;&gt;();} @Data@Builder@Type@NoArgsConstructor@AllArgsConstructorpublic class Comment { @Id String id; String content;} @Data@Builder@NoArgsConstructor@AllArgsConstructor@Inputpublic class CreatePost { String title; String content;} Note there are two annotations: @Type and @Input are added on the classes. Other annotations are from Lombok. Let’s move on to the PostService class. @ApplicationScopedpublic class PostService { static List&lt;Post&gt; STORE = new ArrayList&lt;&gt;(); public void init(List&lt;Post&gt; data) { STORE.clear(); STORE.addAll(data); } List&lt;Post&gt; getAllPosts() { return STORE; } Optional&lt;Post&gt; getPostById(String id) { return STORE.stream().filter(p -&gt; p.id.equals(id)).findFirst(); } Post createPost(CreatePost postInput) { var data = Post.builder().id(UUID.randomUUID().toString()) .title(postInput.title) .content(postInput.content) .build(); STORE.add(data); return data; }} It is a dummy implementation to erase the backend database requirements. You can simply replace it with the codes accessing the real database. Running Application Before running the application, let’s add some sample data. Create a CDI bean to observe the StartupEvent event, it will be executed when the application is already started. @ApplicationScoped@RequiredArgsConstructorpublic class DataInitializer { public static final Logger LOGGER = Logger.getLogger(DataInitializer.class.getName()); // final PostService postService; // public void onStartup(@Observes StartupEvent e) { var initData = IntStream.range(1, 5).mapToObj( i -&gt; { var comments = IntStream.range(1, new Random().nextInt(5)+1).mapToObj(c -&gt; Comment.builder().id(UUID.randomUUID().toString()).content(&quot;comment #&quot; + c).build()) .toList(); var data = Post.builder().title(&quot;title #&quot; + i) .id(UUID.randomUUID().toString()) .content(&quot;test content of #&quot; + i) .comments(comments) .build(); return data; } ).toList(); this.postService.init(initData); this.postService.getAllPosts() .forEach(p -&gt; LOGGER.log(Level.INFO, &quot;post data : {0}&quot;, p)); }} Open a terminal, and run mvn quarkus:dev in the project root folder. 2021-06-01 18:10:27,726 INFO [io.quarkus] (Quarkus Main Thread) quarkus-examples-graphql 1.0.0-SNAPSHOT on JVM (powered by Quarkus 2.0.0.CR2) started in 5.654s. Listening on: http://localhost:80802021-06-01 18:10:27,727 INFO [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.2021-06-01 18:10:27,728 INFO [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, hibernate-validator, resteasy, smallrye-context-propagation, smallrye-graphql] --Tests paused, press [r] to resume When the application is started, then open a browser and navigate to the Dev UI. There is a SmallRye GraphQL card for our application. The GraphQL Schema is the generated schema definition. And the GraphQL UI is the an interactive UI for developers to test the GraphQL operations directly. Click the GraphQL UI to open the Graph UI page. Try to perform an allPosts query and click the execute button, you will will the following page. To get a post by ID, try the following query instead, it requires an extra argument. Set the postId variable in the Query variables input box, it is JSON format. If the postId is a non-existing id, it will return a null result like this. { &quot;data&quot;:{ &quot;postById&quot;:null }} You can define a custom Exception and convert it into a GraphQL error. Exception Handling Create a PostNotFoundException. import io.smallrye.graphql.api.ErrorCode; @ErrorCode(&quot;POST_NOT_FOUND&quot;)public class PostNotFoundException extends RuntimeException{ public PostNotFoundException(String id) { super(&quot;Post: &quot;+ id +&quot; was not found.&quot;); }} And add the following configuration in the application.properties. mp.graphql.showErrorMessage=com.example.demo.PostNotFoundExceptionsmallrye.graphql.errorExtensionFields=exception,classification,code,description,validationErrorType,queryPath Run the application again, and provide a non-existing post ID, then execute the query. As you see the errors is added into the query result, it includes the code and message you have defined in your exception class. Resolving Fields In our former example, a Post includes the comments fields directly, it is an eager approach. In a real world application, you could want to fetch data of the related comments on demand. When a comments field is set in the result field list of a query string, it could hit the backend database or retrieve from cache and return the result for the specified post ID. @GraphQLApi@RequiredArgsConstructorpublic class GraphQLResource { final PostService postService; public int comments(@Source Post post) { return postService.commentsByPostId(post.getId()); }} You can also apply the resolving rule on some virtual fields( here I mean those are not existed in the backend database and evaluated at runtime), there are some examples : // calculate the comments count of a specified postpublic int countOfComments(@Source Post post) { return ...} // retrieve the current user info from the GraphQL context // and determine if he/her has voted the current postpublic boolean voted(@Source Post post, @Context context) { return ...} Input Validation You can apply some bean validation annotations on the input type to check if it satisfies your requirements. public class CreatePost { @NotEmpty//add hibernate-validator, else bean validation dose not work. @Length(min = 5) String title; String content;} And do not forget to add the hibernate-validator extension into the project deps. mvn quarkus:add-extension -Dextensions=&quot;hibernate-validator&quot; Run the application and have a try. Leave the title empty , hit the execute button, the validation exceptions are converted into GraphQL errors. In this post, we have not explored the Subscription type - the messaging contract in the GraphQL specification. We will discuss it in the further posts. Grab the source codes from my Github. &lt;hr&gt;&lt;p&gt;Building GraphQL APIs with Quarkus was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:description" content="GraphQL is used as an alternative of REST to build Web APIs and becomes more and more popular in these days. What is GraphQL? The initial GraphQL protocol is created by Facebook, and now it is maintained by the GraphQL Foundation. From the home page of the official GraphQL website, GraphQL was described as: GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools. Go to the GraphQL Code page, it lists the current GraphQL tools and libraries implemented in different languages. The latest Quarkus adds an extra MicroProfile GraphQL implementation (via SmallRye GraphQL) to replace the original Vertx implementation. In this post, we will create a Quarkus project and experience this built-in GraphQL feature. Generating Project Skeleton Open your browser, navigate to Quarkus Code page, add SmallRye GraphQL into the project dependencies, then hit the Generate your application to generate the project skeleton. Download the generated archive and extract the files in your disc, and import the project into your IDE. For the existing Quarkus project, open a terminal and switch to the project root folder, and run the following command to add SmallRye GraphQL extension. mvn quarkus:add-extension -Dextensions=&quot;smallrye-graphql&quot; Finally, you will find the following dependency is added in the pom.xml file. &lt;dependency&gt; &lt;groupId&gt;io.quarkus&lt;/groupId&gt; &lt;artifactId&gt;quarkus-smallrye-graphql&lt;/artifactId&gt;&lt;/dependency&gt; Next, let’s cook the GraphQL API. Similar to building RESTful APIs, there are two principles to choose, code first or schema first. SmallRye GraphQL follows the code first principle and generate the GraphQL schema from codes at runtime. Declaring GraphQL API Create a class and add a @GraphQLApi annotation on the class to declare the GraphQL API. @GraphQLApi@RequiredArgsConstructorpublic class GraphQLResource { final PostService postService; @Query @Description(&quot;Get all posts&quot;) public List&lt;Post&gt; getAllPosts() { return this.postService.getAllPosts(); } @Query @Description(&quot;Get a specific post by providing an id&quot;) public Optional&lt;Post&gt; getPostById(@Name(&quot;postId&quot;) String id) { return this.postService.getPostById(id); } @Mutation @Description(&quot;Create a new post&quot;) public Post createPost(@Valid CreatePost createPostInput) { return this.postService.createPost(createPostInput); }} In the above code snippets, @RequiredArgsConstructor is a Lombok annotation(do not forget add org.projectlombok:lombok into your dependencies). The PostService is a CDI bean to handle the certain business logic. The @Query defines a query operation, Post is mapped to a GraphQL ObjectType, @Name(&quot;postId&quot;) defines the name of a GraphQL Argument, and @Mutation is a mutation operation, CreatePost is mapped to a GraphQL Input type. More about the concept of GraphQL, such as Query, Mutation, Object Type, and Input Type, please refer to the GraphQL Learn page. Let’s have a look at the content of Post, Comment, and CreatePost. @Data@Builder@ToString@Type@NoArgsConstructor@AllArgsConstructorpublic class Post { @Id String id; String title; String content; int countOfComments; @Builder.Default List&lt;Comment&gt; comments = new ArrayList&lt;&gt;();} @Data@Builder@Type@NoArgsConstructor@AllArgsConstructorpublic class Comment { @Id String id; String content;} @Data@Builder@NoArgsConstructor@AllArgsConstructor@Inputpublic class CreatePost { String title; String content;} Note there are two annotations: @Type and @Input are added on the classes. Other annotations are from Lombok. Let’s move on to the PostService class. @ApplicationScopedpublic class PostService { static List&lt;Post&gt; STORE = new ArrayList&lt;&gt;(); public void init(List&lt;Post&gt; data) { STORE.clear(); STORE.addAll(data); } List&lt;Post&gt; getAllPosts() { return STORE; } Optional&lt;Post&gt; getPostById(String id) { return STORE.stream().filter(p -&gt; p.id.equals(id)).findFirst(); } Post createPost(CreatePost postInput) { var data = Post.builder().id(UUID.randomUUID().toString()) .title(postInput.title) .content(postInput.content) .build(); STORE.add(data); return data; }} It is a dummy implementation to erase the backend database requirements. You can simply replace it with the codes accessing the real database. Running Application Before running the application, let’s add some sample data. Create a CDI bean to observe the StartupEvent event, it will be executed when the application is already started. @ApplicationScoped@RequiredArgsConstructorpublic class DataInitializer { public static final Logger LOGGER = Logger.getLogger(DataInitializer.class.getName()); // final PostService postService; // public void onStartup(@Observes StartupEvent e) { var initData = IntStream.range(1, 5).mapToObj( i -&gt; { var comments = IntStream.range(1, new Random().nextInt(5)+1).mapToObj(c -&gt; Comment.builder().id(UUID.randomUUID().toString()).content(&quot;comment #&quot; + c).build()) .toList(); var data = Post.builder().title(&quot;title #&quot; + i) .id(UUID.randomUUID().toString()) .content(&quot;test content of #&quot; + i) .comments(comments) .build(); return data; } ).toList(); this.postService.init(initData); this.postService.getAllPosts() .forEach(p -&gt; LOGGER.log(Level.INFO, &quot;post data : {0}&quot;, p)); }} Open a terminal, and run mvn quarkus:dev in the project root folder. 2021-06-01 18:10:27,726 INFO [io.quarkus] (Quarkus Main Thread) quarkus-examples-graphql 1.0.0-SNAPSHOT on JVM (powered by Quarkus 2.0.0.CR2) started in 5.654s. Listening on: http://localhost:80802021-06-01 18:10:27,727 INFO [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.2021-06-01 18:10:27,728 INFO [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, hibernate-validator, resteasy, smallrye-context-propagation, smallrye-graphql] --Tests paused, press [r] to resume When the application is started, then open a browser and navigate to the Dev UI. There is a SmallRye GraphQL card for our application. The GraphQL Schema is the generated schema definition. And the GraphQL UI is the an interactive UI for developers to test the GraphQL operations directly. Click the GraphQL UI to open the Graph UI page. Try to perform an allPosts query and click the execute button, you will will the following page. To get a post by ID, try the following query instead, it requires an extra argument. Set the postId variable in the Query variables input box, it is JSON format. If the postId is a non-existing id, it will return a null result like this. { &quot;data&quot;:{ &quot;postById&quot;:null }} You can define a custom Exception and convert it into a GraphQL error. Exception Handling Create a PostNotFoundException. import io.smallrye.graphql.api.ErrorCode; @ErrorCode(&quot;POST_NOT_FOUND&quot;)public class PostNotFoundException extends RuntimeException{ public PostNotFoundException(String id) { super(&quot;Post: &quot;+ id +&quot; was not found.&quot;); }} And add the following configuration in the application.properties. mp.graphql.showErrorMessage=com.example.demo.PostNotFoundExceptionsmallrye.graphql.errorExtensionFields=exception,classification,code,description,validationErrorType,queryPath Run the application again, and provide a non-existing post ID, then execute the query. As you see the errors is added into the query result, it includes the code and message you have defined in your exception class. Resolving Fields In our former example, a Post includes the comments fields directly, it is an eager approach. In a real world application, you could want to fetch data of the related comments on demand. When a comments field is set in the result field list of a query string, it could hit the backend database or retrieve from cache and return the result for the specified post ID. @GraphQLApi@RequiredArgsConstructorpublic class GraphQLResource { final PostService postService; public int comments(@Source Post post) { return postService.commentsByPostId(post.getId()); }} You can also apply the resolving rule on some virtual fields( here I mean those are not existed in the backend database and evaluated at runtime), there are some examples : // calculate the comments count of a specified postpublic int countOfComments(@Source Post post) { return ...} // retrieve the current user info from the GraphQL context // and determine if he/her has voted the current postpublic boolean voted(@Source Post post, @Context context) { return ...} Input Validation You can apply some bean validation annotations on the input type to check if it satisfies your requirements. public class CreatePost { @NotEmpty//add hibernate-validator, else bean validation dose not work. @Length(min = 5) String title; String content;} And do not forget to add the hibernate-validator extension into the project deps. mvn quarkus:add-extension -Dextensions=&quot;hibernate-validator&quot; Run the application and have a try. Leave the title empty , hit the execute button, the validation exceptions are converted into GraphQL errors. In this post, we have not explored the Subscription type - the messaging contract in the GraphQL specification. We will discuss it in the further posts. Grab the source codes from my Github. &lt;hr&gt;&lt;p&gt;Building GraphQL APIs with Quarkus was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:site_name" content="blank" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Building GraphQL APIs with Quarkus" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2021-06-01T00:00:00+00:00","datePublished":"2021-06-01T00:00:00+00:00","description":"GraphQL is used as an alternative of REST to build Web APIs and becomes more and more popular in these days. What is GraphQL? The initial GraphQL protocol is created by Facebook, and now it is maintained by the GraphQL Foundation. From the home page of the official GraphQL website, GraphQL was described as: GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools. Go to the GraphQL Code page, it lists the current GraphQL tools and libraries implemented in different languages. The latest Quarkus adds an extra MicroProfile GraphQL implementation (via SmallRye GraphQL) to replace the original Vertx implementation. In this post, we will create a Quarkus project and experience this built-in GraphQL feature. Generating Project Skeleton Open your browser, navigate to Quarkus Code page, add SmallRye GraphQL into the project dependencies, then hit the Generate your application to generate the project skeleton. Download the generated archive and extract the files in your disc, and import the project into your IDE. For the existing Quarkus project, open a terminal and switch to the project root folder, and run the following command to add SmallRye GraphQL extension. mvn quarkus:add-extension -Dextensions=&quot;smallrye-graphql&quot; Finally, you will find the following dependency is added in the pom.xml file. &lt;dependency&gt; &lt;groupId&gt;io.quarkus&lt;/groupId&gt; &lt;artifactId&gt;quarkus-smallrye-graphql&lt;/artifactId&gt;&lt;/dependency&gt; Next, let’s cook the GraphQL API. Similar to building RESTful APIs, there are two principles to choose, code first or schema first. SmallRye GraphQL follows the code first principle and generate the GraphQL schema from codes at runtime. Declaring GraphQL API Create a class and add a @GraphQLApi annotation on the class to declare the GraphQL API. @GraphQLApi@RequiredArgsConstructorpublic class GraphQLResource { final PostService postService; @Query @Description(&quot;Get all posts&quot;) public List&lt;Post&gt; getAllPosts() { return this.postService.getAllPosts(); } @Query @Description(&quot;Get a specific post by providing an id&quot;) public Optional&lt;Post&gt; getPostById(@Name(&quot;postId&quot;) String id) { return this.postService.getPostById(id); } @Mutation @Description(&quot;Create a new post&quot;) public Post createPost(@Valid CreatePost createPostInput) { return this.postService.createPost(createPostInput); }} In the above code snippets, @RequiredArgsConstructor is a Lombok annotation(do not forget add org.projectlombok:lombok into your dependencies). The PostService is a CDI bean to handle the certain business logic. The @Query defines a query operation, Post is mapped to a GraphQL ObjectType, @Name(&quot;postId&quot;) defines the name of a GraphQL Argument, and @Mutation is a mutation operation, CreatePost is mapped to a GraphQL Input type. More about the concept of GraphQL, such as Query, Mutation, Object Type, and Input Type, please refer to the GraphQL Learn page. Let’s have a look at the content of Post, Comment, and CreatePost. @Data@Builder@ToString@Type@NoArgsConstructor@AllArgsConstructorpublic class Post { @Id String id; String title; String content; int countOfComments; @Builder.Default List&lt;Comment&gt; comments = new ArrayList&lt;&gt;();} @Data@Builder@Type@NoArgsConstructor@AllArgsConstructorpublic class Comment { @Id String id; String content;} @Data@Builder@NoArgsConstructor@AllArgsConstructor@Inputpublic class CreatePost { String title; String content;} Note there are two annotations: @Type and @Input are added on the classes. Other annotations are from Lombok. Let’s move on to the PostService class. @ApplicationScopedpublic class PostService { static List&lt;Post&gt; STORE = new ArrayList&lt;&gt;(); public void init(List&lt;Post&gt; data) { STORE.clear(); STORE.addAll(data); } List&lt;Post&gt; getAllPosts() { return STORE; } Optional&lt;Post&gt; getPostById(String id) { return STORE.stream().filter(p -&gt; p.id.equals(id)).findFirst(); } Post createPost(CreatePost postInput) { var data = Post.builder().id(UUID.randomUUID().toString()) .title(postInput.title) .content(postInput.content) .build(); STORE.add(data); return data; }} It is a dummy implementation to erase the backend database requirements. You can simply replace it with the codes accessing the real database. Running Application Before running the application, let’s add some sample data. Create a CDI bean to observe the StartupEvent event, it will be executed when the application is already started. @ApplicationScoped@RequiredArgsConstructorpublic class DataInitializer { public static final Logger LOGGER = Logger.getLogger(DataInitializer.class.getName()); // final PostService postService; // public void onStartup(@Observes StartupEvent e) { var initData = IntStream.range(1, 5).mapToObj( i -&gt; { var comments = IntStream.range(1, new Random().nextInt(5)+1).mapToObj(c -&gt; Comment.builder().id(UUID.randomUUID().toString()).content(&quot;comment #&quot; + c).build()) .toList(); var data = Post.builder().title(&quot;title #&quot; + i) .id(UUID.randomUUID().toString()) .content(&quot;test content of #&quot; + i) .comments(comments) .build(); return data; } ).toList(); this.postService.init(initData); this.postService.getAllPosts() .forEach(p -&gt; LOGGER.log(Level.INFO, &quot;post data : {0}&quot;, p)); }} Open a terminal, and run mvn quarkus:dev in the project root folder. 2021-06-01 18:10:27,726 INFO [io.quarkus] (Quarkus Main Thread) quarkus-examples-graphql 1.0.0-SNAPSHOT on JVM (powered by Quarkus 2.0.0.CR2) started in 5.654s. Listening on: http://localhost:80802021-06-01 18:10:27,727 INFO [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.2021-06-01 18:10:27,728 INFO [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, hibernate-validator, resteasy, smallrye-context-propagation, smallrye-graphql] --Tests paused, press [r] to resume When the application is started, then open a browser and navigate to the Dev UI. There is a SmallRye GraphQL card for our application. The GraphQL Schema is the generated schema definition. And the GraphQL UI is the an interactive UI for developers to test the GraphQL operations directly. Click the GraphQL UI to open the Graph UI page. Try to perform an allPosts query and click the execute button, you will will the following page. To get a post by ID, try the following query instead, it requires an extra argument. Set the postId variable in the Query variables input box, it is JSON format. If the postId is a non-existing id, it will return a null result like this. { &quot;data&quot;:{ &quot;postById&quot;:null }} You can define a custom Exception and convert it into a GraphQL error. Exception Handling Create a PostNotFoundException. import io.smallrye.graphql.api.ErrorCode; @ErrorCode(&quot;POST_NOT_FOUND&quot;)public class PostNotFoundException extends RuntimeException{ public PostNotFoundException(String id) { super(&quot;Post: &quot;+ id +&quot; was not found.&quot;); }} And add the following configuration in the application.properties. mp.graphql.showErrorMessage=com.example.demo.PostNotFoundExceptionsmallrye.graphql.errorExtensionFields=exception,classification,code,description,validationErrorType,queryPath Run the application again, and provide a non-existing post ID, then execute the query. As you see the errors is added into the query result, it includes the code and message you have defined in your exception class. Resolving Fields In our former example, a Post includes the comments fields directly, it is an eager approach. In a real world application, you could want to fetch data of the related comments on demand. When a comments field is set in the result field list of a query string, it could hit the backend database or retrieve from cache and return the result for the specified post ID. @GraphQLApi@RequiredArgsConstructorpublic class GraphQLResource { final PostService postService; public int comments(@Source Post post) { return postService.commentsByPostId(post.getId()); }} You can also apply the resolving rule on some virtual fields( here I mean those are not existed in the backend database and evaluated at runtime), there are some examples : // calculate the comments count of a specified postpublic int countOfComments(@Source Post post) { return ...} // retrieve the current user info from the GraphQL context // and determine if he/her has voted the current postpublic boolean voted(@Source Post post, @Context context) { return ...} Input Validation You can apply some bean validation annotations on the input type to check if it satisfies your requirements. public class CreatePost { @NotEmpty//add hibernate-validator, else bean validation dose not work. @Length(min = 5) String title; String content;} And do not forget to add the hibernate-validator extension into the project deps. mvn quarkus:add-extension -Dextensions=&quot;hibernate-validator&quot; Run the application and have a try. Leave the title empty , hit the execute button, the validation exceptions are converted into GraphQL errors. In this post, we have not explored the Subscription type - the messaging contract in the GraphQL specification. We will discuss it in the further posts. Grab the source codes from my Github. &lt;hr&gt;&lt;p&gt;Building GraphQL APIs with Quarkus was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;","headline":"Building GraphQL APIs with Quarkus","mainEntityOfPage":{"@type":"WebPage","@id":"/blog/2021/building-graphql-apis-with-quarkus/"},"url":"/blog/2021/building-graphql-apis-with-quarkus/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body
+  class="fixed-top-nav ">
+
+  <!-- Header -->
+
+  <header>
+
+    <!-- Nav Bar -->
+    <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+    <div class="container">
+      
+      <a class="navbar-brand title font-weight-lighter" href="/">
+       <span class="font-weight-bold">Hantsy</span>   Bai
+      </a>
+      
+      <!-- Navbar Toggle -->
+      <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar top-bar"></span>
+        <span class="icon-bar middle-bar"></span>
+        <span class="icon-bar bottom-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-nowrap">
+          <!-- About -->
+          <li class="nav-item ">
+            <a class="nav-link" href="/">
+              about
+              
+            </a>
+          </li>
+          
+          <!-- Blog -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/blog/">
+              blog
+              
+            </a>
+          </li>
+          
+          <!-- Other pages -->
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/projects/">
+                projects
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/publications/">
+                publications
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/service/">
+                service
+                
+              </a>
+          </li>
+          
+          
+          
+            <div class = "toggle-container">
+              <a id = "light-toggle">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+              </a>
+            </div>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+</header>
+
+
+  <!-- Content -->
+
+  <div class="container mt-5">
+    
+
+<div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Building GraphQL APIs with Quarkus</h1>
+    <p class="post-meta">June 1, 2021</p>
+  </header>
+
+  <article class="post-content">
+    <p><a href="https://graphql.org/">GraphQL</a> is used as an alternative of REST to build Web APIs and becomes more and more popular in these days.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/1*-fdiPOs2J-hfZZJxlMLvHw.jpeg" /></figure><h3>What is GraphQL?</h3><p>The initial GraphQL protocol is created by Facebook, and now it is maintained by the GraphQL Foundation. From the home page of the official GraphQL website, GraphQL was described as:</p><blockquote><em>GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.</em></blockquote><p>Go to the GraphQL <a href="https://graphql.org/code">Code</a> page, it lists the current GraphQL tools and libraries implemented in different languages.</p><p>The latest Quarkus adds an extra MicroProfile GraphQL implementation (via SmallRye GraphQL) to replace the original Vertx implementation.</p><p>In this post, we will create a Quarkus project and experience this built-in GraphQL feature.</p><h3>Generating Project Skeleton</h3><p>Open your browser, navigate to <a href="https://code.quarkus.io">Quarkus Code</a> page, add <em>SmallRye GraphQL</em> into the project dependencies, then hit the <em>Generate your application</em> to generate the project skeleton. Download the generated archive and extract the files in your disc, and import the project into your IDE.</p><p>For the existing Quarkus project, open a terminal and switch to the project root folder, and run the following command to add <em>SmallRye GraphQL</em> extension.</p><pre>mvn quarkus:add-extension -Dextensions=&quot;smallrye-graphql&quot;</pre><p>Finally, you will find the following dependency is added in the <em>pom.xml</em> file.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;<br>    &lt;artifactId&gt;quarkus-smallrye-graphql&lt;/artifactId&gt;<br>&lt;/dependency&gt;</pre><p>Next, let’s cook the GraphQL API.</p><p>Similar to building RESTful APIs, there are two principles to choose, <strong>code first</strong> or <strong>schema first</strong>.</p><p>SmallRye GraphQL follows the <strong>code first</strong> principle and generate the GraphQL schema from codes at runtime.</p><h3>Declaring GraphQL API</h3><p>Create a class and add a @GraphQLApi annotation on the class to declare the GraphQL API.</p><pre>@GraphQLApi<br>@RequiredArgsConstructor<br>public class GraphQLResource {<br>    final PostService postService;</pre><pre>    @Query<br>    @Description(&quot;Get all posts&quot;)<br>    public List&lt;Post&gt; getAllPosts() {<br>        return this.postService.getAllPosts();<br>    }</pre><pre>    @Query<br>    @Description(&quot;Get a specific post by providing an id&quot;)<br>    public Optional&lt;Post&gt; getPostById(@Name(&quot;postId&quot;) String id) {<br>        return this.postService.getPostById(id);<br>    }</pre><pre>    @Mutation<br>    @Description(&quot;Create a new post&quot;)<br>    public Post createPost(@Valid CreatePost createPostInput) {<br>        return this.postService.createPost(createPostInput);<br>    }<br>}</pre><p>In the above code snippets, @RequiredArgsConstructor is a <a href="https://projectlombok.org/">Lombok</a> annotation(do not forget add org.projectlombok:lombok into your dependencies).</p><p>The PostService is a CDI bean to handle the certain business logic.</p><p>The @Query defines a query operation, Post is mapped to a GraphQL <em>ObjectType</em>, @Name(&quot;postId&quot;) defines the name of a GraphQL <em>Argument</em>, and @Mutation is a mutation operation, CreatePost is mapped to a GraphQL <em>Input</em> type.</p><p>More about the concept of GraphQL, such as <em>Query</em>, <em>Mutation</em>, <em>Object Type</em>, and <em>Input Type</em>, please refer to the <a href="https://graphql.org/learn/">GraphQL Learn page</a>.</p><p>Let’s have a look at the content of Post, Comment, and CreatePost.</p><pre>@Data<br>@Builder<br>@ToString<br>@Type<br>@NoArgsConstructor<br>@AllArgsConstructor<br>public class Post {<br>    @Id<br>    String id;<br>    String title;<br>    String content;</pre><pre>    int countOfComments;</pre><pre>    @Builder.Default<br>    List&lt;Comment&gt; comments = new ArrayList&lt;&gt;();<br>}</pre><pre>@Data<br>@Builder<br>@Type<br>@NoArgsConstructor<br>@AllArgsConstructor<br>public class Comment {<br>    @Id<br>    String id;<br>    String content;<br>}<br></pre><pre>@Data<br>@Builder<br>@NoArgsConstructor<br>@AllArgsConstructor<br>@Input<br>public class CreatePost {<br>    String title;</pre><pre>    String content;<br>}</pre><p>Note there are two annotations: @Type and @Input are added on the classes. Other annotations are from Lombok.</p><p>Let’s move on to the PostService class.</p><pre>@ApplicationScoped<br>public class PostService {</pre><pre>    static List&lt;Post&gt; STORE = new ArrayList&lt;&gt;();</pre><pre>    public void init(List&lt;Post&gt; data) {<br>        STORE.clear();<br>        STORE.addAll(data);<br>    }</pre><pre>    List&lt;Post&gt; getAllPosts() {<br>        return STORE;<br>    }</pre><pre>    Optional&lt;Post&gt; getPostById(String id) {<br>        return STORE.stream().filter(p -&gt; p.id.equals(id)).findFirst();<br>    }</pre><pre>    Post createPost(CreatePost postInput) {<br>        var data = Post.builder().id(UUID.randomUUID().toString())<br>                .title(postInput.title)<br>                .content(postInput.content)<br>                .build();<br>        STORE.add(data);<br>        return data;<br>    }<br>}</pre><p>It is a dummy implementation to erase the backend database requirements. You can simply replace it with the codes accessing the real database.</p><h3>Running Application</h3><p>Before running the application, let’s add some sample data. Create a CDI bean to observe the StartupEvent event, it will be executed when the application is already started.</p><pre>@ApplicationScoped<br>@RequiredArgsConstructor<br>public class DataInitializer {<br>    public static final Logger LOGGER = Logger.getLogger(DataInitializer.class.getName());<br>    //<br>    final PostService postService;</pre><pre>    //<br>    public void onStartup(@Observes StartupEvent e) {</pre><pre>        var initData = IntStream.range(1, 5).mapToObj(<br>                i -&gt; {<br>                    var comments = IntStream.range(1, new Random().nextInt(5)+1).mapToObj(c -&gt; Comment.builder().id(UUID.randomUUID().toString()).content(&quot;comment #&quot; + c).build())<br>                            .toList();<br>                    var data = Post.builder().title(&quot;title #&quot; + i)<br>                            .id(UUID.randomUUID().toString())<br>                            .content(&quot;test content of #&quot; + i)<br>                            .comments(comments)<br>                            .build();<br>                    return data;<br>                }<br>        ).toList();</pre><pre>        this.postService.init(initData);</pre><pre>        this.postService.getAllPosts()<br>                .forEach(p -&gt; LOGGER.log(Level.INFO, &quot;post data : {0}&quot;, p));</pre><pre>    }<br>}</pre><p>Open a terminal, and run mvn quarkus:dev in the project root folder.</p><pre>2021-06-01 18:10:27,726 INFO  [io.quarkus] (Quarkus Main Thread) quarkus-examples-graphql 1.0.0-SNAPSHOT on JVM (powered by Quarkus 2.0.0.CR2) started in 5.654s. Listening on: <a href="http://l">http://l</a><br>ocalhost:8080<br>2021-06-01 18:10:27,727 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.<br>2021-06-01 18:10:27,728 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, hibernate-validator, resteasy, smallrye-context-propagation, smallrye-graphql]</pre><pre>--<br>Tests paused, press [r] to resume</pre><p>When the application is started, then open a browser and navigate to the <a href="http://localhost:8080/q/dev/">Dev UI</a>.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/0*yDcKylzwdwUP5svF.png" /></figure><p>There is a <strong>SmallRye GraphQL</strong> card for our application. The <em>GraphQL Schema</em> is the generated schema definition. And the <em>GraphQL UI</em> is the an interactive UI for developers to test the GraphQL operations directly.</p><p>Click the <em>GraphQL UI</em> to open the Graph UI page.</p><p>Try to perform an <em>allPosts</em> query and click the execute button, you will will the following page.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/0*Pk0ZGUmxCpmwc8ZT.png" /></figure><p>To get a post by ID, try the following query instead, it requires an extra argument. Set the postId variable in the <em>Query variables</em> input box, it is JSON format.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/0*jOf3BWIMA88xEnGT.png" /></figure><p>If the postId is a non-existing id, it will return a null result like this.</p><pre>{<br>    &quot;data&quot;:{<br>    	&quot;postById&quot;:null<br>	}<br>}</pre><p>You can define a custom Exception and convert it into a GraphQL error.</p><h3>Exception Handling</h3><p>Create a PostNotFoundException.</p><pre>import io.smallrye.graphql.api.ErrorCode;</pre><pre>@ErrorCode(&quot;POST_NOT_FOUND&quot;)<br>public class PostNotFoundException extends RuntimeException{</pre><pre>    public PostNotFoundException(String id) {<br>        super(&quot;Post: &quot;+ id +&quot; was not found.&quot;);<br>    }<br>}</pre><p>And add the following configuration in the <em>application.properties</em>.</p><pre>mp.graphql.showErrorMessage=com.example.demo.PostNotFoundException<br>smallrye.graphql.errorExtensionFields=exception,classification,code,description,validationErrorType,queryPath</pre><p>Run the application again, and provide a non-existing post ID, then execute the query. As you see the errors is added into the query result, it includes the code and message you have defined in your exception class.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/0*jlwaKY5PARWnrUMn.png" /></figure><h3>Resolving Fields</h3><p>In our former example, a Post includes the comments fields directly, it is an <em>eager</em> approach. In a real world application, you could want to fetch data of the related comments on demand. When a <em>comments</em> field is set in the result field list of a query string, it could hit the backend database or retrieve from cache and return the result for the specified post ID.</p><pre>@GraphQLApi<br>@RequiredArgsConstructor<br>public class GraphQLResource {<br>    final PostService postService;</pre><pre>    public int comments(@Source Post post) {<br>        return postService.commentsByPostId(post.getId());<br>    }<br>}</pre><p>You can also apply the resolving rule on some <em>virtual</em> fields( here I mean those are not existed in the backend database and evaluated at runtime), there are some examples :</p><pre>// calculate the comments count of a specified post<br>public int countOfComments(@Source Post post) {<br>     return ...<br>}</pre><pre>// retrieve the current user info from the GraphQL context <br>// and determine if he/her has voted the current post<br>public boolean voted(@Source Post post, @Context context) {<br>     return ...<br>}</pre><h3>Input Validation</h3><p>You can apply some bean validation annotations on the input type to check if it satisfies your requirements.</p><pre>public class CreatePost {</pre><pre>    @NotEmpty//add hibernate-validator, else bean validation dose not work.<br>    @Length(min = 5)<br>    String title;</pre><pre>    String content;<br>}</pre><p>And do not forget to add the hibernate-validator extension into the project deps.</p><pre>mvn quarkus:add-extension -Dextensions=&quot;hibernate-validator&quot;</pre><p>Run the application and have a try. Leave the <em>title</em> empty , hit the <em>execute</em> button, the validation exceptions are converted into GraphQL errors.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/0*hQrPD2svFxYJ4BKu.png" /></figure><p>In this post, we have not explored the Subscription type - the messaging contract in the GraphQL specification. We will discuss it in the further posts.</p><p><a href="https://github.com/hantsy/quarkus-sandbox/tree/master/graphql">Grab the source codes from my Github</a>.</p><img src="https://medium.com/_/stat?event=post.clientViewed&referrerSource=full_rss&postId=dbbf23f897df" width="1" height="1" alt=""><hr><p><a href="https://itnext.io/building-graphql-apis-with-quarkus-dbbf23f897df">Building GraphQL APIs with Quarkus</a> was originally published in <a href="https://itnext.io">ITNEXT</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+
+  </article>
+
+  
+
+</div>
+
+  </div>
+
+  <!-- Footer -->
+
+  
+<footer class="fixed-bottom">
+  <div class="container mt-0">
+    &copy; Copyright 2022 Hantsy  Bai.
+    <span class="mr-auto"></span>
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+
+    
+    
+
+  </div>
+</footer>
+
+
+
+</body>
+
+<!-- Bootsrap & MDB scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js" integrity="sha512-eUQ9hGdLjBjY3F41CScH3UX+4JDSI9zXeroz7hJ+RteoCaY+GP/LDoM8AO+Pt+DRFw3nXqsjh9Zsts8hnYv8/A==" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js" integrity="sha512-Mug9KHKmroQFMLm93zGrjhibM2z2Obg9l6qFG2qKjXEXkMp/VDkI4uju9m4QKPjWSwQ6O2qzZEnJDEeCw0Blcw==" crossorigin="anonymous"></script>
+
+
+<!-- Mansory & imagesLoaded -->
+<script defer src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script defer src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script defer src="/assets/js/mansory.js" type="text/javascript"></script>
+
+
+
+
+
+<!-- Load Common JS -->
+<script src="/assets/js/common.js"></script>
+
+
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  Hantsy
+  
+  Bai
+  
+  
+  | Testing Jakarta EE 9 Components With Arquillian and JBoss Weld
+  
+</title>
+<meta name="description" content="My personal website focusing on Java EE/Jakarta EE and Spring.
+">
+
+<!-- Open Graph -->
+
+
+<!-- Bootstrap & MDB -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css"
+  integrity="sha512-RO38pBRxYH3SoOprtPTD86JFOclM51/XTIdEPh5j8sj4tp8jmQIx26twG52UaLi//hQldfrh7e51WzP9wuP32Q==" crossorigin="anonymous" />
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.0/css/academicons.min.css"
+  integrity="sha512-W4yqoT1+8NLkinBLBZko+dFB2ZbHsYLDdr50VElllRcNt2Q4/GSs6u71UHKxB7S6JEMCp5Ve4xjh3eGQl/HRvg==" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+
+<!-- Code Syntax Highlighting -->
+<link rel="stylesheet"
+  href="https://gitcdn.link/repo/jwarby/jekyll-pygments-themes/master/github.css" />
+
+<!-- Styles -->
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<link rel="canonical" href="/blog/2020/testing-jakarta-ee-9-components-with-arquillian-and-jboss-weld/">
+
+<!-- JQuery -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+
+<!-- Theming-->
+
+<script src="/assets/js/theme.js"></script>
+<!-- Load DarkMode JS -->
+<script src="/assets/js/dark_mode.js"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-18SZ2W3GXD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-18SZ2W3GXD');
+</script>
+
+
+
+
+  
+<!-- MathJax -->
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+<script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"></script>
+<script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="blank" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Testing Jakarta EE 9 Components With Arquillian and JBoss Weld" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Arquillian (JBoss Arquillian) Core 1.7.0 added Jakarta EE 9 and the long-awaited JUnit 5 support. For impatient developers, you can try to run your Jakarta EE 9/JUnit 5 based Arquillian tests against Weld container, Glassfish v6 (both managed and remote) and Apache Tomcat 10 (for Jakarta Servlet 5.0). In this post, we will try to test the CDI components on the Weld container. Prerequisites Java 8 or Java 11 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Configuring Arquillian and JUnit 5 Add Junit 5 dependencies to your project pom.xml file. &lt;dependencyManagement&gt; &lt;dependencies&gt; ... &lt;dependency&gt; &lt;groupId&gt;org.junit&lt;/groupId&gt; &lt;artifactId&gt;junit-bom&lt;/artifactId&gt; &lt;version&gt;5.7.0&lt;/version&gt; &lt;type&gt;pom&lt;/type&gt; &lt;scope&gt;import&lt;/scope&gt; &lt;/dependency&gt; &lt;/dependencies&gt;&lt;/dependencyManagement&gt; &lt;dependencies&gt; ... &lt;dependency&gt; &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt; &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt;&lt;/dependencies&gt; Add the new Arquillian JUnit 5 integration dependency. ...&lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.junit5&lt;/groupId&gt; &lt;artifactId&gt;arquillian-junit5-container&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And switch to use the latest Jakarta Servlet 5.0 protocol. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.protocol&lt;/groupId&gt; &lt;artifactId&gt;arquillian-protocol-servlet-jakarta&lt;/artifactId&gt;&lt;/dependency&gt; Declare the version used in the properties section. &lt;arquillian-bom.version&gt;1.7.0.Alpha5&lt;/arquillian-bom.version&gt;&lt;junit-jupiter.version&gt;5.7.0&lt;/junit-jupiter.version&gt; By default, when arquillian-protocol-servlet-jakarta is ocurred in the classpath, the Servlet 5.0 protocol will be the default protocol, if you have declared the protocol in the existing arquillian.xml file, change it to use Servlet 5.0. &lt;arquillian xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://jboss.org/schema/arquillian&quot; xsi:schemaLocation=&quot;http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd&quot;&gt; &lt;defaultProtocol type=&quot;Servlet 5.0&quot;/&gt; &lt;/arquillian&gt; Configuring Arquillian Weld Container Add the newest arquillian-weld-embedded dependency into the project pom.xml file. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-weld-embedded&lt;/artifactId&gt; &lt;version&gt;${arquillian-weld-embedded.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And also add the weld runtime into dependencies. &lt;dependency&gt; &lt;groupId&gt;org.jboss.weld&lt;/groupId&gt; &lt;artifactId&gt;weld-core-impl&lt;/artifactId&gt; &lt;version&gt;${weld.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; In the Arquillian configuration file arquillian.xml, add a container specific configuration for Weld. &lt;container qualifier=&quot;arq-weld&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;enableConversationScope&quot;&gt;true&lt;/property&gt; &lt;property name=&quot;environment&quot;&gt;SE&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; The enableConversationScope property allows you decide if use @ConversationScope in the tests. And there are several environment available, check the source code of Environments. As a CDI container, we can not run all Jakarta EE compoennts with Weld, for example, the Jakarta Restul WebService resources. So let’s exclude the components that can not be run in the Weld containers, and focus on testing CDI components. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;arquillian.launch&gt;arq-weld&lt;/arquillian.launch&gt; &lt;/systemPropertyVariables&gt; &lt;excludes&gt; &lt;exclude&gt;**/it/GreetingResourceTest*&lt;/exclude&gt; &lt;/excludes&gt; &lt;/configuration&gt;&lt;/plugin&gt; In our sample project, there are two integration tests will be run on Arquillian containers, let’s exclude the GreetingResourceTest which is use to expose Restful APIs. The left is GreetingServiceTest, which is to test the functionality of a simple CDI bean GreetingService. @ExtendWith(ArquillianExtension.class)public class GreetingServiceTest { private final static Logger LOGGER = Logger.getLogger(GreetingServiceTest.class.getName()); @Deployment public static JavaArchive createDeployment() { return ShrinkWrap.create(JavaArchive.class) .addClass(GreetingMessage.class) .addClass(GreetingService.class) .addAsManifestResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;); } @Inject GreetingService service; @Test @DisplayName(&quot;testing buildGreetingMessage&quot;) public void should_create_greeting() { LOGGER.log(Level.INFO, &quot; Running test:: GreetingServiceTest#should_create_greeting ... &quot;); GreetingMessage message = service.buildGreetingMessage(&quot;Jakarta EE&quot;); assertTrue(message.getMessage().startsWith(&quot;Say Hello to Jakarta EE at &quot;), &quot;message should start with \&quot;Say Hello to Jakarta EE at \&quot;&quot;); }} In the above codes, The new @ExtendWith(ArquillianExtension.class) replaces the old @RunWith(Arquilian.class) in the Jakarta EE 8 version.The @Test annotation is from the org.junit.jupiter.api package which belongs to JUnit 5.The @DisplayName annotation allows IDEs or other tools to use a friendly describable text instead of the method name in the test reporting results.The @Deployment describes the assembly resources of the deployment archive for this test. Similar with general Jakarta EE components, you can use @Inject beans in Arquillian test classes. These two items are no difference from the Jakarta EE 8 starter. Running tests Open a terminal window, enter the project root folder, execute the following command. mvn clean verify -Parq-weld In the Jakarta EE 9 sample project, I usually use a Maven profile to organize the resources of testing against a Arquillian container. Here arq-weld profile is configured for Weld container. NOTE: In the real world application development, it is an excellent practice to use Maven profiles to categorize the configurations for different environments. You will see the following info in the console. INFO: Running test:: GreetingServiceTest#should_create_greeting ...[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.783 s - in com.example.it.GreetingServiceTest[INFO][INFO] Results:[INFO][INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0[INFO][INFO][INFO] --- maven-failsafe-plugin:3.0.0-M5:verify (integration-test) @ jakartaee9-starter-boilerplate ---[INFO] ------------------------------------------------------------------------[INFO] BUILD SUCCESS[INFO] ------------------------------------------------------------------------[INFO] Total time: 11.553 s[INFO] Finished at: 2020-11-30T19:17:50+08:00[INFO] ------------------------------------------------------------------------ &lt;hr&gt;&lt;p&gt;Testing Jakarta EE 9 Components With Arquillian and JBoss Weld was originally published in The Startup on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:description" content="Arquillian (JBoss Arquillian) Core 1.7.0 added Jakarta EE 9 and the long-awaited JUnit 5 support. For impatient developers, you can try to run your Jakarta EE 9/JUnit 5 based Arquillian tests against Weld container, Glassfish v6 (both managed and remote) and Apache Tomcat 10 (for Jakarta Servlet 5.0). In this post, we will try to test the CDI components on the Weld container. Prerequisites Java 8 or Java 11 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Configuring Arquillian and JUnit 5 Add Junit 5 dependencies to your project pom.xml file. &lt;dependencyManagement&gt; &lt;dependencies&gt; ... &lt;dependency&gt; &lt;groupId&gt;org.junit&lt;/groupId&gt; &lt;artifactId&gt;junit-bom&lt;/artifactId&gt; &lt;version&gt;5.7.0&lt;/version&gt; &lt;type&gt;pom&lt;/type&gt; &lt;scope&gt;import&lt;/scope&gt; &lt;/dependency&gt; &lt;/dependencies&gt;&lt;/dependencyManagement&gt; &lt;dependencies&gt; ... &lt;dependency&gt; &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt; &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt;&lt;/dependencies&gt; Add the new Arquillian JUnit 5 integration dependency. ...&lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.junit5&lt;/groupId&gt; &lt;artifactId&gt;arquillian-junit5-container&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And switch to use the latest Jakarta Servlet 5.0 protocol. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.protocol&lt;/groupId&gt; &lt;artifactId&gt;arquillian-protocol-servlet-jakarta&lt;/artifactId&gt;&lt;/dependency&gt; Declare the version used in the properties section. &lt;arquillian-bom.version&gt;1.7.0.Alpha5&lt;/arquillian-bom.version&gt;&lt;junit-jupiter.version&gt;5.7.0&lt;/junit-jupiter.version&gt; By default, when arquillian-protocol-servlet-jakarta is ocurred in the classpath, the Servlet 5.0 protocol will be the default protocol, if you have declared the protocol in the existing arquillian.xml file, change it to use Servlet 5.0. &lt;arquillian xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://jboss.org/schema/arquillian&quot; xsi:schemaLocation=&quot;http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd&quot;&gt; &lt;defaultProtocol type=&quot;Servlet 5.0&quot;/&gt; &lt;/arquillian&gt; Configuring Arquillian Weld Container Add the newest arquillian-weld-embedded dependency into the project pom.xml file. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-weld-embedded&lt;/artifactId&gt; &lt;version&gt;${arquillian-weld-embedded.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And also add the weld runtime into dependencies. &lt;dependency&gt; &lt;groupId&gt;org.jboss.weld&lt;/groupId&gt; &lt;artifactId&gt;weld-core-impl&lt;/artifactId&gt; &lt;version&gt;${weld.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; In the Arquillian configuration file arquillian.xml, add a container specific configuration for Weld. &lt;container qualifier=&quot;arq-weld&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;enableConversationScope&quot;&gt;true&lt;/property&gt; &lt;property name=&quot;environment&quot;&gt;SE&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; The enableConversationScope property allows you decide if use @ConversationScope in the tests. And there are several environment available, check the source code of Environments. As a CDI container, we can not run all Jakarta EE compoennts with Weld, for example, the Jakarta Restul WebService resources. So let’s exclude the components that can not be run in the Weld containers, and focus on testing CDI components. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;arquillian.launch&gt;arq-weld&lt;/arquillian.launch&gt; &lt;/systemPropertyVariables&gt; &lt;excludes&gt; &lt;exclude&gt;**/it/GreetingResourceTest*&lt;/exclude&gt; &lt;/excludes&gt; &lt;/configuration&gt;&lt;/plugin&gt; In our sample project, there are two integration tests will be run on Arquillian containers, let’s exclude the GreetingResourceTest which is use to expose Restful APIs. The left is GreetingServiceTest, which is to test the functionality of a simple CDI bean GreetingService. @ExtendWith(ArquillianExtension.class)public class GreetingServiceTest { private final static Logger LOGGER = Logger.getLogger(GreetingServiceTest.class.getName()); @Deployment public static JavaArchive createDeployment() { return ShrinkWrap.create(JavaArchive.class) .addClass(GreetingMessage.class) .addClass(GreetingService.class) .addAsManifestResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;); } @Inject GreetingService service; @Test @DisplayName(&quot;testing buildGreetingMessage&quot;) public void should_create_greeting() { LOGGER.log(Level.INFO, &quot; Running test:: GreetingServiceTest#should_create_greeting ... &quot;); GreetingMessage message = service.buildGreetingMessage(&quot;Jakarta EE&quot;); assertTrue(message.getMessage().startsWith(&quot;Say Hello to Jakarta EE at &quot;), &quot;message should start with \&quot;Say Hello to Jakarta EE at \&quot;&quot;); }} In the above codes, The new @ExtendWith(ArquillianExtension.class) replaces the old @RunWith(Arquilian.class) in the Jakarta EE 8 version.The @Test annotation is from the org.junit.jupiter.api package which belongs to JUnit 5.The @DisplayName annotation allows IDEs or other tools to use a friendly describable text instead of the method name in the test reporting results.The @Deployment describes the assembly resources of the deployment archive for this test. Similar with general Jakarta EE components, you can use @Inject beans in Arquillian test classes. These two items are no difference from the Jakarta EE 8 starter. Running tests Open a terminal window, enter the project root folder, execute the following command. mvn clean verify -Parq-weld In the Jakarta EE 9 sample project, I usually use a Maven profile to organize the resources of testing against a Arquillian container. Here arq-weld profile is configured for Weld container. NOTE: In the real world application development, it is an excellent practice to use Maven profiles to categorize the configurations for different environments. You will see the following info in the console. INFO: Running test:: GreetingServiceTest#should_create_greeting ...[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.783 s - in com.example.it.GreetingServiceTest[INFO][INFO] Results:[INFO][INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0[INFO][INFO][INFO] --- maven-failsafe-plugin:3.0.0-M5:verify (integration-test) @ jakartaee9-starter-boilerplate ---[INFO] ------------------------------------------------------------------------[INFO] BUILD SUCCESS[INFO] ------------------------------------------------------------------------[INFO] Total time: 11.553 s[INFO] Finished at: 2020-11-30T19:17:50+08:00[INFO] ------------------------------------------------------------------------ &lt;hr&gt;&lt;p&gt;Testing Jakarta EE 9 Components With Arquillian and JBoss Weld was originally published in The Startup on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:site_name" content="blank" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-04T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Testing Jakarta EE 9 Components With Arquillian and JBoss Weld" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2020-12-04T00:00:00+00:00","datePublished":"2020-12-04T00:00:00+00:00","description":"Arquillian (JBoss Arquillian) Core 1.7.0 added Jakarta EE 9 and the long-awaited JUnit 5 support. For impatient developers, you can try to run your Jakarta EE 9/JUnit 5 based Arquillian tests against Weld container, Glassfish v6 (both managed and remote) and Apache Tomcat 10 (for Jakarta Servlet 5.0). In this post, we will try to test the CDI components on the Weld container. Prerequisites Java 8 or Java 11 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Configuring Arquillian and JUnit 5 Add Junit 5 dependencies to your project pom.xml file. &lt;dependencyManagement&gt; &lt;dependencies&gt; ... &lt;dependency&gt; &lt;groupId&gt;org.junit&lt;/groupId&gt; &lt;artifactId&gt;junit-bom&lt;/artifactId&gt; &lt;version&gt;5.7.0&lt;/version&gt; &lt;type&gt;pom&lt;/type&gt; &lt;scope&gt;import&lt;/scope&gt; &lt;/dependency&gt; &lt;/dependencies&gt;&lt;/dependencyManagement&gt; &lt;dependencies&gt; ... &lt;dependency&gt; &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt; &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt; &lt;/dependency&gt;&lt;/dependencies&gt; Add the new Arquillian JUnit 5 integration dependency. ...&lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.junit5&lt;/groupId&gt; &lt;artifactId&gt;arquillian-junit5-container&lt;/artifactId&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And switch to use the latest Jakarta Servlet 5.0 protocol. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.protocol&lt;/groupId&gt; &lt;artifactId&gt;arquillian-protocol-servlet-jakarta&lt;/artifactId&gt;&lt;/dependency&gt; Declare the version used in the properties section. &lt;arquillian-bom.version&gt;1.7.0.Alpha5&lt;/arquillian-bom.version&gt;&lt;junit-jupiter.version&gt;5.7.0&lt;/junit-jupiter.version&gt; By default, when arquillian-protocol-servlet-jakarta is ocurred in the classpath, the Servlet 5.0 protocol will be the default protocol, if you have declared the protocol in the existing arquillian.xml file, change it to use Servlet 5.0. &lt;arquillian xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://jboss.org/schema/arquillian&quot; xsi:schemaLocation=&quot;http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd&quot;&gt; &lt;defaultProtocol type=&quot;Servlet 5.0&quot;/&gt; &lt;/arquillian&gt; Configuring Arquillian Weld Container Add the newest arquillian-weld-embedded dependency into the project pom.xml file. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-weld-embedded&lt;/artifactId&gt; &lt;version&gt;${arquillian-weld-embedded.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; And also add the weld runtime into dependencies. &lt;dependency&gt; &lt;groupId&gt;org.jboss.weld&lt;/groupId&gt; &lt;artifactId&gt;weld-core-impl&lt;/artifactId&gt; &lt;version&gt;${weld.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; In the Arquillian configuration file arquillian.xml, add a container specific configuration for Weld. &lt;container qualifier=&quot;arq-weld&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;enableConversationScope&quot;&gt;true&lt;/property&gt; &lt;property name=&quot;environment&quot;&gt;SE&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; The enableConversationScope property allows you decide if use @ConversationScope in the tests. And there are several environment available, check the source code of Environments. As a CDI container, we can not run all Jakarta EE compoennts with Weld, for example, the Jakarta Restul WebService resources. So let’s exclude the components that can not be run in the Weld containers, and focus on testing CDI components. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;systemPropertyVariables&gt; &lt;arquillian.launch&gt;arq-weld&lt;/arquillian.launch&gt; &lt;/systemPropertyVariables&gt; &lt;excludes&gt; &lt;exclude&gt;**/it/GreetingResourceTest*&lt;/exclude&gt; &lt;/excludes&gt; &lt;/configuration&gt;&lt;/plugin&gt; In our sample project, there are two integration tests will be run on Arquillian containers, let’s exclude the GreetingResourceTest which is use to expose Restful APIs. The left is GreetingServiceTest, which is to test the functionality of a simple CDI bean GreetingService. @ExtendWith(ArquillianExtension.class)public class GreetingServiceTest { private final static Logger LOGGER = Logger.getLogger(GreetingServiceTest.class.getName()); @Deployment public static JavaArchive createDeployment() { return ShrinkWrap.create(JavaArchive.class) .addClass(GreetingMessage.class) .addClass(GreetingService.class) .addAsManifestResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;); } @Inject GreetingService service; @Test @DisplayName(&quot;testing buildGreetingMessage&quot;) public void should_create_greeting() { LOGGER.log(Level.INFO, &quot; Running test:: GreetingServiceTest#should_create_greeting ... &quot;); GreetingMessage message = service.buildGreetingMessage(&quot;Jakarta EE&quot;); assertTrue(message.getMessage().startsWith(&quot;Say Hello to Jakarta EE at &quot;), &quot;message should start with \\&quot;Say Hello to Jakarta EE at \\&quot;&quot;); }} In the above codes, The new @ExtendWith(ArquillianExtension.class) replaces the old @RunWith(Arquilian.class) in the Jakarta EE 8 version.The @Test annotation is from the org.junit.jupiter.api package which belongs to JUnit 5.The @DisplayName annotation allows IDEs or other tools to use a friendly describable text instead of the method name in the test reporting results.The @Deployment describes the assembly resources of the deployment archive for this test. Similar with general Jakarta EE components, you can use @Inject beans in Arquillian test classes. These two items are no difference from the Jakarta EE 8 starter. Running tests Open a terminal window, enter the project root folder, execute the following command. mvn clean verify -Parq-weld In the Jakarta EE 9 sample project, I usually use a Maven profile to organize the resources of testing against a Arquillian container. Here arq-weld profile is configured for Weld container. NOTE: In the real world application development, it is an excellent practice to use Maven profiles to categorize the configurations for different environments. You will see the following info in the console. INFO: Running test:: GreetingServiceTest#should_create_greeting ...[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.783 s - in com.example.it.GreetingServiceTest[INFO][INFO] Results:[INFO][INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0[INFO][INFO][INFO] --- maven-failsafe-plugin:3.0.0-M5:verify (integration-test) @ jakartaee9-starter-boilerplate ---[INFO] ------------------------------------------------------------------------[INFO] BUILD SUCCESS[INFO] ------------------------------------------------------------------------[INFO] Total time: 11.553 s[INFO] Finished at: 2020-11-30T19:17:50+08:00[INFO] ------------------------------------------------------------------------ &lt;hr&gt;&lt;p&gt;Testing Jakarta EE 9 Components With Arquillian and JBoss Weld was originally published in The Startup on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;","headline":"Testing Jakarta EE 9 Components With Arquillian and JBoss Weld","mainEntityOfPage":{"@type":"WebPage","@id":"/blog/2020/testing-jakarta-ee-9-components-with-arquillian-and-jboss-weld/"},"url":"/blog/2020/testing-jakarta-ee-9-components-with-arquillian-and-jboss-weld/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body
+  class="fixed-top-nav ">
+
+  <!-- Header -->
+
+  <header>
+
+    <!-- Nav Bar -->
+    <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+    <div class="container">
+      
+      <a class="navbar-brand title font-weight-lighter" href="/">
+       <span class="font-weight-bold">Hantsy</span>   Bai
+      </a>
+      
+      <!-- Navbar Toggle -->
+      <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar top-bar"></span>
+        <span class="icon-bar middle-bar"></span>
+        <span class="icon-bar bottom-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-nowrap">
+          <!-- About -->
+          <li class="nav-item ">
+            <a class="nav-link" href="/">
+              about
+              
+            </a>
+          </li>
+          
+          <!-- Blog -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/blog/">
+              blog
+              
+            </a>
+          </li>
+          
+          <!-- Other pages -->
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/projects/">
+                projects
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/publications/">
+                publications
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/service/">
+                service
+                
+              </a>
+          </li>
+          
+          
+          
+            <div class = "toggle-container">
+              <a id = "light-toggle">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+              </a>
+            </div>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+</header>
+
+
+  <!-- Content -->
+
+  <div class="container mt-5">
+    
+
+<div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Testing Jakarta EE 9 Components With Arquillian and JBoss Weld</h1>
+    <p class="post-meta">December 4, 2020</p>
+  </header>
+
+  <article class="post-content">
+    <p><a href="http://www.arquillian.org">Arquillian</a> (JBoss Arquillian) Core 1.7.0 added Jakarta EE 9 and the long-awaited JUnit 5 support.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/1*XZgar-TMaqJ9r-ovXsLz_A.png" /></figure><p>For impatient developers, you can try to run your Jakarta EE 9/JUnit 5 based Arquillian tests against Weld container, Glassfish v6 (both managed and remote) and Apache Tomcat 10 (for Jakarta Servlet 5.0).</p><p>In this post, we will try to test the CDI components on the Weld container.</p><h3>Prerequisites</h3><ul><li>Java 8 or Java 11 (<a href="https://openjdk.java.net/install/">OpenJDK</a> or <a href="https://adoptopenjdk.net/installation.html">AdoptOpenJDK</a>)</li><li>The latest <a href="http://maven.apache.org/download.cgi">Apache Maven</a></li><li>The basic knowledge of <a href="https://junit.org/junit5/">JUnit 5</a></li><li>Get to know <a href="http://arquillian.org/guides/">the basic of Arquillian</a></li></ul><h3>Configuring Arquillian and JUnit 5</h3><p>Add Junit 5 dependencies to your project <em>pom.xml</em> file.</p><pre>&lt;dependencyManagement&gt;<br>    &lt;dependencies&gt;<br>        ...<br>        &lt;dependency&gt;<br>            &lt;groupId&gt;org.junit&lt;/groupId&gt;<br>            &lt;artifactId&gt;junit-bom&lt;/artifactId&gt;<br>            &lt;version&gt;5.7.0&lt;/version&gt;<br>            &lt;type&gt;pom&lt;/type&gt;<br>            &lt;scope&gt;import&lt;/scope&gt;<br>        &lt;/dependency&gt;<br>    &lt;/dependencies&gt;<br>&lt;/dependencyManagement&gt;</pre><pre>&lt;dependencies&gt;<br>    ...<br>    &lt;dependency&gt;<br>        &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;<br>        &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;<br>        &lt;scope&gt;test&lt;/scope&gt;<br>    &lt;/dependency&gt;<br>&lt;/dependencies&gt;</pre><p>Add the new Arquillian JUnit 5 integration dependency.</p><pre>...<br>&lt;dependency&gt;<br>    &lt;groupId&gt;org.jboss.arquillian.junit5&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-junit5-container&lt;/artifactId&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>And switch to use the latest Jakarta Servlet 5.0 protocol.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;org.jboss.arquillian.protocol&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-protocol-servlet-jakarta&lt;/artifactId&gt;<br>&lt;/dependency&gt;</pre><p>Declare the version used in the <em>properties</em> section.</p><pre>&lt;arquillian-bom.version&gt;1.7.0.Alpha5&lt;/arquillian-bom.version&gt;<br>&lt;junit-jupiter.version&gt;5.7.0&lt;/junit-jupiter.version&gt;</pre><p>By default, when arquillian-protocol-servlet-jakarta is ocurred in the classpath, the <strong>Servlet 5.0</strong> protocol will be the default protocol, if you have declared the protocol in the existing <em>arquillian.xml</em> file, change it to use <strong>Servlet 5.0</strong>.</p><pre>&lt;arquillian xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://jboss.org/schema/arquillian&quot;<br>            xsi:schemaLocation=&quot;http://jboss.org/schema/arquillian<br>    http://jboss.org/schema/arquillian/arquillian_1_0.xsd&quot;&gt;<br>    &lt;defaultProtocol type=&quot;Servlet 5.0&quot;/&gt;<br>    <br>&lt;/arquillian&gt;</pre><h3>Configuring Arquillian Weld Container</h3><p>Add the newest arquillian-weld-embedded dependency into the project <em>pom.xml</em> file.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-weld-embedded&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-weld-embedded.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>And also add the weld runtime into dependencies.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;org.jboss.weld&lt;/groupId&gt;<br>    &lt;artifactId&gt;weld-core-impl&lt;/artifactId&gt;<br>    &lt;version&gt;${weld.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>In the Arquillian configuration file arquillian.xml, add a container specific configuration for Weld.</p><pre>&lt;container qualifier=&quot;arq-weld&quot;&gt;<br>    &lt;configuration&gt;<br>    &lt;property name=&quot;enableConversationScope&quot;&gt;true&lt;/property&gt;<br>    &lt;property name=&quot;environment&quot;&gt;SE&lt;/property&gt;<br>    &lt;/configuration&gt;<br>&lt;/container&gt;</pre><p>The enableConversationScope property allows you decide if use @ConversationScope in the tests. And there are several environment available, check the source code of <a href="https://github.com/weld/api/blob/master/weld-spi/src/main/java/org/jboss/weld/bootstrap/api/Environments.java">Environments</a>.</p><p>As a CDI container, we can not run all Jakarta EE compoennts with Weld, for example, the Jakarta Restul WebService resources.</p><p>So let’s exclude the components that can not be run in the Weld containers, and focus on testing CDI components.</p><pre>&lt;plugin&gt;<br>    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br>    &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;<br>    &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt;<br>    &lt;configuration&gt;<br>        &lt;systemPropertyVariables&gt;<br>        	&lt;arquillian.launch&gt;arq-weld&lt;/arquillian.launch&gt;<br>        &lt;/systemPropertyVariables&gt;<br>        &lt;excludes&gt;<br>        	&lt;exclude&gt;**/it/GreetingResourceTest*&lt;/exclude&gt;<br>        &lt;/excludes&gt;<br>    &lt;/configuration&gt;<br>&lt;/plugin&gt;</pre><p>In <a href="https://github.com/hantsy/jakartaee9-starter-boilerplate">our sample project</a>, there are two integration tests will be run on Arquillian containers, let’s exclude the GreetingResourceTest which is use to expose Restful APIs.</p><p>The left is GreetingServiceTest, which is to test the functionality of a simple CDI bean GreetingService.</p><pre>@ExtendWith(ArquillianExtension.class)<br>public class GreetingServiceTest {<br>    private final static Logger LOGGER = Logger.getLogger(GreetingServiceTest.class.getName());</pre><pre>    @Deployment<br>    public static JavaArchive createDeployment() {<br>        return ShrinkWrap.create(JavaArchive.class)<br>                .addClass(GreetingMessage.class)<br>                .addClass(GreetingService.class)<br>                .addAsManifestResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;);<br>    }</pre><pre>    @Inject<br>    GreetingService service;</pre><pre>    @Test<br>    @DisplayName(&quot;testing buildGreetingMessage&quot;)<br>    public void should_create_greeting() {<br>        LOGGER.log(Level.INFO, &quot; Running test:: GreetingServiceTest#should_create_greeting ... &quot;);<br>        GreetingMessage message = service.buildGreetingMessage(&quot;Jakarta EE&quot;);<br>        assertTrue(message.getMessage().startsWith(&quot;Say Hello to Jakarta EE at &quot;),<br>                &quot;message should start with \&quot;Say Hello to Jakarta EE at \&quot;&quot;);<br>    }<br>}</pre><p>In the above codes,</p><ul><li>The new @ExtendWith(ArquillianExtension.class) replaces the old @RunWith(Arquilian.class) in <a href="https://github.com/hantsy/jakartaee8-starter">the Jakarta EE 8 version</a>.</li><li>The @Test annotation is from the org.junit.jupiter.api package which belongs to JUnit 5.</li><li>The @DisplayName annotation allows IDEs or other tools to use a friendly describable text instead of the method name in the test reporting results.</li><li>The @Deployment describes the assembly resources of the deployment archive for this test. Similar with general Jakarta EE components, you can use @Inject beans in Arquillian test classes. These two items are no difference from <a href="https://github.com/hantsy/jakartaee8-starter">the Jakarta EE 8 starter</a>.</li></ul><h3>Running tests</h3><p>Open a terminal window, enter the project root folder, execute the following command.</p><pre>mvn clean verify -Parq-weld</pre><p>In <a href="https://github.com/hantsy/jakartaee9-starter-boilerplate">the Jakarta EE 9 sample project</a>, I usually use a Maven profile to organize the resources of testing against a Arquillian container. Here arq-weld profile is configured for Weld container.</p><blockquote><em>NOTE: In the real world application development, it is an excellent practice to use Maven profiles to categorize the configurations for different environments.</em></blockquote><p>You will see the following info in the console.</p><pre>INFO:  Running test:: GreetingServiceTest#should_create_greeting ...<br>[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.783 s - in com.example.it.GreetingServiceTest<br>[INFO]<br>[INFO] Results:<br>[INFO]<br>[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0<br>[INFO]<br>[INFO]<br>[INFO] --- maven-failsafe-plugin:3.0.0-M5:verify (integration-test) @ jakartaee9-starter-boilerplate ---<br>[INFO] ------------------------------------------------------------------------<br>[INFO] BUILD SUCCESS<br>[INFO] ------------------------------------------------------------------------<br>[INFO] Total time:  11.553 s<br>[INFO] Finished at: 2020-11-30T19:17:50+08:00<br>[INFO] ------------------------------------------------------------------------</pre><img src="https://medium.com/_/stat?event=post.clientViewed&referrerSource=full_rss&postId=f9e1add08895" width="1" height="1" alt=""><hr><p><a href="https://medium.com/swlh/testing-jakarta-ee-9-components-with-arquillian-and-weld-f9e1add08895">Testing Jakarta EE 9 Components With Arquillian and JBoss Weld</a> was originally published in <a href="https://medium.com/swlh">The Startup</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+
+  </article>
+
+  
+
+</div>
+
+  </div>
+
+  <!-- Footer -->
+
+  
+<footer class="fixed-bottom">
+  <div class="container mt-0">
+    &copy; Copyright 2022 Hantsy  Bai.
+    <span class="mr-auto"></span>
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+
+    
+    
+
+  </div>
+</footer>
+
+
+
+</body>
+
+<!-- Bootsrap & MDB scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js" integrity="sha512-eUQ9hGdLjBjY3F41CScH3UX+4JDSI9zXeroz7hJ+RteoCaY+GP/LDoM8AO+Pt+DRFw3nXqsjh9Zsts8hnYv8/A==" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js" integrity="sha512-Mug9KHKmroQFMLm93zGrjhibM2z2Obg9l6qFG2qKjXEXkMp/VDkI4uju9m4QKPjWSwQ6O2qzZEnJDEeCw0Blcw==" crossorigin="anonymous"></script>
+
+
+<!-- Mansory & imagesLoaded -->
+<script defer src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script defer src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script defer src="/assets/js/mansory.js" type="text/javascript"></script>
+
+
+
+
+
+<!-- Load Common JS -->
+<script src="/assets/js/common.js"></script>
+
+
+</html>

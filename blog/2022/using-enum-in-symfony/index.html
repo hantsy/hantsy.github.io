@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  Hantsy
+  
+  Bai
+  
+  
+  | Using Enum in Symfony
+  
+</title>
+<meta name="description" content="My personal website focusing on Java EE/Jakarta EE and Spring.
+">
+
+<!-- Open Graph -->
+
+
+<!-- Bootstrap & MDB -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css"
+  integrity="sha512-RO38pBRxYH3SoOprtPTD86JFOclM51/XTIdEPh5j8sj4tp8jmQIx26twG52UaLi//hQldfrh7e51WzP9wuP32Q==" crossorigin="anonymous" />
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.0/css/academicons.min.css"
+  integrity="sha512-W4yqoT1+8NLkinBLBZko+dFB2ZbHsYLDdr50VElllRcNt2Q4/GSs6u71UHKxB7S6JEMCp5Ve4xjh3eGQl/HRvg==" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+
+<!-- Code Syntax Highlighting -->
+<link rel="stylesheet"
+  href="https://gitcdn.link/repo/jwarby/jekyll-pygments-themes/master/github.css" />
+
+<!-- Styles -->
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<link rel="canonical" href="/blog/2022/using-enum-in-symfony/">
+
+<!-- JQuery -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+
+<!-- Theming-->
+
+<script src="/assets/js/theme.js"></script>
+<!-- Load DarkMode JS -->
+<script src="/assets/js/dark_mode.js"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-18SZ2W3GXD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-18SZ2W3GXD');
+</script>
+
+
+
+
+  
+<!-- MathJax -->
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+<script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"></script>
+<script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="blank" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Using Enum in Symfony" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="PHP 8.1 introduces the official Enum support. Doctrine brought Enum type support in its ORM framework, and Symfony added serialization and deserialization support of a Enum type. Photo by te chan on Unsplash It is time to migrate your projects to use PHP Enum if you are using 3rd-party enumeration solutions. To use PHP Enum, you have to upgrade to PHP 8.1, and set the PHP version to 8.1 in the project composer file. { //... &quot;require&quot;: { &quot;php&quot;: &quot;&gt;=8.1&quot;, //... }} Creating Enum Class For example, we will add a Status to the Post entity, and defined several fixed values of the post status. &lt;?php namespace App\Entity; enum Status: string{ case Draft = &quot;DRAFT&quot;; case PendingModerated = &quot;PENDING_MODERATED&quot;; case Published = &quot;PUBLISHED&quot;;} Here we use a string backed enum, add a field in the Post class. #[Column(type: &quot;string&quot;, enumType: Status::class)]private Status $status; Note, set the enumType as the Status class. It will store the status value as a string in the database tables. In the Post constructor, assign a default value to the status. public function __construct(){ $this-&gt;status = Status::Draft; //...} Now everything is ok. Creating HttpMethod When we setup the Route attribute on the Controller class, we use a literal value to set up the HTTP method. #[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])] For the methods value, there are only several options available to choose. Obviously, if introducing Enum, it will provide a type-safe way to setup the values and decrease the typo errors. Create an Enum named HttpMethod. &lt;?php namespace App\Annotation; enum HttpMethod{ case GET; case POST; case HEAD; case OPTIONS; case PATCH; case PUT; case DELETE;} Then refactor the Route attribute and create a series of attributes(Get, Post, Put, Delete, etc.) that are mapped to different HTTP methods. //file : src/Annotation/Get.php#[Attribute]class Get extends Route{ public function getMethods() { return [HttpMethod::GET-&gt;name]; } } //file : src/Annotation/Head.php#[Attribute]class Head extends Route{ public function getMethods() { return [HttpMethod::HEAD-&gt;name]; } } //file : src/Annotation/Options.php#[Attribute]class Options extends Route{ public function getMethods() { return [HttpMethod::OPTIONS-&gt;name]; } } //file : src/Annotation/Patch.php#[Attribute]class Patch extends Route{ public function getMethods() { return [HttpMethod::PATCH-&gt;name]; }} //file : src/Annotation/Post.php#[Attribute]class Post extends Route{ public function getMethods() { return [HttpMethod::POST-&gt;name]; }} //file : src/Annotation/Put.php#[Attribute]class Put extends Route{ public function getMethods() { return [HttpMethod::PUT-&gt;name]; }} //file : src/Annotation/Delete.php#[Attribute]class Delete extends Route{ public function getMethods() { return [HttpMethod::DELETE-&gt;name]; }} Now you can polish the PostController, use these attributes instead. As you see, the naming of the new attributes literally look more clear. #[Route(path: &quot;/posts&quot;, name: &quot;posts_&quot;)]class PostController extends AbstractController{ // constructor... // #[Route(path: &quot;&quot;, name: &quot;all&quot;, methods: [&quot;GET&quot;])] #[Get(path: &quot;&quot;, name: &quot;all&quot;)] public function all(#[QueryParam] string $keyword, #[QueryParam] int $offset = 0, #[QueryParam] int $limit = 20): Response { //... } // #[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])] #[Get(path: &quot;/{id}&quot;, name: &quot;byId&quot;)] public function getById(Uuid $id): Response { //... } //#[Route(path: &quot;&quot;, name: &quot;create&quot;, methods: [&quot;POST&quot;])] #[Post(path: &quot;&quot;, name: &quot;create&quot;)] public function create(#[Body] CreatePostDto $data): Response { //... } //#[Route(path: &quot;/{id}&quot;, name: &quot;update&quot;, methods: [&quot;PUT&quot;])] #[Put(path: &quot;/{id}&quot;, name: &quot;update&quot;)] public function update(Uuid $id, #[Body] UpdatePostDto $data): Response { //... } // #[Route(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;, methods: [&quot;PUT&quot;])] #[Put(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;)] public function updateStatus(Uuid $id, #[Body] UpdatePostStatusDto $data): Response { //... } //#[Route(path: &quot;/{id}&quot;, name: &quot;delete&quot;, methods: [&quot;DELETE&quot;])] #[Delete(path: &quot;/{id}&quot;, name: &quot;delete&quot;)] public function deleteById(Uuid $id): Response { //... } // comments sub resources. //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;, methods: [&quot;GET&quot;])] #[GET(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;)] public function getComments(Uuid $id): Response { //... } //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;, methods: [&quot;POST&quot;])] #[Post(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;)] public function addComment(Uuid $id, Request $request): Response { //... } } Run the application again to make sure it works. Get the source codes from my Github. BTW, I have updated my original Symfony posts into a step-by-step guide, read it online: https://hantsy.github.io/symfony-rest-sample/ &lt;hr&gt;&lt;p&gt;Using Enum in Symfony was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:description" content="PHP 8.1 introduces the official Enum support. Doctrine brought Enum type support in its ORM framework, and Symfony added serialization and deserialization support of a Enum type. Photo by te chan on Unsplash It is time to migrate your projects to use PHP Enum if you are using 3rd-party enumeration solutions. To use PHP Enum, you have to upgrade to PHP 8.1, and set the PHP version to 8.1 in the project composer file. { //... &quot;require&quot;: { &quot;php&quot;: &quot;&gt;=8.1&quot;, //... }} Creating Enum Class For example, we will add a Status to the Post entity, and defined several fixed values of the post status. &lt;?php namespace App\Entity; enum Status: string{ case Draft = &quot;DRAFT&quot;; case PendingModerated = &quot;PENDING_MODERATED&quot;; case Published = &quot;PUBLISHED&quot;;} Here we use a string backed enum, add a field in the Post class. #[Column(type: &quot;string&quot;, enumType: Status::class)]private Status $status; Note, set the enumType as the Status class. It will store the status value as a string in the database tables. In the Post constructor, assign a default value to the status. public function __construct(){ $this-&gt;status = Status::Draft; //...} Now everything is ok. Creating HttpMethod When we setup the Route attribute on the Controller class, we use a literal value to set up the HTTP method. #[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])] For the methods value, there are only several options available to choose. Obviously, if introducing Enum, it will provide a type-safe way to setup the values and decrease the typo errors. Create an Enum named HttpMethod. &lt;?php namespace App\Annotation; enum HttpMethod{ case GET; case POST; case HEAD; case OPTIONS; case PATCH; case PUT; case DELETE;} Then refactor the Route attribute and create a series of attributes(Get, Post, Put, Delete, etc.) that are mapped to different HTTP methods. //file : src/Annotation/Get.php#[Attribute]class Get extends Route{ public function getMethods() { return [HttpMethod::GET-&gt;name]; } } //file : src/Annotation/Head.php#[Attribute]class Head extends Route{ public function getMethods() { return [HttpMethod::HEAD-&gt;name]; } } //file : src/Annotation/Options.php#[Attribute]class Options extends Route{ public function getMethods() { return [HttpMethod::OPTIONS-&gt;name]; } } //file : src/Annotation/Patch.php#[Attribute]class Patch extends Route{ public function getMethods() { return [HttpMethod::PATCH-&gt;name]; }} //file : src/Annotation/Post.php#[Attribute]class Post extends Route{ public function getMethods() { return [HttpMethod::POST-&gt;name]; }} //file : src/Annotation/Put.php#[Attribute]class Put extends Route{ public function getMethods() { return [HttpMethod::PUT-&gt;name]; }} //file : src/Annotation/Delete.php#[Attribute]class Delete extends Route{ public function getMethods() { return [HttpMethod::DELETE-&gt;name]; }} Now you can polish the PostController, use these attributes instead. As you see, the naming of the new attributes literally look more clear. #[Route(path: &quot;/posts&quot;, name: &quot;posts_&quot;)]class PostController extends AbstractController{ // constructor... // #[Route(path: &quot;&quot;, name: &quot;all&quot;, methods: [&quot;GET&quot;])] #[Get(path: &quot;&quot;, name: &quot;all&quot;)] public function all(#[QueryParam] string $keyword, #[QueryParam] int $offset = 0, #[QueryParam] int $limit = 20): Response { //... } // #[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])] #[Get(path: &quot;/{id}&quot;, name: &quot;byId&quot;)] public function getById(Uuid $id): Response { //... } //#[Route(path: &quot;&quot;, name: &quot;create&quot;, methods: [&quot;POST&quot;])] #[Post(path: &quot;&quot;, name: &quot;create&quot;)] public function create(#[Body] CreatePostDto $data): Response { //... } //#[Route(path: &quot;/{id}&quot;, name: &quot;update&quot;, methods: [&quot;PUT&quot;])] #[Put(path: &quot;/{id}&quot;, name: &quot;update&quot;)] public function update(Uuid $id, #[Body] UpdatePostDto $data): Response { //... } // #[Route(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;, methods: [&quot;PUT&quot;])] #[Put(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;)] public function updateStatus(Uuid $id, #[Body] UpdatePostStatusDto $data): Response { //... } //#[Route(path: &quot;/{id}&quot;, name: &quot;delete&quot;, methods: [&quot;DELETE&quot;])] #[Delete(path: &quot;/{id}&quot;, name: &quot;delete&quot;)] public function deleteById(Uuid $id): Response { //... } // comments sub resources. //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;, methods: [&quot;GET&quot;])] #[GET(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;)] public function getComments(Uuid $id): Response { //... } //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;, methods: [&quot;POST&quot;])] #[Post(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;)] public function addComment(Uuid $id, Request $request): Response { //... } } Run the application again to make sure it works. Get the source codes from my Github. BTW, I have updated my original Symfony posts into a step-by-step guide, read it online: https://hantsy.github.io/symfony-rest-sample/ &lt;hr&gt;&lt;p&gt;Using Enum in Symfony was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:site_name" content="blank" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-02-27T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Using Enum in Symfony" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-02-27T00:00:00+00:00","datePublished":"2022-02-27T00:00:00+00:00","description":"PHP 8.1 introduces the official Enum support. Doctrine brought Enum type support in its ORM framework, and Symfony added serialization and deserialization support of a Enum type. Photo by te chan on Unsplash It is time to migrate your projects to use PHP Enum if you are using 3rd-party enumeration solutions. To use PHP Enum, you have to upgrade to PHP 8.1, and set the PHP version to 8.1 in the project composer file. { //... &quot;require&quot;: { &quot;php&quot;: &quot;&gt;=8.1&quot;, //... }} Creating Enum Class For example, we will add a Status to the Post entity, and defined several fixed values of the post status. &lt;?php namespace App\\Entity; enum Status: string{ case Draft = &quot;DRAFT&quot;; case PendingModerated = &quot;PENDING_MODERATED&quot;; case Published = &quot;PUBLISHED&quot;;} Here we use a string backed enum, add a field in the Post class. #[Column(type: &quot;string&quot;, enumType: Status::class)]private Status $status; Note, set the enumType as the Status class. It will store the status value as a string in the database tables. In the Post constructor, assign a default value to the status. public function __construct(){ $this-&gt;status = Status::Draft; //...} Now everything is ok. Creating HttpMethod When we setup the Route attribute on the Controller class, we use a literal value to set up the HTTP method. #[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])] For the methods value, there are only several options available to choose. Obviously, if introducing Enum, it will provide a type-safe way to setup the values and decrease the typo errors. Create an Enum named HttpMethod. &lt;?php namespace App\\Annotation; enum HttpMethod{ case GET; case POST; case HEAD; case OPTIONS; case PATCH; case PUT; case DELETE;} Then refactor the Route attribute and create a series of attributes(Get, Post, Put, Delete, etc.) that are mapped to different HTTP methods. //file : src/Annotation/Get.php#[Attribute]class Get extends Route{ public function getMethods() { return [HttpMethod::GET-&gt;name]; } } //file : src/Annotation/Head.php#[Attribute]class Head extends Route{ public function getMethods() { return [HttpMethod::HEAD-&gt;name]; } } //file : src/Annotation/Options.php#[Attribute]class Options extends Route{ public function getMethods() { return [HttpMethod::OPTIONS-&gt;name]; } } //file : src/Annotation/Patch.php#[Attribute]class Patch extends Route{ public function getMethods() { return [HttpMethod::PATCH-&gt;name]; }} //file : src/Annotation/Post.php#[Attribute]class Post extends Route{ public function getMethods() { return [HttpMethod::POST-&gt;name]; }} //file : src/Annotation/Put.php#[Attribute]class Put extends Route{ public function getMethods() { return [HttpMethod::PUT-&gt;name]; }} //file : src/Annotation/Delete.php#[Attribute]class Delete extends Route{ public function getMethods() { return [HttpMethod::DELETE-&gt;name]; }} Now you can polish the PostController, use these attributes instead. As you see, the naming of the new attributes literally look more clear. #[Route(path: &quot;/posts&quot;, name: &quot;posts_&quot;)]class PostController extends AbstractController{ // constructor... // #[Route(path: &quot;&quot;, name: &quot;all&quot;, methods: [&quot;GET&quot;])] #[Get(path: &quot;&quot;, name: &quot;all&quot;)] public function all(#[QueryParam] string $keyword, #[QueryParam] int $offset = 0, #[QueryParam] int $limit = 20): Response { //... } // #[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])] #[Get(path: &quot;/{id}&quot;, name: &quot;byId&quot;)] public function getById(Uuid $id): Response { //... } //#[Route(path: &quot;&quot;, name: &quot;create&quot;, methods: [&quot;POST&quot;])] #[Post(path: &quot;&quot;, name: &quot;create&quot;)] public function create(#[Body] CreatePostDto $data): Response { //... } //#[Route(path: &quot;/{id}&quot;, name: &quot;update&quot;, methods: [&quot;PUT&quot;])] #[Put(path: &quot;/{id}&quot;, name: &quot;update&quot;)] public function update(Uuid $id, #[Body] UpdatePostDto $data): Response { //... } // #[Route(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;, methods: [&quot;PUT&quot;])] #[Put(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;)] public function updateStatus(Uuid $id, #[Body] UpdatePostStatusDto $data): Response { //... } //#[Route(path: &quot;/{id}&quot;, name: &quot;delete&quot;, methods: [&quot;DELETE&quot;])] #[Delete(path: &quot;/{id}&quot;, name: &quot;delete&quot;)] public function deleteById(Uuid $id): Response { //... } // comments sub resources. //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;, methods: [&quot;GET&quot;])] #[GET(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;)] public function getComments(Uuid $id): Response { //... } //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;, methods: [&quot;POST&quot;])] #[Post(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;)] public function addComment(Uuid $id, Request $request): Response { //... } } Run the application again to make sure it works. Get the source codes from my Github. BTW, I have updated my original Symfony posts into a step-by-step guide, read it online: https://hantsy.github.io/symfony-rest-sample/ &lt;hr&gt;&lt;p&gt;Using Enum in Symfony was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;","headline":"Using Enum in Symfony","mainEntityOfPage":{"@type":"WebPage","@id":"/blog/2022/using-enum-in-symfony/"},"url":"/blog/2022/using-enum-in-symfony/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body
+  class="fixed-top-nav ">
+
+  <!-- Header -->
+
+  <header>
+
+    <!-- Nav Bar -->
+    <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+    <div class="container">
+      
+      <a class="navbar-brand title font-weight-lighter" href="/">
+       <span class="font-weight-bold">Hantsy</span>   Bai
+      </a>
+      
+      <!-- Navbar Toggle -->
+      <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar top-bar"></span>
+        <span class="icon-bar middle-bar"></span>
+        <span class="icon-bar bottom-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-nowrap">
+          <!-- About -->
+          <li class="nav-item ">
+            <a class="nav-link" href="/">
+              about
+              
+            </a>
+          </li>
+          
+          <!-- Blog -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/blog/">
+              blog
+              
+            </a>
+          </li>
+          
+          <!-- Other pages -->
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/projects/">
+                projects
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/publications/">
+                publications
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/service/">
+                service
+                
+              </a>
+          </li>
+          
+          
+          
+            <div class = "toggle-container">
+              <a id = "light-toggle">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+              </a>
+            </div>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+</header>
+
+
+  <!-- Content -->
+
+  <div class="container mt-5">
+    
+
+<div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Using Enum in Symfony</h1>
+    <p class="post-meta">February 27, 2022</p>
+  </header>
+
+  <article class="post-content">
+    <p>PHP 8.1 introduces the official <em>Enum</em> support. <a href="https://www.doctrine-project.org/2022/01/11/orm-2.11.html">Doctrine brought Enum type support in its ORM framework</a>, and <a href="https://symfony.com/blog/new-in-symfony-5-4-php-enumerations-support">Symfony added serialization and deserialization support of a Enum type</a>.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/1*zM0-IX7pIVhjXuP1aJtb4w.jpeg" /><figcaption>Photo by <a href="https://unsplash.com/@kakachen?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">te chan</a> on <a href="https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></figcaption></figure><p>It is time to migrate your projects to use PHP Enum if you are using 3rd-party enumeration solutions.</p><p>To use PHP <em>Enum</em>, you have to upgrade to PHP 8.1, and set the PHP version to 8.1 in the project composer file.</p><pre>{<br>    //...<br>    &quot;require&quot;: {<br>        &quot;php&quot;: &quot;&gt;=8.1&quot;,<br>        //...<br>    }<br>}</pre><h3>Creating Enum Class</h3><p>For example, we will add a Status to the Post entity, and defined several fixed values of the post status.</p><pre>&lt;?php</pre><pre>namespace App\Entity;</pre><pre>enum Status: string<br>{<br>    case Draft = &quot;DRAFT&quot;;<br>    case PendingModerated = &quot;PENDING_MODERATED&quot;;<br>    case Published = &quot;PUBLISHED&quot;;<br>}</pre><p>Here we use a <em>string</em> backed enum, add a field in the Post class.</p><pre>#[Column(type: &quot;string&quot;, enumType: Status::class)]<br>private Status $status;</pre><p>Note, set the <em>enumType</em> as the Status class. It will store the status value as a string in the database tables.</p><p>In the Post constructor, assign a default value to the status.</p><pre>public function __construct()<br>{<br>    $this-&gt;status = Status::Draft;<br>    //...<br>}</pre><p>Now everything is ok.</p><h3>Creating HttpMethod</h3><p>When we setup the Route attribute on the Controller class, we use a literal value to set up the HTTP method.</p><pre>#[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])]</pre><p>For the <em>methods</em> value, there are only several options available to choose. Obviously, if introducing <em>Enum</em>, it will provide a <em>type-safe</em> way to setup the values and decrease the typo errors.</p><p>Create an Enum named HttpMethod.</p><pre>&lt;?php</pre><pre>namespace App\Annotation;</pre><pre>enum HttpMethod<br>{<br>    case GET;<br>    case POST;<br>    case HEAD;<br>    case OPTIONS;<br>    case PATCH;<br>    case PUT;<br>    case DELETE;<br>}</pre><p>Then refactor the Route attribute and create a series of attributes(Get, Post, Put, Delete, etc.) that are mapped to different HTTP methods.</p><pre>//file : src/Annotation/Get.php<br>#[Attribute]<br>class Get extends Route<br>{<br>    public function getMethods()<br>    {<br>        return [HttpMethod::GET-&gt;name];<br>    }</pre><pre>}</pre><pre>//file : src/Annotation/Head.php<br>#[Attribute]<br>class Head extends Route<br>{<br>    public function getMethods()<br>    {<br>        return [HttpMethod::HEAD-&gt;name];<br>    }</pre><pre>}</pre><pre>//file : src/Annotation/Options.php<br>#[Attribute]<br>class Options extends Route<br>{<br>    public function getMethods()<br>    {<br>        return [HttpMethod::OPTIONS-&gt;name];<br>    }</pre><pre>}</pre><pre>//file : src/Annotation/Patch.php<br>#[Attribute]<br>class Patch extends Route<br>{<br>    public function getMethods()<br>    {<br>        return [HttpMethod::PATCH-&gt;name];<br>    }<br>}</pre><pre>//file : src/Annotation/Post.php<br>#[Attribute]<br>class Post extends Route<br>{<br>    public function getMethods()<br>    {<br>        return [HttpMethod::POST-&gt;name];<br>    }<br>}</pre><pre>//file : src/Annotation/Put.php<br>#[Attribute]<br>class Put extends Route<br>{<br>    public function getMethods()<br>    {<br>        return [HttpMethod::PUT-&gt;name];<br>    }<br>}</pre><pre>//file : src/Annotation/Delete.php<br>#[Attribute]<br>class Delete extends Route<br>{<br>    public function getMethods()<br>    {<br>        return [HttpMethod::DELETE-&gt;name];<br>    }<br>}</pre><p>Now you can polish the PostController, use these attributes instead. As you see, the naming of the new attributes literally look more clear.</p><pre>#[Route(path: &quot;/posts&quot;, name: &quot;posts_&quot;)]<br>class PostController extends AbstractController<br>{</pre><pre>    // constructor...</pre><pre>    // #[Route(path: &quot;&quot;, name: &quot;all&quot;, methods: [&quot;GET&quot;])]<br>    #[Get(path: &quot;&quot;, name: &quot;all&quot;)]<br>    public function all(#[QueryParam] string $keyword,<br>                        #[QueryParam] int $offset = 0,<br>                        #[QueryParam] int $limit = 20): Response<br>    {<br>        //...<br>    }</pre><pre>    // #[Route(path: &quot;/{id}&quot;, name: &quot;byId&quot;, methods: [&quot;GET&quot;])]<br>    #[Get(path: &quot;/{id}&quot;, name: &quot;byId&quot;)]<br>    public function getById(Uuid $id): Response<br>    {<br>       //...<br>    }</pre><pre>    //#[Route(path: &quot;&quot;, name: &quot;create&quot;, methods: [&quot;POST&quot;])]<br>    #[Post(path: &quot;&quot;, name: &quot;create&quot;)]<br>    public function create(#[Body] CreatePostDto $data): Response<br>    {<br>        //...<br>    }</pre><pre>    //#[Route(path: &quot;/{id}&quot;, name: &quot;update&quot;, methods: [&quot;PUT&quot;])]<br>    #[Put(path: &quot;/{id}&quot;, name: &quot;update&quot;)]<br>    public function update(Uuid $id, #[Body] UpdatePostDto $data): Response<br>    {<br>        //...<br>    }</pre><pre>    // #[Route(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;, methods: [&quot;PUT&quot;])]<br>    #[Put(path: &quot;/{id}/status&quot;, name: &quot;update_status&quot;)]<br>    public function updateStatus(Uuid $id, #[Body] UpdatePostStatusDto $data): Response<br>    {<br>       //...<br>    }</pre><pre>    //#[Route(path: &quot;/{id}&quot;, name: &quot;delete&quot;, methods: [&quot;DELETE&quot;])]<br>    #[Delete(path: &quot;/{id}&quot;, name: &quot;delete&quot;)]<br>    public function deleteById(Uuid $id): Response<br>    {<br>        //...<br>    }</pre><pre>    // comments sub resources.<br>    //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;, methods: [&quot;GET&quot;])]<br>    #[GET(path: &quot;/{id}/comments&quot;, name: &quot;commentByPostId&quot;)]<br>    public function getComments(Uuid $id): Response<br>    {<br>      //...<br>    }</pre><pre>    //#[Route(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;, methods: [&quot;POST&quot;])]<br>    #[Post(path: &quot;/{id}/comments&quot;, name: &quot;addComments&quot;)]<br>    public function addComment(Uuid $id, Request $request): Response<br>    {<br>		//...<br>    }</pre><pre>}</pre><p>Run the application again to make sure it works.</p><h4>Get <a href="https://github.com/hantsy/symfony-rest-sample">the source codes</a> from my Github.</h4><h4>BTW, I have updated my original Symfony posts into a step-by-step guide, read it online: <a href="https://hantsy.github.io/symfony-rest-sample/">https://hantsy.github.io/symfony-rest-sample/</a></h4><img src="https://medium.com/_/stat?event=post.clientViewed&referrerSource=full_rss&postId=8f32d9cfaa0f" width="1" height="1" alt=""><hr><p><a href="https://itnext.io/using-enum-in-symfony-8f32d9cfaa0f">Using Enum in Symfony</a> was originally published in <a href="https://itnext.io">ITNEXT</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+
+  </article>
+
+  
+
+</div>
+
+  </div>
+
+  <!-- Footer -->
+
+  
+<footer class="fixed-bottom">
+  <div class="container mt-0">
+    &copy; Copyright 2022 Hantsy  Bai.
+    <span class="mr-auto"></span>
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+
+    
+    
+
+  </div>
+</footer>
+
+
+
+</body>
+
+<!-- Bootsrap & MDB scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js" integrity="sha512-eUQ9hGdLjBjY3F41CScH3UX+4JDSI9zXeroz7hJ+RteoCaY+GP/LDoM8AO+Pt+DRFw3nXqsjh9Zsts8hnYv8/A==" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js" integrity="sha512-Mug9KHKmroQFMLm93zGrjhibM2z2Obg9l6qFG2qKjXEXkMp/VDkI4uju9m4QKPjWSwQ6O2qzZEnJDEeCw0Blcw==" crossorigin="anonymous"></script>
+
+
+<!-- Mansory & imagesLoaded -->
+<script defer src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script defer src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script defer src="/assets/js/mansory.js" type="text/javascript"></script>
+
+
+
+
+
+<!-- Load Common JS -->
+<script src="/assets/js/common.js"></script>
+
+
+</html>
