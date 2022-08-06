@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  Hantsy
+  
+  Bai
+  
+  
+  | Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6
+  
+</title>
+<meta name="description" content="My personal website focusing on Java EE/Jakarta EE and Spring.
+">
+
+<!-- Open Graph -->
+
+
+<!-- Bootstrap & MDB -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css"
+  integrity="sha512-RO38pBRxYH3SoOprtPTD86JFOclM51/XTIdEPh5j8sj4tp8jmQIx26twG52UaLi//hQldfrh7e51WzP9wuP32Q==" crossorigin="anonymous" />
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.0/css/academicons.min.css"
+  integrity="sha512-W4yqoT1+8NLkinBLBZko+dFB2ZbHsYLDdr50VElllRcNt2Q4/GSs6u71UHKxB7S6JEMCp5Ve4xjh3eGQl/HRvg==" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+
+<!-- Code Syntax Highlighting -->
+<link rel="stylesheet"
+  href="https://gitcdn.link/repo/jwarby/jekyll-pygments-themes/master/github.css" />
+
+<!-- Styles -->
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<link rel="canonical" href="/blog/2020/testing-jakarta-ee-9-applications-with-arquillian-and-glassfish-v6/">
+
+<!-- JQuery -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+
+<!-- Theming-->
+
+<script src="/assets/js/theme.js"></script>
+<!-- Load DarkMode JS -->
+<script src="/assets/js/dark_mode.js"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-18SZ2W3GXD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-18SZ2W3GXD');
+</script>
+
+
+
+
+  
+<!-- MathJax -->
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+<script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"></script>
+<script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="blank" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Arquillian added a new module Arquillian Container Glassfish6 to align with the changes of Jakarta EE 9 and the features introduced in the Arquillian Core 1.7.0. Arquillian Container Glassfish6 is designated to run tests on Glassfish v6, which is a full-featured Jakarta EE 9 compatible application server, so you can test all Jakarta EE 9 components using this new Arquillian Glassfish container. In this post, we will try to run the our tests on the Glassfish container using both managed and remote adapters. When using the managed adapter, Arquillian has ability to manage lifecycle of Glassfish server,eg. start and stop the container during the testing execution.When using the remote adapter, Arquillian will try to run tests against a remote container, and gather the testing report through a proxy and send back to clients(IDE, Maven command console, etc.). Note: The original Aruqillian Glassfish embedded container is not ported to the latest Glassfish v6 now. Prerequisites Java 8 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Note: Make sure you are using Java 8, Glassfish v6.0 does not support Java 11. Glassfish v6.1 will focus on Java 11 support. Testing Restful Web Service Currently, only two simple Arquillian integration tests are included in our sample project, we have introduced the CDI components in the last post. Let’s move on the GreetingResourceTest. @ExtendWith(ArquillianExtension.class)public class GreetingResourceTest { private final static Logger LOGGER = Logger.getLogger(GreetingResourceTest.class.getName()); @Deployment(testable = false) public static WebArchive createDeployment() { return ShrinkWrap.create(WebArchive.class) .addClass(GreetingMessage.class) .addClass(GreetingService.class) .addClasses(GreetingResource.class, JaxrsActivator.class) // Enable CDI .addAsWebInfResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;); } @ArquillianResource private URL base; private Client client; @BeforeEach public void setup() { this.client = ClientBuilder.newClient(); //removed the Jackson json provider registry, due to OpenLiberty 21.0.0.1 switched to use Resteasy. } @AfterEach public void teardown() { if (this.client != null) { this.client.close(); } } @Test public void should_create_greeting() throws MalformedURLException { LOGGER.log(Level.INFO, &quot; Running test:: GreetingResourceTest#should_create_greeting ... &quot;); final WebTarget greetingTarget = client.target(new URL(base, &quot;api/greeting/JakartaEE&quot;).toExternalForm()); try (final Response greetingGetResponse = greetingTarget.request() .accept(MediaType.APPLICATION_JSON) .get()) { assertThat(greetingGetResponse.getStatus()).isEqualTo(200); assertThat(greetingGetResponse.readEntity(GreetingMessage.class).getMessage()).startsWith(&quot;Say Hello to JakartaEE&quot;); } }} In the above codes. Use a @ExtendWith(ArquillianExtension.class) to extend the default JUnit lifecycle, @ExtendWith is newly introduced in JUnit 5 to replace the @RunWith(...).A static method annotated with @Deployment(testable = false) is for describing the deployment unit. Here testable = false indicates this tests is running as client mode, you can not inject beans like before.You can get the URL of this application after it is deployed into the target server via a @ArquillianResource annotation.A test method is annotated with @Test annotation. In the should_create_greeting method, it uses Restful WS Client API to shake hands with the Restful APIs. You should add an implementation of the Restful WS Client. At the moment, only jersey completed the transformation. &lt;!-- Jersey --&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt; &lt;artifactId&gt;jersey-media-sse&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt; &lt;artifactId&gt;jersey-media-json-binding&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.inject&lt;/groupId&gt; &lt;artifactId&gt;jersey-hk2&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.core&lt;/groupId&gt; &lt;artifactId&gt;jersey-client&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; In the above code, there are some dependencies added. The jersey-client is the implementation of Jakarta Restful WS Client.The jersey-hk2 is the dependency inject engine in jersey, which will be replaced by CDI in future.The jersey-media-json-binding is use for JSON serialization and deserialization using Jakarta JSON Binding.The jersey-media-sse is responsible for handling media type text/event-stream. Before configuring the Arquillian Glassfish container support, please make sure you have added Arquillian Jarkarta EE 9 and JUnit 5 dependencies. Configuring Glassfish Managed Container Adapter Add arquillian-glassfish-managed-6 dependency into your project. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-glassfish-managed-6&lt;/artifactId&gt; &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Create a container configuration in the arquillian.xml file. &lt;container qualifier=&quot;arq-glassfish-managed&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt; &lt;!-- &lt;property name=&quot;glassFishHome&quot;&gt;target/${glassfish.home}&lt;/property&gt;--&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;enableDerby&quot;&gt;${enableDerby:true}&lt;/property&gt; &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; You can define a glassFishHome property in the arquillian.xml file to specify the location of the existing Glassfish server in your local system. Alternatively, to get a clean environment to run your tests every time, you can configure a Dependency Maven Plugin to download a copy of Glassfish, and use it to run your tests. This is a great option to run the tests continuously in your CI servers. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;unpack&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;org.glassfish.main.distributions&lt;/groupId&gt; &lt;artifactId&gt;glassfish&lt;/artifactId&gt; &lt;version&gt;${glassfish.version}&lt;/version&gt; &lt;type&gt;zip&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;environmentVariables&gt; &lt;GLASSFISH_HOME&gt;${project.build.directory}/glassfish6&lt;/GLASSFISH_HOME&gt; &lt;/environmentVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Execute the following command to run the tests against a Glassfish container that managed by Arquillian. mvn clean verify -Parq-glassfish-managed In the managed mode, Arquillian is responsible for starting and stopping the Glassfish container. Configuring Glassfish Remote Container Adapter With Arquillian Glassfish remote container, you can run the tests against a running Glassfish server, esp. it is running on a different server. Adding the following arquillian-glassfish-remote-6 dependency instead. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-glassfish-remote-6&lt;/artifactId&gt; &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;// the jersey client depdenceies are omitted. And add a container section in the arquillian.xml file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value. &lt;container qualifier=&quot;glassfish-remote&quot;&gt; &lt;configuration&gt; &lt;!--Supported property names: [adminHttps, remoteServerHttpPort, libraries, type, remoteServerAddress, target, retries, remoteServerAdminPort, remoteServerAdminHttps, adminUser, authorisation, waitTimeMs, adminPort, properties, adminPassword, adminHost]--&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt; &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt; &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt; &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt; &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt; &lt;!-- default is empty --&gt; &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt; &lt;/configuration&gt; &lt;/container&gt; Before executing the tests, make sure the target Glassfish server is running. Execute the following command to run tests against the running Glassfish server. mvn clean verfiy -Parq-glassfish-managed Securing administration By default, Glassfish does not set a password for admin user, you can change it by executing command asadmin change-admin-password on the Glassfish server side, do not forget to change the value of the adminPasswordproperty in the above arquillian.xml file. To deploy applications on a remote Glassfish server, it is better to enable secure connections on the remote Glassfish server. Execute asadmin enable-secure-admin on Glassfish side to enable secure connections. Correspondingly, set the adminHttps to true in the arquillian.xml file. Once the adminHttps is set, when running the tests, you could get a SSL certification related exception, the reason is the client JVM can not recognize the certificate used in the Glassfish server. Try to follow the following steps to to overcome this barrier. Firstly, export the cert from [Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks using keytooltools which is shipped with JDK. keytool -export -alias default -file testwlp.crt -keystore [Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks And import it into the JVM you are using to run the tests. keytool -import -trustcacerts -keystore ${JAVA_HOME}/jre/lib/security/cacerts -storepass changeit -alias testwlp -file testwlp.crt -noprompt Now run the tests again, the certificate exception should be disappeared. Grab a copy of the source codes from my Github, and exploring them yourself. &lt;hr&gt;&lt;p&gt;Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6 was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:description" content="Arquillian added a new module Arquillian Container Glassfish6 to align with the changes of Jakarta EE 9 and the features introduced in the Arquillian Core 1.7.0. Arquillian Container Glassfish6 is designated to run tests on Glassfish v6, which is a full-featured Jakarta EE 9 compatible application server, so you can test all Jakarta EE 9 components using this new Arquillian Glassfish container. In this post, we will try to run the our tests on the Glassfish container using both managed and remote adapters. When using the managed adapter, Arquillian has ability to manage lifecycle of Glassfish server,eg. start and stop the container during the testing execution.When using the remote adapter, Arquillian will try to run tests against a remote container, and gather the testing report through a proxy and send back to clients(IDE, Maven command console, etc.). Note: The original Aruqillian Glassfish embedded container is not ported to the latest Glassfish v6 now. Prerequisites Java 8 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Note: Make sure you are using Java 8, Glassfish v6.0 does not support Java 11. Glassfish v6.1 will focus on Java 11 support. Testing Restful Web Service Currently, only two simple Arquillian integration tests are included in our sample project, we have introduced the CDI components in the last post. Let’s move on the GreetingResourceTest. @ExtendWith(ArquillianExtension.class)public class GreetingResourceTest { private final static Logger LOGGER = Logger.getLogger(GreetingResourceTest.class.getName()); @Deployment(testable = false) public static WebArchive createDeployment() { return ShrinkWrap.create(WebArchive.class) .addClass(GreetingMessage.class) .addClass(GreetingService.class) .addClasses(GreetingResource.class, JaxrsActivator.class) // Enable CDI .addAsWebInfResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;); } @ArquillianResource private URL base; private Client client; @BeforeEach public void setup() { this.client = ClientBuilder.newClient(); //removed the Jackson json provider registry, due to OpenLiberty 21.0.0.1 switched to use Resteasy. } @AfterEach public void teardown() { if (this.client != null) { this.client.close(); } } @Test public void should_create_greeting() throws MalformedURLException { LOGGER.log(Level.INFO, &quot; Running test:: GreetingResourceTest#should_create_greeting ... &quot;); final WebTarget greetingTarget = client.target(new URL(base, &quot;api/greeting/JakartaEE&quot;).toExternalForm()); try (final Response greetingGetResponse = greetingTarget.request() .accept(MediaType.APPLICATION_JSON) .get()) { assertThat(greetingGetResponse.getStatus()).isEqualTo(200); assertThat(greetingGetResponse.readEntity(GreetingMessage.class).getMessage()).startsWith(&quot;Say Hello to JakartaEE&quot;); } }} In the above codes. Use a @ExtendWith(ArquillianExtension.class) to extend the default JUnit lifecycle, @ExtendWith is newly introduced in JUnit 5 to replace the @RunWith(...).A static method annotated with @Deployment(testable = false) is for describing the deployment unit. Here testable = false indicates this tests is running as client mode, you can not inject beans like before.You can get the URL of this application after it is deployed into the target server via a @ArquillianResource annotation.A test method is annotated with @Test annotation. In the should_create_greeting method, it uses Restful WS Client API to shake hands with the Restful APIs. You should add an implementation of the Restful WS Client. At the moment, only jersey completed the transformation. &lt;!-- Jersey --&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt; &lt;artifactId&gt;jersey-media-sse&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt; &lt;artifactId&gt;jersey-media-json-binding&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.inject&lt;/groupId&gt; &lt;artifactId&gt;jersey-hk2&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.core&lt;/groupId&gt; &lt;artifactId&gt;jersey-client&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; In the above code, there are some dependencies added. The jersey-client is the implementation of Jakarta Restful WS Client.The jersey-hk2 is the dependency inject engine in jersey, which will be replaced by CDI in future.The jersey-media-json-binding is use for JSON serialization and deserialization using Jakarta JSON Binding.The jersey-media-sse is responsible for handling media type text/event-stream. Before configuring the Arquillian Glassfish container support, please make sure you have added Arquillian Jarkarta EE 9 and JUnit 5 dependencies. Configuring Glassfish Managed Container Adapter Add arquillian-glassfish-managed-6 dependency into your project. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-glassfish-managed-6&lt;/artifactId&gt; &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Create a container configuration in the arquillian.xml file. &lt;container qualifier=&quot;arq-glassfish-managed&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt; &lt;!-- &lt;property name=&quot;glassFishHome&quot;&gt;target/${glassfish.home}&lt;/property&gt;--&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;enableDerby&quot;&gt;${enableDerby:true}&lt;/property&gt; &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; You can define a glassFishHome property in the arquillian.xml file to specify the location of the existing Glassfish server in your local system. Alternatively, to get a clean environment to run your tests every time, you can configure a Dependency Maven Plugin to download a copy of Glassfish, and use it to run your tests. This is a great option to run the tests continuously in your CI servers. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;unpack&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;org.glassfish.main.distributions&lt;/groupId&gt; &lt;artifactId&gt;glassfish&lt;/artifactId&gt; &lt;version&gt;${glassfish.version}&lt;/version&gt; &lt;type&gt;zip&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;environmentVariables&gt; &lt;GLASSFISH_HOME&gt;${project.build.directory}/glassfish6&lt;/GLASSFISH_HOME&gt; &lt;/environmentVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Execute the following command to run the tests against a Glassfish container that managed by Arquillian. mvn clean verify -Parq-glassfish-managed In the managed mode, Arquillian is responsible for starting and stopping the Glassfish container. Configuring Glassfish Remote Container Adapter With Arquillian Glassfish remote container, you can run the tests against a running Glassfish server, esp. it is running on a different server. Adding the following arquillian-glassfish-remote-6 dependency instead. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-glassfish-remote-6&lt;/artifactId&gt; &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;// the jersey client depdenceies are omitted. And add a container section in the arquillian.xml file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value. &lt;container qualifier=&quot;glassfish-remote&quot;&gt; &lt;configuration&gt; &lt;!--Supported property names: [adminHttps, remoteServerHttpPort, libraries, type, remoteServerAddress, target, retries, remoteServerAdminPort, remoteServerAdminHttps, adminUser, authorisation, waitTimeMs, adminPort, properties, adminPassword, adminHost]--&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt; &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt; &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt; &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt; &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt; &lt;!-- default is empty --&gt; &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt; &lt;/configuration&gt; &lt;/container&gt; Before executing the tests, make sure the target Glassfish server is running. Execute the following command to run tests against the running Glassfish server. mvn clean verfiy -Parq-glassfish-managed Securing administration By default, Glassfish does not set a password for admin user, you can change it by executing command asadmin change-admin-password on the Glassfish server side, do not forget to change the value of the adminPasswordproperty in the above arquillian.xml file. To deploy applications on a remote Glassfish server, it is better to enable secure connections on the remote Glassfish server. Execute asadmin enable-secure-admin on Glassfish side to enable secure connections. Correspondingly, set the adminHttps to true in the arquillian.xml file. Once the adminHttps is set, when running the tests, you could get a SSL certification related exception, the reason is the client JVM can not recognize the certificate used in the Glassfish server. Try to follow the following steps to to overcome this barrier. Firstly, export the cert from [Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks using keytooltools which is shipped with JDK. keytool -export -alias default -file testwlp.crt -keystore [Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks And import it into the JVM you are using to run the tests. keytool -import -trustcacerts -keystore ${JAVA_HOME}/jre/lib/security/cacerts -storepass changeit -alias testwlp -file testwlp.crt -noprompt Now run the tests again, the certificate exception should be disappeared. Grab a copy of the source codes from my Github, and exploring them yourself. &lt;hr&gt;&lt;p&gt;Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6 was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:site_name" content="blank" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-04T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2020-12-04T00:00:00+00:00","datePublished":"2020-12-04T00:00:00+00:00","description":"Arquillian added a new module Arquillian Container Glassfish6 to align with the changes of Jakarta EE 9 and the features introduced in the Arquillian Core 1.7.0. Arquillian Container Glassfish6 is designated to run tests on Glassfish v6, which is a full-featured Jakarta EE 9 compatible application server, so you can test all Jakarta EE 9 components using this new Arquillian Glassfish container. In this post, we will try to run the our tests on the Glassfish container using both managed and remote adapters. When using the managed adapter, Arquillian has ability to manage lifecycle of Glassfish server,eg. start and stop the container during the testing execution.When using the remote adapter, Arquillian will try to run tests against a remote container, and gather the testing report through a proxy and send back to clients(IDE, Maven command console, etc.). Note: The original Aruqillian Glassfish embedded container is not ported to the latest Glassfish v6 now. Prerequisites Java 8 (OpenJDK or AdoptOpenJDK)The latest Apache MavenThe basic knowledge of JUnit 5Get to know the basic of Arquillian Note: Make sure you are using Java 8, Glassfish v6.0 does not support Java 11. Glassfish v6.1 will focus on Java 11 support. Testing Restful Web Service Currently, only two simple Arquillian integration tests are included in our sample project, we have introduced the CDI components in the last post. Let’s move on the GreetingResourceTest. @ExtendWith(ArquillianExtension.class)public class GreetingResourceTest { private final static Logger LOGGER = Logger.getLogger(GreetingResourceTest.class.getName()); @Deployment(testable = false) public static WebArchive createDeployment() { return ShrinkWrap.create(WebArchive.class) .addClass(GreetingMessage.class) .addClass(GreetingService.class) .addClasses(GreetingResource.class, JaxrsActivator.class) // Enable CDI .addAsWebInfResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;); } @ArquillianResource private URL base; private Client client; @BeforeEach public void setup() { this.client = ClientBuilder.newClient(); //removed the Jackson json provider registry, due to OpenLiberty 21.0.0.1 switched to use Resteasy. } @AfterEach public void teardown() { if (this.client != null) { this.client.close(); } } @Test public void should_create_greeting() throws MalformedURLException { LOGGER.log(Level.INFO, &quot; Running test:: GreetingResourceTest#should_create_greeting ... &quot;); final WebTarget greetingTarget = client.target(new URL(base, &quot;api/greeting/JakartaEE&quot;).toExternalForm()); try (final Response greetingGetResponse = greetingTarget.request() .accept(MediaType.APPLICATION_JSON) .get()) { assertThat(greetingGetResponse.getStatus()).isEqualTo(200); assertThat(greetingGetResponse.readEntity(GreetingMessage.class).getMessage()).startsWith(&quot;Say Hello to JakartaEE&quot;); } }} In the above codes. Use a @ExtendWith(ArquillianExtension.class) to extend the default JUnit lifecycle, @ExtendWith is newly introduced in JUnit 5 to replace the @RunWith(...).A static method annotated with @Deployment(testable = false) is for describing the deployment unit. Here testable = false indicates this tests is running as client mode, you can not inject beans like before.You can get the URL of this application after it is deployed into the target server via a @ArquillianResource annotation.A test method is annotated with @Test annotation. In the should_create_greeting method, it uses Restful WS Client API to shake hands with the Restful APIs. You should add an implementation of the Restful WS Client. At the moment, only jersey completed the transformation. &lt;!-- Jersey --&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt; &lt;artifactId&gt;jersey-media-sse&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt; &lt;artifactId&gt;jersey-media-json-binding&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.inject&lt;/groupId&gt; &lt;artifactId&gt;jersey-hk2&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;&lt;dependency&gt; &lt;groupId&gt;org.glassfish.jersey.core&lt;/groupId&gt; &lt;artifactId&gt;jersey-client&lt;/artifactId&gt; &lt;version&gt;${jersey.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; In the above code, there are some dependencies added. The jersey-client is the implementation of Jakarta Restful WS Client.The jersey-hk2 is the dependency inject engine in jersey, which will be replaced by CDI in future.The jersey-media-json-binding is use for JSON serialization and deserialization using Jakarta JSON Binding.The jersey-media-sse is responsible for handling media type text/event-stream. Before configuring the Arquillian Glassfish container support, please make sure you have added Arquillian Jarkarta EE 9 and JUnit 5 dependencies. Configuring Glassfish Managed Container Adapter Add arquillian-glassfish-managed-6 dependency into your project. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-glassfish-managed-6&lt;/artifactId&gt; &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt; Create a container configuration in the arquillian.xml file. &lt;container qualifier=&quot;arq-glassfish-managed&quot;&gt; &lt;configuration&gt; &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt; &lt;!-- &lt;property name=&quot;glassFishHome&quot;&gt;target/${glassfish.home}&lt;/property&gt;--&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;enableDerby&quot;&gt;${enableDerby:true}&lt;/property&gt; &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt; &lt;/configuration&gt;&lt;/container&gt; You can define a glassFishHome property in the arquillian.xml file to specify the location of the existing Glassfish server in your local system. Alternatively, to get a clean environment to run your tests every time, you can configure a Dependency Maven Plugin to download a copy of Glassfish, and use it to run your tests. This is a great option to run the tests continuously in your CI servers. &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;unpack&lt;/id&gt; &lt;phase&gt;pre-integration-test&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;unpack&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactItems&gt; &lt;artifactItem&gt; &lt;groupId&gt;org.glassfish.main.distributions&lt;/groupId&gt; &lt;artifactId&gt;glassfish&lt;/artifactId&gt; &lt;version&gt;${glassfish.version}&lt;/version&gt; &lt;type&gt;zip&lt;/type&gt; &lt;overWrite&gt;false&lt;/overWrite&gt; &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt; &lt;/artifactItem&gt; &lt;/artifactItems&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt;&lt;/plugin&gt;&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt; &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt; &lt;configuration&gt; &lt;environmentVariables&gt; &lt;GLASSFISH_HOME&gt;${project.build.directory}/glassfish6&lt;/GLASSFISH_HOME&gt; &lt;/environmentVariables&gt; &lt;/configuration&gt;&lt;/plugin&gt; Execute the following command to run the tests against a Glassfish container that managed by Arquillian. mvn clean verify -Parq-glassfish-managed In the managed mode, Arquillian is responsible for starting and stopping the Glassfish container. Configuring Glassfish Remote Container Adapter With Arquillian Glassfish remote container, you can run the tests against a running Glassfish server, esp. it is running on a different server. Adding the following arquillian-glassfish-remote-6 dependency instead. &lt;dependency&gt; &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt; &lt;artifactId&gt;arquillian-glassfish-remote-6&lt;/artifactId&gt; &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt; &lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;// the jersey client depdenceies are omitted. And add a container section in the arquillian.xml file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value. &lt;container qualifier=&quot;glassfish-remote&quot;&gt; &lt;configuration&gt; &lt;!--Supported property names: [adminHttps, remoteServerHttpPort, libraries, type, remoteServerAddress, target, retries, remoteServerAdminPort, remoteServerAdminHttps, adminUser, authorisation, waitTimeMs, adminPort, properties, adminPassword, adminHost]--&gt; &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt; &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt; &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt; &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt; &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt; &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt; &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt; &lt;!-- default is empty --&gt; &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt; &lt;/configuration&gt; &lt;/container&gt; Before executing the tests, make sure the target Glassfish server is running. Execute the following command to run tests against the running Glassfish server. mvn clean verfiy -Parq-glassfish-managed Securing administration By default, Glassfish does not set a password for admin user, you can change it by executing command asadmin change-admin-password on the Glassfish server side, do not forget to change the value of the adminPasswordproperty in the above arquillian.xml file. To deploy applications on a remote Glassfish server, it is better to enable secure connections on the remote Glassfish server. Execute asadmin enable-secure-admin on Glassfish side to enable secure connections. Correspondingly, set the adminHttps to true in the arquillian.xml file. Once the adminHttps is set, when running the tests, you could get a SSL certification related exception, the reason is the client JVM can not recognize the certificate used in the Glassfish server. Try to follow the following steps to to overcome this barrier. Firstly, export the cert from [Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks using keytooltools which is shipped with JDK. keytool -export -alias default -file testwlp.crt -keystore [Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks And import it into the JVM you are using to run the tests. keytool -import -trustcacerts -keystore ${JAVA_HOME}/jre/lib/security/cacerts -storepass changeit -alias testwlp -file testwlp.crt -noprompt Now run the tests again, the certificate exception should be disappeared. Grab a copy of the source codes from my Github, and exploring them yourself. &lt;hr&gt;&lt;p&gt;Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6 was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;","headline":"Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6","mainEntityOfPage":{"@type":"WebPage","@id":"/blog/2020/testing-jakarta-ee-9-applications-with-arquillian-and-glassfish-v6/"},"url":"/blog/2020/testing-jakarta-ee-9-applications-with-arquillian-and-glassfish-v6/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body
+  class="fixed-top-nav ">
+
+  <!-- Header -->
+
+  <header>
+
+    <!-- Nav Bar -->
+    <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+    <div class="container">
+      
+      <a class="navbar-brand title font-weight-lighter" href="/">
+       <span class="font-weight-bold">Hantsy</span>   Bai
+      </a>
+      
+      <!-- Navbar Toggle -->
+      <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar top-bar"></span>
+        <span class="icon-bar middle-bar"></span>
+        <span class="icon-bar bottom-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-nowrap">
+          <!-- About -->
+          <li class="nav-item ">
+            <a class="nav-link" href="/">
+              about
+              
+            </a>
+          </li>
+          
+          <!-- Blog -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/blog/">
+              blog
+              
+            </a>
+          </li>
+          
+          <!-- Other pages -->
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/projects/">
+                projects
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/publications/">
+                publications
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/service/">
+                service
+                
+              </a>
+          </li>
+          
+          
+          
+            <div class = "toggle-container">
+              <a id = "light-toggle">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+              </a>
+            </div>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+</header>
+
+
+  <!-- Content -->
+
+  <div class="container mt-5">
+    
+
+<div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6</h1>
+    <p class="post-meta">December 4, 2020</p>
+  </header>
+
+  <article class="post-content">
+    <p><a href="http://www.arquillian.org">Arquillian</a> added a new module <a href="https://github.com/arquillian/arquillian-container-glassfish6">Arquillian Container Glassfish6</a> to align with the changes of Jakarta EE 9 and the features introduced in the Arquillian Core 1.7.0.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/1*XZgar-TMaqJ9r-ovXsLz_A.png" /></figure><p><a href="https://github.com/arquillian/arquillian-container-glassfish6">Arquillian Container Glassfish6</a> is designated to run tests on Glassfish v6, which is a full-featured Jakarta EE 9 compatible application server, so you can test all Jakarta EE 9 components using this new Arquillian Glassfish container.</p><p>In this post, we will try to run the our tests on the Glassfish container using both managed and remote adapters.</p><ul><li>When using the managed adapter, Arquillian has ability to manage lifecycle of Glassfish server,eg. start and stop the container during the testing execution.</li><li>When using the remote adapter, Arquillian will try to run tests against a remote container, and gather the testing report through a proxy and send back to clients(IDE, Maven command console, etc.).</li></ul><blockquote><em>Note: The original </em><a href="https://github.com/arquillian/arquillian-container-glassfish/tree/master/glassfish-embedded-3.1"><em>Aruqillian Glassfish embedded container</em></a><em> is not ported to the latest Glassfish v6 now.</em></blockquote><h3>Prerequisites</h3><ul><li>Java 8 (<a href="https://openjdk.java.net/install/">OpenJDK</a> or <a href="https://adoptopenjdk.net/installation.html">AdoptOpenJDK</a>)</li><li>The latest <a href="http://maven.apache.org/download.cgi">Apache Maven</a></li><li>The basic knowledge of <a href="https://junit.org/junit5/">JUnit 5</a></li><li>Get to know <a href="http://arquillian.org/guides/">the basic of Arquillian</a></li></ul><blockquote><em>Note: Make sure you are using Java 8, Glassfish v6.0 does not support Java 11. Glassfish v6.1 will focus on Java 11 support.</em></blockquote><h3>Testing Restful Web Service</h3><p>Currently, only two simple Arquillian integration tests are included in our sample project, we have introduced the CDI components in the last post.</p><p>Let’s move on the GreetingResourceTest.</p><pre>@ExtendWith(ArquillianExtension.class)<br>public class GreetingResourceTest {<br>    private final static Logger LOGGER = Logger.getLogger(GreetingResourceTest.class.getName());</pre><pre>    @Deployment(testable = false)<br>    public static WebArchive createDeployment() {<br>        return ShrinkWrap.create(WebArchive.class)<br>                .addClass(GreetingMessage.class)<br>                .addClass(GreetingService.class)<br>                .addClasses(GreetingResource.class, JaxrsActivator.class)<br>                // Enable CDI<br>                .addAsWebInfResource(EmptyAsset.INSTANCE, &quot;beans.xml&quot;);<br>    }</pre><pre>    @ArquillianResource<br>    private URL base;</pre><pre>    private Client client;</pre><pre>    @BeforeEach<br>    public void setup() {<br>        this.client = ClientBuilder.newClient();<br>        //removed the Jackson json provider registry, due to OpenLiberty 21.0.0.1 switched to use Resteasy.<br>    }</pre><pre>    @AfterEach<br>    public void teardown() {<br>        if (this.client != null) {<br>            this.client.close();<br>        }<br>    }</pre><pre>    @Test<br>    public void should_create_greeting() throws MalformedURLException {<br>        LOGGER.log(Level.INFO, &quot; Running test:: GreetingResourceTest#should_create_greeting ... &quot;);<br>        final WebTarget greetingTarget = client.target(new URL(base, &quot;api/greeting/JakartaEE&quot;).toExternalForm());<br>        try (final Response greetingGetResponse = greetingTarget.request()<br>                .accept(MediaType.APPLICATION_JSON)<br>                .get()) {<br>            assertThat(greetingGetResponse.getStatus()).isEqualTo(200);<br>            assertThat(greetingGetResponse.readEntity(GreetingMessage.class).getMessage()).startsWith(&quot;Say Hello to JakartaEE&quot;);<br>        }<br>    }<br>}</pre><p>In the above codes.</p><ul><li>Use a @ExtendWith(ArquillianExtension.class) to extend the default JUnit lifecycle, @ExtendWith is newly introduced in JUnit 5 to replace the @RunWith(...).</li><li>A static method annotated with @Deployment(testable = false) is for describing the deployment unit. Here testable = false indicates this tests is running as client mode, you can not inject beans like before.</li><li>You can get the URL of this application after it is deployed into the target server via a @ArquillianResource annotation.</li><li>A test method is annotated with @Test annotation.</li></ul><p>In the should_create_greeting method, it uses Restful WS Client API to shake hands with the Restful APIs. You should add an implementation of the Restful WS Client. At the moment, only <strong>jersey</strong> completed the transformation.</p><pre>&lt;!-- Jersey --&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt;<br>    &lt;artifactId&gt;jersey-media-sse&lt;/artifactId&gt;<br>    &lt;version&gt;${jersey.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;org.glassfish.jersey.media&lt;/groupId&gt;<br>    &lt;artifactId&gt;jersey-media-json-binding&lt;/artifactId&gt;<br>    &lt;version&gt;${jersey.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;org.glassfish.jersey.inject&lt;/groupId&gt;<br>    &lt;artifactId&gt;jersey-hk2&lt;/artifactId&gt;<br>    &lt;version&gt;${jersey.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;<br>&lt;dependency&gt;<br>    &lt;groupId&gt;org.glassfish.jersey.core&lt;/groupId&gt;<br>    &lt;artifactId&gt;jersey-client&lt;/artifactId&gt;<br>    &lt;version&gt;${jersey.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>In the above code, there are some dependencies added.</p><ul><li>The jersey-client is the implementation of Jakarta Restful WS Client.</li><li>The jersey-hk2 is the dependency inject engine in <strong>jersey</strong>, which will be replaced by CDI in future.</li><li>The jersey-media-json-binding is use for JSON serialization and deserialization using <strong>Jakarta JSON Binding</strong>.</li><li>The jersey-media-sse is responsible for handling media type text/event-stream.</li></ul><p>Before configuring the Arquillian Glassfish container support, please make sure you have added <a href="https://github.com/hantsy/jakartaee9-starter-boilerplate/blob/master/docs/docs/arq-weld.md">Arquillian Jarkarta EE 9 and JUnit 5 dependencies</a>.</p><h3>Configuring Glassfish Managed Container Adapter</h3><p>Add arquillian-glassfish-managed-6 dependency into your project.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-glassfish-managed-6&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;</pre><p>Create a container configuration in the <em>arquillian.xml</em> file.</p><pre>&lt;container qualifier=&quot;arq-glassfish-managed&quot;&gt;<br>    &lt;configuration&gt;<br>        &lt;property name=&quot;allowConnectingToRunningServer&quot;&gt;false&lt;/property&gt;<br>        &lt;!--            &lt;property name=&quot;glassFishHome&quot;&gt;target/${glassfish.home}&lt;/property&gt;--&gt;<br>        &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt;<br>        &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt;<br>        &lt;property name=&quot;enableDerby&quot;&gt;${enableDerby:true}&lt;/property&gt;<br>        &lt;property name=&quot;outputToConsole&quot;&gt;true&lt;/property&gt;<br>    &lt;/configuration&gt;<br>&lt;/container&gt;</pre><p>You can define a glassFishHome property in the <em>arquillian.xml</em> file to specify the location of the existing Glassfish server in your local system.</p><p>Alternatively, to get a clean environment to run your tests every time, you can configure a <strong>Dependency Maven Plugin</strong> to download a copy of Glassfish, and use it to run your tests. This is a great option to run the tests continuously in your CI servers.</p><pre>&lt;plugin&gt;<br>     &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br>     &lt;artifactId&gt;maven-dependency-plugin&lt;/artifactId&gt;<br>     &lt;version&gt;${maven-dependency-plugin.version}&lt;/version&gt;<br>     &lt;executions&gt;<br>         &lt;execution&gt;<br>             &lt;id&gt;unpack&lt;/id&gt;<br>             &lt;phase&gt;pre-integration-test&lt;/phase&gt;<br>             &lt;goals&gt;<br>                 &lt;goal&gt;unpack&lt;/goal&gt;<br>             &lt;/goals&gt;<br>             &lt;configuration&gt;<br>                 &lt;artifactItems&gt;<br>                     &lt;artifactItem&gt;<br>                         &lt;groupId&gt;org.glassfish.main.distributions&lt;/groupId&gt;<br>                         &lt;artifactId&gt;glassfish&lt;/artifactId&gt;<br>                         &lt;version&gt;${glassfish.version}&lt;/version&gt;<br>                         &lt;type&gt;zip&lt;/type&gt;<br>                         &lt;overWrite&gt;false&lt;/overWrite&gt;<br>                         &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt;<br>                     &lt;/artifactItem&gt;<br>                 &lt;/artifactItems&gt;<br>             &lt;/configuration&gt;<br>         &lt;/execution&gt;<br>     &lt;/executions&gt;<br>&lt;/plugin&gt;<br>&lt;plugin&gt;<br>    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br>    &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;<br>    &lt;version&gt;${maven-failsafe-plugin.version}&lt;/version&gt;<br>    &lt;configuration&gt;<br>        &lt;environmentVariables&gt;<br>            &lt;GLASSFISH_HOME&gt;${project.build.directory}/glassfish6&lt;/GLASSFISH_HOME&gt;<br>        &lt;/environmentVariables&gt;<br>    &lt;/configuration&gt;<br>&lt;/plugin&gt;</pre><p>Execute the following command to run the tests against a Glassfish container that managed by Arquillian.</p><pre>mvn clean verify -Parq-glassfish-managed</pre><p>In the managed mode, Arquillian is responsible for starting and stopping the Glassfish container.</p><h3>Configuring Glassfish Remote Container Adapter</h3><p>With Arquillian Glassfish remote container, you can run the tests against a running Glassfish server, esp. it is running on a different server.</p><p>Adding the following arquillian-glassfish-remote-6 dependency instead.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;org.jboss.arquillian.container&lt;/groupId&gt;<br>    &lt;artifactId&gt;arquillian-glassfish-remote-6&lt;/artifactId&gt;<br>    &lt;version&gt;${arquillian-glassfish6.version}&lt;/version&gt;<br>    &lt;scope&gt;test&lt;/scope&gt;<br>&lt;/dependency&gt;<br>// the jersey client depdenceies are omitted.</pre><p>And add a <em>container</em> section in the <em>arquillian.xml</em> file for this remote container, and configure the adminHost adminPort, adminUser , adminPassword if they are different from the default value.</p><pre>&lt;container qualifier=&quot;glassfish-remote&quot;&gt;<br>        &lt;configuration&gt;<br>            &lt;!--Supported property names:<br>            [adminHttps,<br>            remoteServerHttpPort,<br>            libraries,<br>            type,<br>            remoteServerAddress,<br>            target,<br>            retries,<br>            remoteServerAdminPort,<br>            remoteServerAdminHttps,<br>            adminUser,<br>            authorisation,<br>            waitTimeMs,<br>            adminPort,<br>            properties,<br>            adminPassword,<br>            adminHost]--&gt;<br>            &lt;property name=&quot;adminHost&quot;&gt;localhost&lt;/property&gt;<br>            &lt;property name=&quot;adminPort&quot;&gt;4848&lt;/property&gt;<br>            &lt;property name=&quot;adminUser&quot;&gt;admin&lt;/property&gt;<br>            &lt;!-- if https is enabled via `asadmin enable-secure-admin` on a remote server --&gt;<br>            &lt;!-- &lt;property name=&quot;adminHttps&quot;&gt;true&lt;/property&gt;--&gt;<br>            &lt;!-- if admin password is changed via `asadmin change-admin-password` --&gt;<br>            &lt;!--&lt;property name=&quot;adminPassword&quot;&gt;adminadmin&lt;/property&gt;--&gt;<br>            &lt;!-- default is empty --&gt;<br>            &lt;property name=&quot;adminPassword&quot;&gt;&lt;/property&gt;<br>        &lt;/configuration&gt;<br>    &lt;/container&gt;</pre><p>Before executing the tests, make sure the target Glassfish server is running.</p><p>Execute the following command to run tests against the running Glassfish server.</p><pre>mvn clean verfiy -Parq-glassfish-managed</pre><h3>Securing administration</h3><p>By default, Glassfish does not set a password for admin user, you can change it by executing command asadmin change-admin-password on the Glassfish server side, do not forget to change the value of the adminPasswordproperty in the above <em>arquillian.xml</em> file.</p><p>To deploy applications on a remote Glassfish server, it is better to enable secure connections on the remote Glassfish server. Execute asadmin enable-secure-admin on Glassfish side to enable secure connections. Correspondingly, set the adminHttps to <strong>true</strong> in the <em>arquillian.xml</em> file.</p><p>Once the adminHttps is set, when running the tests, you could get a SSL certification related exception, the reason is the client JVM can not recognize the certificate used in the Glassfish server. Try to follow the following steps to to overcome this barrier.</p><p>Firstly, export the cert from <em>[Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks</em> using keytooltools which is shipped with JDK.</p><pre>keytool -export -alias default -file testwlp.crt -keystore [Glassfish install dir]/glassfish/domains/domain1/config/keystore.jks</pre><p>And import it into the JVM you are using to run the tests.</p><pre>keytool -import -trustcacerts -keystore ${JAVA_HOME}/jre/lib/security/cacerts -storepass changeit -alias testwlp -file testwlp.crt -noprompt</pre><p>Now run the tests again, the certificate exception should be disappeared.</p><p>Grab a copy of <a href="https://github.com/hantsy/jakartaee9-starter-boilerplate">the source codes from my Github</a>, and exploring them yourself.</p><img src="https://medium.com/_/stat?event=post.clientViewed&referrerSource=full_rss&postId=9981e454e6eb" width="1" height="1" alt=""><hr><p><a href="https://itnext.io/testing-jakarta-ee-9-applications-with-arquillian-and-glassfish-v6-9981e454e6eb">Testing Jakarta EE 9 Applications with Arquillian and Glassfish v6</a> was originally published in <a href="https://itnext.io">ITNEXT</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+
+  </article>
+
+  
+
+</div>
+
+  </div>
+
+  <!-- Footer -->
+
+  
+<footer class="fixed-bottom">
+  <div class="container mt-0">
+    &copy; Copyright 2022 Hantsy  Bai.
+    <span class="mr-auto"></span>
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+
+    
+    
+
+  </div>
+</footer>
+
+
+
+</body>
+
+<!-- Bootsrap & MDB scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js" integrity="sha512-eUQ9hGdLjBjY3F41CScH3UX+4JDSI9zXeroz7hJ+RteoCaY+GP/LDoM8AO+Pt+DRFw3nXqsjh9Zsts8hnYv8/A==" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js" integrity="sha512-Mug9KHKmroQFMLm93zGrjhibM2z2Obg9l6qFG2qKjXEXkMp/VDkI4uju9m4QKPjWSwQ6O2qzZEnJDEeCw0Blcw==" crossorigin="anonymous"></script>
+
+
+<!-- Mansory & imagesLoaded -->
+<script defer src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script defer src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script defer src="/assets/js/mansory.js" type="text/javascript"></script>
+
+
+
+
+
+<!-- Load Common JS -->
+<script src="/assets/js/common.js"></script>
+
+
+</html>
