@@ -14,7 +14,7 @@ selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
 
-Hi, my name is Hantsy, a passionate independent freelancer from China. I have over 18 years of experience in software engineering and focused on Java EE/Jakarta EE and Spring ecosystem. 
+Hi, my name is Hantsy, a passionate independent freelancer from China. I have 20-year experience in software engineering, and I am mainly focusing on Java EE/Jakarta EE and Spring ecosystem. 
 
 I am also a blogger, twitter, and open-source contributor. In the past 2020, I have contributed over 100k lines of open-source codes via Github.
 
