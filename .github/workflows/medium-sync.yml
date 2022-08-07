@@ -25,8 +25,7 @@ jobs:
       - name: Set up Ruby
         # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
         # change this to (see https://github.com/ruby/setup-ruby#versioning):
-        # uses: ruby/setup-ruby@v1
-        uses: ruby/setup-ruby@6148f408d35df04b0189be5e64c1458377b8ae13
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
@@ -41,5 +40,5 @@ jobs:
         with:
           author_name: github-actions
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
-          branch: source
+          message: 'sync my medium rss'
           add: "*.html"
