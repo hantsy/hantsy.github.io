@@ -11,7 +11,7 @@ name: medium-rss-sync
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron: "0 1 * * *"
+    - cron: "0 1,12 * * *"
 
 jobs:
   rss:
@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v3
-        with: 
+        with:
           ref: source
       - name: Set up Ruby
         # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
