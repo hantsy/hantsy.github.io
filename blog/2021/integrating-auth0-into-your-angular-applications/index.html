@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  Hantsy
+  
+  Bai
+  
+  
+  | Integrating Auth0 into your Angular applications
+  
+</title>
+<meta name="description" content="My personal website focusing on Java EE/Jakarta EE and Spring.
+">
+
+<!-- Open Graph -->
+
+
+<!-- Bootstrap & MDB -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css"
+  integrity="sha512-RO38pBRxYH3SoOprtPTD86JFOclM51/XTIdEPh5j8sj4tp8jmQIx26twG52UaLi//hQldfrh7e51WzP9wuP32Q==" crossorigin="anonymous" />
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.0/css/academicons.min.css"
+  integrity="sha512-W4yqoT1+8NLkinBLBZko+dFB2ZbHsYLDdr50VElllRcNt2Q4/GSs6u71UHKxB7S6JEMCp5Ve4xjh3eGQl/HRvg==" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+
+<!-- Code Syntax Highlighting -->
+<link rel="stylesheet"
+  href="https://gitcdn.link/repo/jwarby/jekyll-pygments-themes/master/github.css" />
+
+<!-- Styles -->
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<link rel="canonical" href="/blog/2021/integrating-auth0-into-your-angular-applications/">
+
+<!-- JQuery -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+
+<!-- Theming-->
+
+<script src="/assets/js/theme.js"></script>
+<!-- Load DarkMode JS -->
+<script src="/assets/js/dark_mode.js"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-18SZ2W3GXD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-18SZ2W3GXD');
+</script>
+
+
+
+
+  
+<!-- MathJax -->
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+<script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"></script>
+<script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="blank" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Integrating Auth0 into your Angular applications" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Auth0 provides SDK for Angular to authenticate users and simply authorize users to access the protected APIs . The image is from https://unsplash.com/photos/SEYO0Botkgc In this post, we will create a simple Angular SPA application and try to access the Backend API we have created in the last post. Firstly lets create a new application in the Auth0 management console. An application presents an OAuth2 Client role , each client should have a unique client id to identify it. In the dashboard UI, expand Applications/applications in the left pane. Click the Create Application button to start up the creating progress. In the application name, set a name for this new Angular application, eg. I used spa here.Then select the Single page applications.Click the Create button. After it is created, open the Settings page, you will find a Client ID and Client Secrets are generated in the page. In the Application URLs section, add http://localhost:4200 to the following fields. Allowed Callback URLsAllowed Logout URLsAllowed Web OriginsAllowed Origins (CORS) In the Quickstarts tab, Auth0 provides a series of tutorials to integrate Auth0 with the popular SPA framework, including Angular/React/Vue, etc. I followed the official Angular Quickstart tutorial, but I refactored the project file structure according to the Angular Coding Style Guide, and ported the existing codes from hantsy/angular-spring-reactive-sample to simplify the development work. The final source codes can be found under my Github account. More details about creating this sample application step by step, please read the official Angular Quickstart tutorial. For the implementation details of accessing Backend APIs, check this article I have published on Medium and this old Angular2 sample codes. Here we are going to introduce the details of integrating Auth0 Angular SDK. Install Auth0 Angular SDK. $ npm i @auth0/auth0-angular Auth0 Angular SDK provides a series of authentication related facilities out of box, including AuthModule, AuthService , AuthGuard and AuthHttpInterceptor . We have built those components from scratch in the hantsy/angular-spring-reactive-sample. Configure AuthModule and AuthHttpInterceptor in the app.module.ts. // Import the module from the SDKimport { AuthHttpInterceptor, AuthModule } from &#39;@auth0/auth0-angular&#39;; @NgModule({ declarations: [AppComponent], imports: [ BrowserModule, BrowserAnimationsModule, CoreModule, SharedModule, // Import the module into the application, with configuration AuthModule.forRoot({ domain: &#39;dev-ese8241b.us.auth0.com&#39;, clientId: &#39;xwulkQN219vK2LU9MKowCo0HQLRi0WQU&#39;, audience: &#39;https://hantsy.github.io/api&#39;, scope: &#39;openid profile email read:posts write:posts delete:posts&#39;, // The AuthHttpInterceptor configuration httpInterceptor: { allowedList: [ &#39;/api/*&#39;, ], }, }), HomeModule, AppRoutingModule, ], providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true, }, ], bootstrap: [AppComponent],})export class AppModule {} Let’s have a look at the content of AppRoutingModule. In the path of profile module and admin module, add a AuthGuard to ensure the current user is authenticated. import { AuthGuard } from &#39;@auth0/auth0-angular&#39;;//... const routes: Routes = [ { path: &#39;&#39;, redirectTo: &#39;/home&#39;, pathMatch: &#39;full&#39; }, { path: &#39;profile&#39;, loadChildren: () =&gt; import(&#39;./profile/profile.module&#39;).then((m) =&gt; m.ProfileModule), canActivate: [AuthGuard], }, { path: &#39;posts&#39;, loadChildren: () =&gt; import(&#39;./posts/posts.module&#39;).then((m) =&gt; m.PostsModule), }, { path: &#39;admin&#39;, loadChildren: () =&gt; import(&#39;./admin/admin.module&#39;).then((m) =&gt; m.AdminModule), canActivate: [AuthGuard], }, //{ path: &#39;**&#39;, component:PageNotFoundComponent}]; @NgModule({ imports: [RouterModule.forRoot(routes)], exports: [RouterModule],})export class AppRoutingModule {} To show/hide the login and log out button, inject an AuthService and detect the authentication status via its isAuthenticated method. export class AuthenticationButtonComponent implements OnInit { constructor(public auth: AuthService) {} ngOnInit(): void {}} The template file of AuthenticationButtonComponent. &lt;app-login-button *ngIf=&quot;(auth.isAuthenticated$ | async) === false&quot;&gt;&lt;/app-login-button&gt; &lt;app-logout-button *ngIf=&quot;auth.isAuthenticated$ | async&quot;&gt;&lt;/app-logout-button&gt; To test the application, we have to add some testing users in Auth0(you can also use Signup form to register a user). Go to Auth0 management console. Expand the Authentication/Databases in the left pane, we will use the default Username-Password-Authentication here, click the options button to open Settings page, make sure Requires Username is checked, I would like to use a username instead of email to login. Switch to Password Policy tab, make Password strength lower, it allows you to create simple passwords for your testing users. Switch to the Applications tab, make sure your application is activated there. Let’s add some users now. Open User management/Users in the dashboard. Click Create User to start adding new users. Add the following new users(username/password/email), and assign permissions to them. user/password/user@example.com — read:posts, write:postsadmin/password/admin@example.com — read:posts, write:posts, delete:posts Go to the user details page of every users, under the email, mark the email as verified directly to avoid email verification. Now back to your application, run the following command to start it. $ npm run start Click login button to show the Auth0 Login Form, input the user/password to login. Navigate to the Profile page, you will see the screen similar to the following. The blog accesses the Backend API we have created. To experience it, make sure the Backend API is running. Try to log out, it should return to the http://localhost:4200. Grab the source codes form my Github. &lt;hr&gt;&lt;p&gt;Integrating Auth0 into your Angular applications was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:description" content="Auth0 provides SDK for Angular to authenticate users and simply authorize users to access the protected APIs . The image is from https://unsplash.com/photos/SEYO0Botkgc In this post, we will create a simple Angular SPA application and try to access the Backend API we have created in the last post. Firstly lets create a new application in the Auth0 management console. An application presents an OAuth2 Client role , each client should have a unique client id to identify it. In the dashboard UI, expand Applications/applications in the left pane. Click the Create Application button to start up the creating progress. In the application name, set a name for this new Angular application, eg. I used spa here.Then select the Single page applications.Click the Create button. After it is created, open the Settings page, you will find a Client ID and Client Secrets are generated in the page. In the Application URLs section, add http://localhost:4200 to the following fields. Allowed Callback URLsAllowed Logout URLsAllowed Web OriginsAllowed Origins (CORS) In the Quickstarts tab, Auth0 provides a series of tutorials to integrate Auth0 with the popular SPA framework, including Angular/React/Vue, etc. I followed the official Angular Quickstart tutorial, but I refactored the project file structure according to the Angular Coding Style Guide, and ported the existing codes from hantsy/angular-spring-reactive-sample to simplify the development work. The final source codes can be found under my Github account. More details about creating this sample application step by step, please read the official Angular Quickstart tutorial. For the implementation details of accessing Backend APIs, check this article I have published on Medium and this old Angular2 sample codes. Here we are going to introduce the details of integrating Auth0 Angular SDK. Install Auth0 Angular SDK. $ npm i @auth0/auth0-angular Auth0 Angular SDK provides a series of authentication related facilities out of box, including AuthModule, AuthService , AuthGuard and AuthHttpInterceptor . We have built those components from scratch in the hantsy/angular-spring-reactive-sample. Configure AuthModule and AuthHttpInterceptor in the app.module.ts. // Import the module from the SDKimport { AuthHttpInterceptor, AuthModule } from &#39;@auth0/auth0-angular&#39;; @NgModule({ declarations: [AppComponent], imports: [ BrowserModule, BrowserAnimationsModule, CoreModule, SharedModule, // Import the module into the application, with configuration AuthModule.forRoot({ domain: &#39;dev-ese8241b.us.auth0.com&#39;, clientId: &#39;xwulkQN219vK2LU9MKowCo0HQLRi0WQU&#39;, audience: &#39;https://hantsy.github.io/api&#39;, scope: &#39;openid profile email read:posts write:posts delete:posts&#39;, // The AuthHttpInterceptor configuration httpInterceptor: { allowedList: [ &#39;/api/*&#39;, ], }, }), HomeModule, AppRoutingModule, ], providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true, }, ], bootstrap: [AppComponent],})export class AppModule {} Let’s have a look at the content of AppRoutingModule. In the path of profile module and admin module, add a AuthGuard to ensure the current user is authenticated. import { AuthGuard } from &#39;@auth0/auth0-angular&#39;;//... const routes: Routes = [ { path: &#39;&#39;, redirectTo: &#39;/home&#39;, pathMatch: &#39;full&#39; }, { path: &#39;profile&#39;, loadChildren: () =&gt; import(&#39;./profile/profile.module&#39;).then((m) =&gt; m.ProfileModule), canActivate: [AuthGuard], }, { path: &#39;posts&#39;, loadChildren: () =&gt; import(&#39;./posts/posts.module&#39;).then((m) =&gt; m.PostsModule), }, { path: &#39;admin&#39;, loadChildren: () =&gt; import(&#39;./admin/admin.module&#39;).then((m) =&gt; m.AdminModule), canActivate: [AuthGuard], }, //{ path: &#39;**&#39;, component:PageNotFoundComponent}]; @NgModule({ imports: [RouterModule.forRoot(routes)], exports: [RouterModule],})export class AppRoutingModule {} To show/hide the login and log out button, inject an AuthService and detect the authentication status via its isAuthenticated method. export class AuthenticationButtonComponent implements OnInit { constructor(public auth: AuthService) {} ngOnInit(): void {}} The template file of AuthenticationButtonComponent. &lt;app-login-button *ngIf=&quot;(auth.isAuthenticated$ | async) === false&quot;&gt;&lt;/app-login-button&gt; &lt;app-logout-button *ngIf=&quot;auth.isAuthenticated$ | async&quot;&gt;&lt;/app-logout-button&gt; To test the application, we have to add some testing users in Auth0(you can also use Signup form to register a user). Go to Auth0 management console. Expand the Authentication/Databases in the left pane, we will use the default Username-Password-Authentication here, click the options button to open Settings page, make sure Requires Username is checked, I would like to use a username instead of email to login. Switch to Password Policy tab, make Password strength lower, it allows you to create simple passwords for your testing users. Switch to the Applications tab, make sure your application is activated there. Let’s add some users now. Open User management/Users in the dashboard. Click Create User to start adding new users. Add the following new users(username/password/email), and assign permissions to them. user/password/user@example.com — read:posts, write:postsadmin/password/admin@example.com — read:posts, write:posts, delete:posts Go to the user details page of every users, under the email, mark the email as verified directly to avoid email verification. Now back to your application, run the following command to start it. $ npm run start Click login button to show the Auth0 Login Form, input the user/password to login. Navigate to the Profile page, you will see the screen similar to the following. The blog accesses the Backend API we have created. To experience it, make sure the Backend API is running. Try to log out, it should return to the http://localhost:4200. Grab the source codes form my Github. &lt;hr&gt;&lt;p&gt;Integrating Auth0 into your Angular applications was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:site_name" content="blank" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-10T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Integrating Auth0 into your Angular applications" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2021-05-10T00:00:00+00:00","datePublished":"2021-05-10T00:00:00+00:00","description":"Auth0 provides SDK for Angular to authenticate users and simply authorize users to access the protected APIs . The image is from https://unsplash.com/photos/SEYO0Botkgc In this post, we will create a simple Angular SPA application and try to access the Backend API we have created in the last post. Firstly lets create a new application in the Auth0 management console. An application presents an OAuth2 Client role , each client should have a unique client id to identify it. In the dashboard UI, expand Applications/applications in the left pane. Click the Create Application button to start up the creating progress. In the application name, set a name for this new Angular application, eg. I used spa here.Then select the Single page applications.Click the Create button. After it is created, open the Settings page, you will find a Client ID and Client Secrets are generated in the page. In the Application URLs section, add http://localhost:4200 to the following fields. Allowed Callback URLsAllowed Logout URLsAllowed Web OriginsAllowed Origins (CORS) In the Quickstarts tab, Auth0 provides a series of tutorials to integrate Auth0 with the popular SPA framework, including Angular/React/Vue, etc. I followed the official Angular Quickstart tutorial, but I refactored the project file structure according to the Angular Coding Style Guide, and ported the existing codes from hantsy/angular-spring-reactive-sample to simplify the development work. The final source codes can be found under my Github account. More details about creating this sample application step by step, please read the official Angular Quickstart tutorial. For the implementation details of accessing Backend APIs, check this article I have published on Medium and this old Angular2 sample codes. Here we are going to introduce the details of integrating Auth0 Angular SDK. Install Auth0 Angular SDK. $ npm i @auth0/auth0-angular Auth0 Angular SDK provides a series of authentication related facilities out of box, including AuthModule, AuthService , AuthGuard and AuthHttpInterceptor . We have built those components from scratch in the hantsy/angular-spring-reactive-sample. Configure AuthModule and AuthHttpInterceptor in the app.module.ts. // Import the module from the SDKimport { AuthHttpInterceptor, AuthModule } from &#39;@auth0/auth0-angular&#39;; @NgModule({ declarations: [AppComponent], imports: [ BrowserModule, BrowserAnimationsModule, CoreModule, SharedModule, // Import the module into the application, with configuration AuthModule.forRoot({ domain: &#39;dev-ese8241b.us.auth0.com&#39;, clientId: &#39;xwulkQN219vK2LU9MKowCo0HQLRi0WQU&#39;, audience: &#39;https://hantsy.github.io/api&#39;, scope: &#39;openid profile email read:posts write:posts delete:posts&#39;, // The AuthHttpInterceptor configuration httpInterceptor: { allowedList: [ &#39;/api/*&#39;, ], }, }), HomeModule, AppRoutingModule, ], providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true, }, ], bootstrap: [AppComponent],})export class AppModule {} Let’s have a look at the content of AppRoutingModule. In the path of profile module and admin module, add a AuthGuard to ensure the current user is authenticated. import { AuthGuard } from &#39;@auth0/auth0-angular&#39;;//... const routes: Routes = [ { path: &#39;&#39;, redirectTo: &#39;/home&#39;, pathMatch: &#39;full&#39; }, { path: &#39;profile&#39;, loadChildren: () =&gt; import(&#39;./profile/profile.module&#39;).then((m) =&gt; m.ProfileModule), canActivate: [AuthGuard], }, { path: &#39;posts&#39;, loadChildren: () =&gt; import(&#39;./posts/posts.module&#39;).then((m) =&gt; m.PostsModule), }, { path: &#39;admin&#39;, loadChildren: () =&gt; import(&#39;./admin/admin.module&#39;).then((m) =&gt; m.AdminModule), canActivate: [AuthGuard], }, //{ path: &#39;**&#39;, component:PageNotFoundComponent}]; @NgModule({ imports: [RouterModule.forRoot(routes)], exports: [RouterModule],})export class AppRoutingModule {} To show/hide the login and log out button, inject an AuthService and detect the authentication status via its isAuthenticated method. export class AuthenticationButtonComponent implements OnInit { constructor(public auth: AuthService) {} ngOnInit(): void {}} The template file of AuthenticationButtonComponent. &lt;app-login-button *ngIf=&quot;(auth.isAuthenticated$ | async) === false&quot;&gt;&lt;/app-login-button&gt; &lt;app-logout-button *ngIf=&quot;auth.isAuthenticated$ | async&quot;&gt;&lt;/app-logout-button&gt; To test the application, we have to add some testing users in Auth0(you can also use Signup form to register a user). Go to Auth0 management console. Expand the Authentication/Databases in the left pane, we will use the default Username-Password-Authentication here, click the options button to open Settings page, make sure Requires Username is checked, I would like to use a username instead of email to login. Switch to Password Policy tab, make Password strength lower, it allows you to create simple passwords for your testing users. Switch to the Applications tab, make sure your application is activated there. Let’s add some users now. Open User management/Users in the dashboard. Click Create User to start adding new users. Add the following new users(username/password/email), and assign permissions to them. user/password/user@example.com — read:posts, write:postsadmin/password/admin@example.com — read:posts, write:posts, delete:posts Go to the user details page of every users, under the email, mark the email as verified directly to avoid email verification. Now back to your application, run the following command to start it. $ npm run start Click login button to show the Auth0 Login Form, input the user/password to login. Navigate to the Profile page, you will see the screen similar to the following. The blog accesses the Backend API we have created. To experience it, make sure the Backend API is running. Try to log out, it should return to the http://localhost:4200. Grab the source codes form my Github. &lt;hr&gt;&lt;p&gt;Integrating Auth0 into your Angular applications was originally published in ITNEXT on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;","headline":"Integrating Auth0 into your Angular applications","mainEntityOfPage":{"@type":"WebPage","@id":"/blog/2021/integrating-auth0-into-your-angular-applications/"},"url":"/blog/2021/integrating-auth0-into-your-angular-applications/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body
+  class="fixed-top-nav ">
+
+  <!-- Header -->
+
+  <header>
+
+    <!-- Nav Bar -->
+    <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+    <div class="container">
+      
+      <a class="navbar-brand title font-weight-lighter" href="/">
+       <span class="font-weight-bold">Hantsy</span>   Bai
+      </a>
+      
+      <!-- Navbar Toggle -->
+      <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar top-bar"></span>
+        <span class="icon-bar middle-bar"></span>
+        <span class="icon-bar bottom-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-nowrap">
+          <!-- About -->
+          <li class="nav-item ">
+            <a class="nav-link" href="/">
+              about
+              
+            </a>
+          </li>
+          
+          <!-- Blog -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/blog/">
+              blog
+              
+            </a>
+          </li>
+          
+          <!-- Other pages -->
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/projects/">
+                projects
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/publications/">
+                publications
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/service/">
+                service
+                
+              </a>
+          </li>
+          
+          
+          
+            <div class = "toggle-container">
+              <a id = "light-toggle">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+              </a>
+            </div>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+</header>
+
+
+  <!-- Content -->
+
+  <div class="container mt-5">
+    
+
+<div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Integrating Auth0 into your Angular applications</h1>
+    <p class="post-meta">May 10, 2021</p>
+  </header>
+
+  <article class="post-content">
+    <p>Auth0 provides SDK for Angular to authenticate users and simply authorize users to access the protected APIs .</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/1*H0FUZ7BDCiv5AvGDNFS7dw.jpeg" /><figcaption>The image is from <a href="https://unsplash.com/photos/SEYO0Botkgc">https://unsplash.com/photos/SEYO0Botkgc</a></figcaption></figure><p>In this post, we will create a simple Angular SPA application and try to access the <em>Backend API</em> we have created in <a href="https://hantsy.medium.com/secures-rest-apis-with-spring-security-5-and-auth0-41d579ca1e27">the last post</a>.</p><p>Firstly lets create a new application in the Auth0 management console. An application presents an OAuth2 <em>Client</em> role , each client should have a unique client id to identify it.</p><p>In the dashboard UI, expand <em>Applications/applications</em> in the left pane. Click the <em>Create Application</em> button to start up the creating progress.</p><ul><li>In the application name, set a name for this new Angular application, eg. I used <em>spa</em> here.</li><li>Then select the <em>Single page applications</em>.</li><li>Click the <em>Create</em> button.</li></ul><p>After it is created, open the <em>Settings</em> page, you will find a <em>Client ID</em> and <em>Client Secrets</em> are generated in the page. In the <em>Application URLs</em> section, add <a href="http://localhost:4200"><em>http://localhost:4200</em></a> to the following fields.</p><ul><li><em>Allowed Callback URLs</em></li><li><em>Allowed Logout URLs</em></li><li><em>Allowed Web Origins</em></li><li><em>Allowed Origins (CORS)</em></li></ul><p>In the <em>Quickstarts</em> tab, Auth0 provides a series of tutorials to integrate Auth0 with the popular SPA framework, including Angular/React/Vue, etc.</p><p>I followed the official Angular Quickstart tutorial, but I refactored the project file structure according to the <a href="https://angular.io/guide/styleguide">Angular Coding Style Guide</a>, and ported the existing codes from <a href="https://github.com/hantsy/angular-spring-reactive-sample">hantsy/angular-spring-reactive-sample</a> to simplify the development work. The final source codes can be found under my Github account.</p><blockquote><em>More details about creating this sample application step by step, please read the </em><a href="https://auth0.com/docs/quickstart/spa/angular"><em>official Angular Quickstart tutorial</em></a><em>.</em></blockquote><blockquote><em>For the implementation details of accessing Backend APIs, check </em><a href="https://hantsy.medium.com/build-a-reactive-application-with-spring-boot-2-0-and-angular-de0ee5837fed"><em>this article I have published on Medium</em></a><em> and this old </em><a href="https://github.com/hantsy/angular2-sample"><em>Angular2 sample codes</em></a><em>.</em></blockquote><p>Here we are going to introduce the details of integrating Auth0 Angular SDK.</p><p>Install Auth0 Angular SDK.</p><pre>$ npm i @auth0/auth0-angular</pre><p>Auth0 Angular SDK provides a series of authentication related facilities out of box, including AuthModule, AuthService , AuthGuard and AuthHttpInterceptor . We have built those components from scratch in the <a href="https://github.com/hantsy/angular-spring-reactive-sample">hantsy/angular-spring-reactive-sample</a>.</p><p>Configure AuthModule and AuthHttpInterceptor in the <em>app.module.ts</em>.</p><pre>// Import the module from the SDK<br>import { AuthHttpInterceptor, AuthModule } from &#39;@auth0/auth0-angular&#39;;</pre><pre>@NgModule({<br>  declarations: [AppComponent],<br>  imports: [<br>    BrowserModule,<br>    BrowserAnimationsModule,<br>    CoreModule,<br>    SharedModule,<br>    // Import the module into the application, with configuration<br>    AuthModule.forRoot({<br>      domain: &#39;dev-ese8241b.us.auth0.com&#39;,<br>      clientId: &#39;xwulkQN219vK2LU9MKowCo0HQLRi0WQU&#39;,<br>      audience: &#39;https://hantsy.github.io/api&#39;,<br>      scope: &#39;openid profile email read:posts write:posts delete:posts&#39;,<br>      // The AuthHttpInterceptor configuration<br>      httpInterceptor: {<br>        allowedList: [<br>          &#39;/api/*&#39;,<br>        ],<br>      },<br>    }),<br>    HomeModule,<br>    AppRoutingModule,<br>  ],<br>  providers: [<br>    {<br>      provide: HTTP_INTERCEPTORS,<br>      useClass: AuthHttpInterceptor,<br>      multi: true,<br>    },<br>  ],<br>  bootstrap: [AppComponent],<br>})<br>export class AppModule {}</pre><p>Let’s have a look at the content of AppRoutingModule. In the path of profile module and admin module, add a AuthGuard to ensure the current user is authenticated.</p><pre>import { AuthGuard } from &#39;@auth0/auth0-angular&#39;;<br>//...</pre><pre>const routes: Routes = [<br>  { path: &#39;&#39;, redirectTo: &#39;/home&#39;, pathMatch: &#39;full&#39; },<br>  {<br>    path: &#39;profile&#39;,<br>    loadChildren: () =&gt;<br>      import(&#39;./profile/profile.module&#39;).then((m) =&gt; m.ProfileModule),<br>    canActivate: [AuthGuard],<br>  },<br>  {<br>    path: &#39;posts&#39;,<br>    loadChildren: () =&gt;<br>      import(&#39;./posts/posts.module&#39;).then((m) =&gt; m.PostsModule),<br>  },<br>  {<br>    path: &#39;admin&#39;,<br>    loadChildren: () =&gt;<br>      import(&#39;./admin/admin.module&#39;).then((m) =&gt; m.AdminModule),<br>    canActivate: [AuthGuard],<br>  },<br>  //{ path: &#39;**&#39;, component:PageNotFoundComponent}<br>];</pre><pre>@NgModule({<br>  imports: [RouterModule.forRoot(routes)],<br>  exports: [RouterModule],<br>})<br>export class AppRoutingModule {}</pre><p>To show/hide the login and log out button, inject an AuthService and detect the authentication status via its isAuthenticated method.</p><pre>export class AuthenticationButtonComponent implements OnInit {<br>  constructor(public auth: AuthService) {}</pre><pre>  ngOnInit(): void {}<br>}</pre><p>The template file of AuthenticationButtonComponent.</p><pre>&lt;app-login-button *ngIf=&quot;(auth.isAuthenticated$ | async) === false&quot;&gt;<br>&lt;/app-login-button&gt;</pre><pre>&lt;app-logout-button *ngIf=&quot;auth.isAuthenticated$ | async&quot;&gt;<br>&lt;/app-logout-button&gt;</pre><p>To test the application, we have to add some testing users in Auth0(you can also use <em>Signup</em> form to register a user).</p><p>Go to Auth0 management console. Expand the <em>Authentication/Databases</em> in the left pane, we will use the default <em>Username-Password-Authentication</em> here, click the options button to open <em>Settings</em> page, make sure <em>Requires Username</em> is checked, I would like to use a username instead of email to login. Switch to <em>Password Policy</em> tab, make <em>Password strength</em> lower, it allows you to create simple passwords for your testing users. Switch to the <em>Applications</em> tab, make sure your application is activated there.</p><p>Let’s add some users now. Open <em>User management/Users</em> in the dashboard. Click <em>Create User</em> to start adding new users. Add the following new users(username/password/email), and assign permissions to them.</p><ul><li>user/password/user@example.com — read:posts, write:posts</li><li>admin/password/admin@example.com — read:posts, write:posts, delete:posts</li></ul><p>Go to the user details page of every users, under the email, mark the email as verified directly to avoid email verification.</p><p>Now back to your application, run the following command to start it.</p><pre>$ npm run start</pre><p>Click login button to show the Auth0 Login Form, input the user/password to login.</p><p>Navigate to the <em>Profile</em> page, you will see the screen similar to the following.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/0*WLh-8P7h-HcGfPof.png" /></figure><p>The blog accesses the <em>Backend API</em> we have created. To experience it, make sure the Backend API is running.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/0*bQVaA3xTTeGNAZWi.png" /></figure><p>Try to log out, it should return to the <a href="http://localhost:4200"><em>http://localhost:4200</em></a>.</p><h4>Grab the source codes form my <a href="https://github.com/hantsy/spring-security-auth0-sample/tree/master/ui">Github</a>.</h4><img src="https://medium.com/_/stat?event=post.clientViewed&referrerSource=full_rss&postId=42fabef31f3e" width="1" height="1" alt=""><hr><p><a href="https://itnext.io/integrating-auth0-into-your-angular-applications-42fabef31f3e">Integrating Auth0 into your Angular applications</a> was originally published in <a href="https://itnext.io">ITNEXT</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+
+  </article>
+
+  
+
+</div>
+
+  </div>
+
+  <!-- Footer -->
+
+  
+<footer class="fixed-bottom">
+  <div class="container mt-0">
+    &copy; Copyright 2022 Hantsy  Bai.
+    <span class="mr-auto"></span>
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+
+    
+    
+
+  </div>
+</footer>
+
+
+
+</body>
+
+<!-- Bootsrap & MDB scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js" integrity="sha512-eUQ9hGdLjBjY3F41CScH3UX+4JDSI9zXeroz7hJ+RteoCaY+GP/LDoM8AO+Pt+DRFw3nXqsjh9Zsts8hnYv8/A==" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js" integrity="sha512-Mug9KHKmroQFMLm93zGrjhibM2z2Obg9l6qFG2qKjXEXkMp/VDkI4uju9m4QKPjWSwQ6O2qzZEnJDEeCw0Blcw==" crossorigin="anonymous"></script>
+
+
+<!-- Mansory & imagesLoaded -->
+<script defer src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script defer src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script defer src="/assets/js/mansory.js" type="text/javascript"></script>
+
+
+
+
+
+<!-- Load Common JS -->
+<script src="/assets/js/common.js"></script>
+
+
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>
+  Hantsy
+  
+  Bai
+  
+  
+  | Building a Vertx application with RxJava 3 API Bindings
+  
+</title>
+<meta name="description" content="My personal website focusing on Java EE/Jakarta EE and Spring.
+">
+
+<!-- Open Graph -->
+
+
+<!-- Bootstrap & MDB -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css"
+  integrity="sha512-RO38pBRxYH3SoOprtPTD86JFOclM51/XTIdEPh5j8sj4tp8jmQIx26twG52UaLi//hQldfrh7e51WzP9wuP32Q==" crossorigin="anonymous" />
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.0/css/academicons.min.css"
+  integrity="sha512-W4yqoT1+8NLkinBLBZko+dFB2ZbHsYLDdr50VElllRcNt2Q4/GSs6u71UHKxB7S6JEMCp5Ve4xjh3eGQl/HRvg==" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons">
+
+<!-- Code Syntax Highlighting -->
+<link rel="stylesheet"
+  href="https://gitcdn.link/repo/jwarby/jekyll-pygments-themes/master/github.css" />
+
+<!-- Styles -->
+<link rel="shortcut icon" href="/assets/img/favicon.ico">
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<link rel="canonical" href="/blog/2021/building-a-vertx-application-with-rxjava-3-api-bindings/">
+
+<!-- JQuery -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+
+<!-- Theming-->
+
+<script src="/assets/js/theme.js"></script>
+<!-- Load DarkMode JS -->
+<script src="/assets/js/dark_mode.js"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-18SZ2W3GXD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-18SZ2W3GXD');
+</script>
+
+
+
+
+  
+<!-- MathJax -->
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+<script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"></script>
+<script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="blank" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Building a Vertx application with RxJava 3 API Bindings" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Eclipse Vertx has a great codegen mechanism to bring its Event Loop based asynchronous programming model to diverse platforms, including other asynchronous libraries, such as RxJava2/3 and SmallRye Mutiny and different languages, such as Kotlin, Kotlin Coroutines, and even Node/Typescript, PHP etc. Photo by Mèng Jiǎ on Unsplash In this post, we will refactor the RESTful APIs we have done in the last post and reimplement it with RxJava 3. RxJava 3 fully implements Reactive Steams specification. Open your browser, go to Vertx Starter, create a Vertx project skeleton. Do not forget to add RxJava 3 to the dependencies. If you are working on an existing project, add the rxjava3 dependency directly. &lt;dependency&gt; &lt;groupId&gt;io.vertx&lt;/groupId&gt; &lt;artifactId&gt;vertx-rx-java3&lt;/artifactId&gt;&lt;/dependency&gt; Import the project source codes into your IDE, eg. Intellij IDEA. Firstly let’s have a look at MainVerticle. import io.vertx.rxjava3.core.AbstractVerticle;import io.vertx.rxjava3.ext.web.Router;import io.vertx.rxjava3.ext.web.RoutingContext;import io.vertx.rxjava3.ext.web.handler.BodyHandler;import io.vertx.rxjava3.ext.web.validation.ValidationHandler;import io.vertx.rxjava3.json.schema.SchemaParser;import io.vertx.rxjava3.json.schema.SchemaRouter;import io.vertx.rxjava3.pgclient.PgPool;// other imports @Slf4jpublic class MainVerticle extends AbstractVerticle { @Override public Completable rxStart() {} //create routes private Router routes(PostsHandler handlers) {} private PgPool pgPool() {}} As you see, we import all essential classes from io.vertx.rxjava3, and use RxJava 3 API instead of the Vertx built-in Future and Promise. In this implementation, we override the rxStart which return a RxJava Completable. Ok, let’s move to the PostRepository class. import io.reactivex.rxjava3.core.Flowable;import io.reactivex.rxjava3.core.Single;import io.vertx.rxjava3.pgclient.PgPool;import io.vertx.rxjava3.sqlclient.Row;import io.vertx.rxjava3.sqlclient.RowSet;import io.vertx.rxjava3.sqlclient.SqlResult;import io.vertx.rxjava3.sqlclient.Tuple;// other imports... @Slf4jpublic class PostRepository { private static Function&lt;Row, Post&gt; MAPPER = (row) -&gt; Post.of( row.getUUID(&quot;id&quot;), row.getString(&quot;title&quot;), row.getString(&quot;content&quot;), row.getLocalDateTime(&quot;created_at&quot;) ); private final PgPool client; private PostRepository(PgPool _client) { this.client = _client; } //factory method public static PostRepository create(PgPool client) { return new PostRepository(client); } public Flowable&lt;Post&gt; findAll() { return this.client .query(&quot;SELECT * FROM posts&quot;) .rxExecute() .flattenAsFlowable( rows -&gt; StreamSupport.stream(rows.spliterator(), false) .map(MAPPER) .collect(Collectors.toList()) ); } public Single&lt;Post&gt; findById(UUID id) { Objects.requireNonNull(id, &quot;id can not be null&quot;); return client.preparedQuery(&quot;SELECT * FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id)) .map(RowSet::iterator) .flatMap(iterator -&gt; iterator.hasNext() ? Single.just(MAPPER.apply(iterator.next())) : Single.error(new PostNotFoundException(id))); } public Single&lt;UUID&gt; save(Post data) { return client.preparedQuery(&quot;INSERT INTO posts(title, content) VALUES ($1, $2) RETURNING (id)&quot;) .rxExecute(Tuple.of(data.getTitle(), data.getContent())) .map(rs -&gt; rs.iterator().next().getUUID(&quot;id&quot;)); } public Single&lt;Integer&gt; saveAll(List&lt;Post&gt; data) { var tuples = data.stream() .map(d -&gt; Tuple.of(d.getTitle(), d.getContent())) .collect(Collectors.toList()); return client.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;) .rxExecuteBatch(tuples) .map(SqlResult::rowCount); } public Single&lt;Integer&gt; update(Post data) { return client.preparedQuery(&quot;UPDATE posts SET title=$1, content=$2 WHERE id=$3&quot;) .rxExecute(Tuple.of(data.getTitle(), data.getContent(), data.getId())) .map(SqlResult::rowCount); } public Single&lt;Integer&gt; deleteAll() { return client.query(&quot;DELETE FROM posts&quot;).rxExecute() .map(SqlResult::rowCount); } public Single&lt;Integer&gt; deleteById(UUID id) { Objects.requireNonNull(id, &quot;id can not be null&quot;); return client.preparedQuery(&quot;DELETE FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id)) .map(SqlResult::rowCount); } } In this class, we use a RxJava 3 API based PgPool instead which wraps the original Vertx PgPool and add extra RxJava 3 APIs support. All methods are similar to the former Vertx version, here we use a rxExecute method to execute the SQL query and the returned result is switched to the RxJava 3 world. Let’s have a look at the PostsHandler. import io.vertx.rxjava3.ext.web.RoutingContext;//other imports @Slf4jclass PostsHandler { PostRepository posts; private PostsHandler(PostRepository _posts) { this.posts = _posts; } //factory method public static PostsHandler create(PostRepository posts) { return new PostsHandler(posts); } public void all(RoutingContext rc) {// var params = rc.queryParams();// var q = params.get(&quot;q&quot;);// var limit = params.get(&quot;limit&quot;) == null ? 10 : Integer.parseInt(params.get(&quot;q&quot;));// var offset = params.get(&quot;offset&quot;) == null ? 0 : Integer.parseInt(params.get(&quot;offset&quot;));// LOGGER.log(Level.INFO, &quot; find by keyword: q={0}, limit={1}, offset={2}&quot;, new Object[]{q, limit, offset}); this.posts.findAll().takeLast(10).toList() .subscribe( data -&gt; rc.response().end(Json.encode(data)) ); } public void get(RoutingContext rc) throws PostNotFoundException { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var uuid = UUID.fromString(id); this.posts.findById(uuid) .subscribe( post -&gt; rc.response().end(Json.encode(post)), throwable -&gt; rc.fail(404, throwable) ); } public void save(RoutingContext rc) { //rc.getBodyAsJson().mapTo(PostForm.class) var body = rc.getBodyAsJson(); log.info(&quot;request body: {0}&quot;, body); var form = body.mapTo(CreatePostCommand.class); this.posts .save(Post.builder() .title(form.getTitle()) .content(form.getContent()) .build() ) .subscribe( savedId -&gt; rc.response() .putHeader(&quot;Location&quot;, &quot;/posts/&quot; + savedId) .setStatusCode(201) .end() ); } public void update(RoutingContext rc) { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var body = rc.getBodyAsJson(); log.info(&quot;\npath param id: {}\nrequest body: {}&quot;, id, body); var form = body.mapTo(CreatePostCommand.class); this.posts.findById(UUID.fromString(id)) .flatMap( post -&gt; { post.setTitle(form.getTitle()); post.setContent(form.getContent()); return this.posts.update(post); } ) .subscribe( data -&gt; rc.response().setStatusCode(204).end(), throwable -&gt; rc.fail(404, throwable) ); } public void delete(RoutingContext rc) { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var uuid = UUID.fromString(id); this.posts.findById(uuid) .flatMap( post -&gt; this.posts.deleteById(uuid) ) .subscribe( data -&gt; rc.response().setStatusCode(204).end(), throwable -&gt; rc.fail(404, throwable) ); } } In the subscribe method, use the RxJava 3 specific RoutingContext to send response. Refactor the DataInitializer to use the RxJava 3 API bindings. @Slf4jpublic class DataInitializer { private PgPool client; public DataInitializer(PgPool client) { this.client = client; } public static DataInitializer create(PgPool client) { return new DataInitializer(client); } public void run() { log.info(&quot;Data initialization is starting...&quot;); Tuple first = Tuple.of(&quot;Hello Quarkus&quot;, &quot;My first post of Quarkus&quot;); Tuple second = Tuple.of(&quot;Hello Again, Quarkus&quot;, &quot;My second post of Quarkus&quot;); client .rxWithTransaction( (SqlConnection tx) -&gt; tx.query(&quot;DELETE FROM posts&quot;).rxExecute() .flatMap(result -&gt; tx.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;).rxExecuteBatch(List.of(first, second))) .toMaybe() ) .flatMapSingle(d -&gt; client.query(&quot;SELECT * FROM posts&quot;).rxExecute()) .subscribe( (data) -&gt; { data.forEach(row -&gt; { log.info(&quot;saved row: {}&quot;, row.toJson()); }); }, err -&gt; log.warn(&quot;failed to initializing: {}&quot;, err.getMessage()) ); }} The complete codes of the rxStart method in the MainVerticle class. @Overridepublic Completable rxStart() { log.info(&quot;Starting HTTP server...&quot;); InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE); //Create a PgPool instance var pgPool = pgPool(); //Creating PostRepository var postRepository = PostRepository.create(pgPool); //Creating PostHandler var postHandlers = PostsHandler.create(postRepository); // Initializing the sample data var initializer = DataInitializer.create(pgPool); initializer.run(); // Configure routes var router = routes(postHandlers); // Create the HTTP server return vertx.createHttpServer() // Handle every request using the router .requestHandler(router) // Start listening .rxListen(8888) // to Completable .ignoreElement() ;} Now you can run the application. mvn clean compile exec:java Get the source codes from my github, if you are still using the RxJava 2, there also includes a RxJava 2 version. &lt;hr&gt;&lt;p&gt;Building a Vertx application with RxJava 3 API Bindings was originally published in Nerd For Tech on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:description" content="Eclipse Vertx has a great codegen mechanism to bring its Event Loop based asynchronous programming model to diverse platforms, including other asynchronous libraries, such as RxJava2/3 and SmallRye Mutiny and different languages, such as Kotlin, Kotlin Coroutines, and even Node/Typescript, PHP etc. Photo by Mèng Jiǎ on Unsplash In this post, we will refactor the RESTful APIs we have done in the last post and reimplement it with RxJava 3. RxJava 3 fully implements Reactive Steams specification. Open your browser, go to Vertx Starter, create a Vertx project skeleton. Do not forget to add RxJava 3 to the dependencies. If you are working on an existing project, add the rxjava3 dependency directly. &lt;dependency&gt; &lt;groupId&gt;io.vertx&lt;/groupId&gt; &lt;artifactId&gt;vertx-rx-java3&lt;/artifactId&gt;&lt;/dependency&gt; Import the project source codes into your IDE, eg. Intellij IDEA. Firstly let’s have a look at MainVerticle. import io.vertx.rxjava3.core.AbstractVerticle;import io.vertx.rxjava3.ext.web.Router;import io.vertx.rxjava3.ext.web.RoutingContext;import io.vertx.rxjava3.ext.web.handler.BodyHandler;import io.vertx.rxjava3.ext.web.validation.ValidationHandler;import io.vertx.rxjava3.json.schema.SchemaParser;import io.vertx.rxjava3.json.schema.SchemaRouter;import io.vertx.rxjava3.pgclient.PgPool;// other imports @Slf4jpublic class MainVerticle extends AbstractVerticle { @Override public Completable rxStart() {} //create routes private Router routes(PostsHandler handlers) {} private PgPool pgPool() {}} As you see, we import all essential classes from io.vertx.rxjava3, and use RxJava 3 API instead of the Vertx built-in Future and Promise. In this implementation, we override the rxStart which return a RxJava Completable. Ok, let’s move to the PostRepository class. import io.reactivex.rxjava3.core.Flowable;import io.reactivex.rxjava3.core.Single;import io.vertx.rxjava3.pgclient.PgPool;import io.vertx.rxjava3.sqlclient.Row;import io.vertx.rxjava3.sqlclient.RowSet;import io.vertx.rxjava3.sqlclient.SqlResult;import io.vertx.rxjava3.sqlclient.Tuple;// other imports... @Slf4jpublic class PostRepository { private static Function&lt;Row, Post&gt; MAPPER = (row) -&gt; Post.of( row.getUUID(&quot;id&quot;), row.getString(&quot;title&quot;), row.getString(&quot;content&quot;), row.getLocalDateTime(&quot;created_at&quot;) ); private final PgPool client; private PostRepository(PgPool _client) { this.client = _client; } //factory method public static PostRepository create(PgPool client) { return new PostRepository(client); } public Flowable&lt;Post&gt; findAll() { return this.client .query(&quot;SELECT * FROM posts&quot;) .rxExecute() .flattenAsFlowable( rows -&gt; StreamSupport.stream(rows.spliterator(), false) .map(MAPPER) .collect(Collectors.toList()) ); } public Single&lt;Post&gt; findById(UUID id) { Objects.requireNonNull(id, &quot;id can not be null&quot;); return client.preparedQuery(&quot;SELECT * FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id)) .map(RowSet::iterator) .flatMap(iterator -&gt; iterator.hasNext() ? Single.just(MAPPER.apply(iterator.next())) : Single.error(new PostNotFoundException(id))); } public Single&lt;UUID&gt; save(Post data) { return client.preparedQuery(&quot;INSERT INTO posts(title, content) VALUES ($1, $2) RETURNING (id)&quot;) .rxExecute(Tuple.of(data.getTitle(), data.getContent())) .map(rs -&gt; rs.iterator().next().getUUID(&quot;id&quot;)); } public Single&lt;Integer&gt; saveAll(List&lt;Post&gt; data) { var tuples = data.stream() .map(d -&gt; Tuple.of(d.getTitle(), d.getContent())) .collect(Collectors.toList()); return client.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;) .rxExecuteBatch(tuples) .map(SqlResult::rowCount); } public Single&lt;Integer&gt; update(Post data) { return client.preparedQuery(&quot;UPDATE posts SET title=$1, content=$2 WHERE id=$3&quot;) .rxExecute(Tuple.of(data.getTitle(), data.getContent(), data.getId())) .map(SqlResult::rowCount); } public Single&lt;Integer&gt; deleteAll() { return client.query(&quot;DELETE FROM posts&quot;).rxExecute() .map(SqlResult::rowCount); } public Single&lt;Integer&gt; deleteById(UUID id) { Objects.requireNonNull(id, &quot;id can not be null&quot;); return client.preparedQuery(&quot;DELETE FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id)) .map(SqlResult::rowCount); } } In this class, we use a RxJava 3 API based PgPool instead which wraps the original Vertx PgPool and add extra RxJava 3 APIs support. All methods are similar to the former Vertx version, here we use a rxExecute method to execute the SQL query and the returned result is switched to the RxJava 3 world. Let’s have a look at the PostsHandler. import io.vertx.rxjava3.ext.web.RoutingContext;//other imports @Slf4jclass PostsHandler { PostRepository posts; private PostsHandler(PostRepository _posts) { this.posts = _posts; } //factory method public static PostsHandler create(PostRepository posts) { return new PostsHandler(posts); } public void all(RoutingContext rc) {// var params = rc.queryParams();// var q = params.get(&quot;q&quot;);// var limit = params.get(&quot;limit&quot;) == null ? 10 : Integer.parseInt(params.get(&quot;q&quot;));// var offset = params.get(&quot;offset&quot;) == null ? 0 : Integer.parseInt(params.get(&quot;offset&quot;));// LOGGER.log(Level.INFO, &quot; find by keyword: q={0}, limit={1}, offset={2}&quot;, new Object[]{q, limit, offset}); this.posts.findAll().takeLast(10).toList() .subscribe( data -&gt; rc.response().end(Json.encode(data)) ); } public void get(RoutingContext rc) throws PostNotFoundException { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var uuid = UUID.fromString(id); this.posts.findById(uuid) .subscribe( post -&gt; rc.response().end(Json.encode(post)), throwable -&gt; rc.fail(404, throwable) ); } public void save(RoutingContext rc) { //rc.getBodyAsJson().mapTo(PostForm.class) var body = rc.getBodyAsJson(); log.info(&quot;request body: {0}&quot;, body); var form = body.mapTo(CreatePostCommand.class); this.posts .save(Post.builder() .title(form.getTitle()) .content(form.getContent()) .build() ) .subscribe( savedId -&gt; rc.response() .putHeader(&quot;Location&quot;, &quot;/posts/&quot; + savedId) .setStatusCode(201) .end() ); } public void update(RoutingContext rc) { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var body = rc.getBodyAsJson(); log.info(&quot;\npath param id: {}\nrequest body: {}&quot;, id, body); var form = body.mapTo(CreatePostCommand.class); this.posts.findById(UUID.fromString(id)) .flatMap( post -&gt; { post.setTitle(form.getTitle()); post.setContent(form.getContent()); return this.posts.update(post); } ) .subscribe( data -&gt; rc.response().setStatusCode(204).end(), throwable -&gt; rc.fail(404, throwable) ); } public void delete(RoutingContext rc) { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var uuid = UUID.fromString(id); this.posts.findById(uuid) .flatMap( post -&gt; this.posts.deleteById(uuid) ) .subscribe( data -&gt; rc.response().setStatusCode(204).end(), throwable -&gt; rc.fail(404, throwable) ); } } In the subscribe method, use the RxJava 3 specific RoutingContext to send response. Refactor the DataInitializer to use the RxJava 3 API bindings. @Slf4jpublic class DataInitializer { private PgPool client; public DataInitializer(PgPool client) { this.client = client; } public static DataInitializer create(PgPool client) { return new DataInitializer(client); } public void run() { log.info(&quot;Data initialization is starting...&quot;); Tuple first = Tuple.of(&quot;Hello Quarkus&quot;, &quot;My first post of Quarkus&quot;); Tuple second = Tuple.of(&quot;Hello Again, Quarkus&quot;, &quot;My second post of Quarkus&quot;); client .rxWithTransaction( (SqlConnection tx) -&gt; tx.query(&quot;DELETE FROM posts&quot;).rxExecute() .flatMap(result -&gt; tx.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;).rxExecuteBatch(List.of(first, second))) .toMaybe() ) .flatMapSingle(d -&gt; client.query(&quot;SELECT * FROM posts&quot;).rxExecute()) .subscribe( (data) -&gt; { data.forEach(row -&gt; { log.info(&quot;saved row: {}&quot;, row.toJson()); }); }, err -&gt; log.warn(&quot;failed to initializing: {}&quot;, err.getMessage()) ); }} The complete codes of the rxStart method in the MainVerticle class. @Overridepublic Completable rxStart() { log.info(&quot;Starting HTTP server...&quot;); InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE); //Create a PgPool instance var pgPool = pgPool(); //Creating PostRepository var postRepository = PostRepository.create(pgPool); //Creating PostHandler var postHandlers = PostsHandler.create(postRepository); // Initializing the sample data var initializer = DataInitializer.create(pgPool); initializer.run(); // Configure routes var router = routes(postHandlers); // Create the HTTP server return vertx.createHttpServer() // Handle every request using the router .requestHandler(router) // Start listening .rxListen(8888) // to Completable .ignoreElement() ;} Now you can run the application. mvn clean compile exec:java Get the source codes from my github, if you are still using the RxJava 2, there also includes a RxJava 2 version. &lt;hr&gt;&lt;p&gt;Building a Vertx application with RxJava 3 API Bindings was originally published in Nerd For Tech on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;" />
+<meta property="og:site_name" content="blank" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-23T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Building a Vertx application with RxJava 3 API Bindings" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2021-07-23T00:00:00+00:00","datePublished":"2021-07-23T00:00:00+00:00","description":"Eclipse Vertx has a great codegen mechanism to bring its Event Loop based asynchronous programming model to diverse platforms, including other asynchronous libraries, such as RxJava2/3 and SmallRye Mutiny and different languages, such as Kotlin, Kotlin Coroutines, and even Node/Typescript, PHP etc. Photo by Mèng Jiǎ on Unsplash In this post, we will refactor the RESTful APIs we have done in the last post and reimplement it with RxJava 3. RxJava 3 fully implements Reactive Steams specification. Open your browser, go to Vertx Starter, create a Vertx project skeleton. Do not forget to add RxJava 3 to the dependencies. If you are working on an existing project, add the rxjava3 dependency directly. &lt;dependency&gt; &lt;groupId&gt;io.vertx&lt;/groupId&gt; &lt;artifactId&gt;vertx-rx-java3&lt;/artifactId&gt;&lt;/dependency&gt; Import the project source codes into your IDE, eg. Intellij IDEA. Firstly let’s have a look at MainVerticle. import io.vertx.rxjava3.core.AbstractVerticle;import io.vertx.rxjava3.ext.web.Router;import io.vertx.rxjava3.ext.web.RoutingContext;import io.vertx.rxjava3.ext.web.handler.BodyHandler;import io.vertx.rxjava3.ext.web.validation.ValidationHandler;import io.vertx.rxjava3.json.schema.SchemaParser;import io.vertx.rxjava3.json.schema.SchemaRouter;import io.vertx.rxjava3.pgclient.PgPool;// other imports @Slf4jpublic class MainVerticle extends AbstractVerticle { @Override public Completable rxStart() {} //create routes private Router routes(PostsHandler handlers) {} private PgPool pgPool() {}} As you see, we import all essential classes from io.vertx.rxjava3, and use RxJava 3 API instead of the Vertx built-in Future and Promise. In this implementation, we override the rxStart which return a RxJava Completable. Ok, let’s move to the PostRepository class. import io.reactivex.rxjava3.core.Flowable;import io.reactivex.rxjava3.core.Single;import io.vertx.rxjava3.pgclient.PgPool;import io.vertx.rxjava3.sqlclient.Row;import io.vertx.rxjava3.sqlclient.RowSet;import io.vertx.rxjava3.sqlclient.SqlResult;import io.vertx.rxjava3.sqlclient.Tuple;// other imports... @Slf4jpublic class PostRepository { private static Function&lt;Row, Post&gt; MAPPER = (row) -&gt; Post.of( row.getUUID(&quot;id&quot;), row.getString(&quot;title&quot;), row.getString(&quot;content&quot;), row.getLocalDateTime(&quot;created_at&quot;) ); private final PgPool client; private PostRepository(PgPool _client) { this.client = _client; } //factory method public static PostRepository create(PgPool client) { return new PostRepository(client); } public Flowable&lt;Post&gt; findAll() { return this.client .query(&quot;SELECT * FROM posts&quot;) .rxExecute() .flattenAsFlowable( rows -&gt; StreamSupport.stream(rows.spliterator(), false) .map(MAPPER) .collect(Collectors.toList()) ); } public Single&lt;Post&gt; findById(UUID id) { Objects.requireNonNull(id, &quot;id can not be null&quot;); return client.preparedQuery(&quot;SELECT * FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id)) .map(RowSet::iterator) .flatMap(iterator -&gt; iterator.hasNext() ? Single.just(MAPPER.apply(iterator.next())) : Single.error(new PostNotFoundException(id))); } public Single&lt;UUID&gt; save(Post data) { return client.preparedQuery(&quot;INSERT INTO posts(title, content) VALUES ($1, $2) RETURNING (id)&quot;) .rxExecute(Tuple.of(data.getTitle(), data.getContent())) .map(rs -&gt; rs.iterator().next().getUUID(&quot;id&quot;)); } public Single&lt;Integer&gt; saveAll(List&lt;Post&gt; data) { var tuples = data.stream() .map(d -&gt; Tuple.of(d.getTitle(), d.getContent())) .collect(Collectors.toList()); return client.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;) .rxExecuteBatch(tuples) .map(SqlResult::rowCount); } public Single&lt;Integer&gt; update(Post data) { return client.preparedQuery(&quot;UPDATE posts SET title=$1, content=$2 WHERE id=$3&quot;) .rxExecute(Tuple.of(data.getTitle(), data.getContent(), data.getId())) .map(SqlResult::rowCount); } public Single&lt;Integer&gt; deleteAll() { return client.query(&quot;DELETE FROM posts&quot;).rxExecute() .map(SqlResult::rowCount); } public Single&lt;Integer&gt; deleteById(UUID id) { Objects.requireNonNull(id, &quot;id can not be null&quot;); return client.preparedQuery(&quot;DELETE FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id)) .map(SqlResult::rowCount); } } In this class, we use a RxJava 3 API based PgPool instead which wraps the original Vertx PgPool and add extra RxJava 3 APIs support. All methods are similar to the former Vertx version, here we use a rxExecute method to execute the SQL query and the returned result is switched to the RxJava 3 world. Let’s have a look at the PostsHandler. import io.vertx.rxjava3.ext.web.RoutingContext;//other imports @Slf4jclass PostsHandler { PostRepository posts; private PostsHandler(PostRepository _posts) { this.posts = _posts; } //factory method public static PostsHandler create(PostRepository posts) { return new PostsHandler(posts); } public void all(RoutingContext rc) {// var params = rc.queryParams();// var q = params.get(&quot;q&quot;);// var limit = params.get(&quot;limit&quot;) == null ? 10 : Integer.parseInt(params.get(&quot;q&quot;));// var offset = params.get(&quot;offset&quot;) == null ? 0 : Integer.parseInt(params.get(&quot;offset&quot;));// LOGGER.log(Level.INFO, &quot; find by keyword: q={0}, limit={1}, offset={2}&quot;, new Object[]{q, limit, offset}); this.posts.findAll().takeLast(10).toList() .subscribe( data -&gt; rc.response().end(Json.encode(data)) ); } public void get(RoutingContext rc) throws PostNotFoundException { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var uuid = UUID.fromString(id); this.posts.findById(uuid) .subscribe( post -&gt; rc.response().end(Json.encode(post)), throwable -&gt; rc.fail(404, throwable) ); } public void save(RoutingContext rc) { //rc.getBodyAsJson().mapTo(PostForm.class) var body = rc.getBodyAsJson(); log.info(&quot;request body: {0}&quot;, body); var form = body.mapTo(CreatePostCommand.class); this.posts .save(Post.builder() .title(form.getTitle()) .content(form.getContent()) .build() ) .subscribe( savedId -&gt; rc.response() .putHeader(&quot;Location&quot;, &quot;/posts/&quot; + savedId) .setStatusCode(201) .end() ); } public void update(RoutingContext rc) { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var body = rc.getBodyAsJson(); log.info(&quot;\\npath param id: {}\\nrequest body: {}&quot;, id, body); var form = body.mapTo(CreatePostCommand.class); this.posts.findById(UUID.fromString(id)) .flatMap( post -&gt; { post.setTitle(form.getTitle()); post.setContent(form.getContent()); return this.posts.update(post); } ) .subscribe( data -&gt; rc.response().setStatusCode(204).end(), throwable -&gt; rc.fail(404, throwable) ); } public void delete(RoutingContext rc) { var params = rc.pathParams(); var id = params.get(&quot;id&quot;); var uuid = UUID.fromString(id); this.posts.findById(uuid) .flatMap( post -&gt; this.posts.deleteById(uuid) ) .subscribe( data -&gt; rc.response().setStatusCode(204).end(), throwable -&gt; rc.fail(404, throwable) ); } } In the subscribe method, use the RxJava 3 specific RoutingContext to send response. Refactor the DataInitializer to use the RxJava 3 API bindings. @Slf4jpublic class DataInitializer { private PgPool client; public DataInitializer(PgPool client) { this.client = client; } public static DataInitializer create(PgPool client) { return new DataInitializer(client); } public void run() { log.info(&quot;Data initialization is starting...&quot;); Tuple first = Tuple.of(&quot;Hello Quarkus&quot;, &quot;My first post of Quarkus&quot;); Tuple second = Tuple.of(&quot;Hello Again, Quarkus&quot;, &quot;My second post of Quarkus&quot;); client .rxWithTransaction( (SqlConnection tx) -&gt; tx.query(&quot;DELETE FROM posts&quot;).rxExecute() .flatMap(result -&gt; tx.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;).rxExecuteBatch(List.of(first, second))) .toMaybe() ) .flatMapSingle(d -&gt; client.query(&quot;SELECT * FROM posts&quot;).rxExecute()) .subscribe( (data) -&gt; { data.forEach(row -&gt; { log.info(&quot;saved row: {}&quot;, row.toJson()); }); }, err -&gt; log.warn(&quot;failed to initializing: {}&quot;, err.getMessage()) ); }} The complete codes of the rxStart method in the MainVerticle class. @Overridepublic Completable rxStart() { log.info(&quot;Starting HTTP server...&quot;); InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE); //Create a PgPool instance var pgPool = pgPool(); //Creating PostRepository var postRepository = PostRepository.create(pgPool); //Creating PostHandler var postHandlers = PostsHandler.create(postRepository); // Initializing the sample data var initializer = DataInitializer.create(pgPool); initializer.run(); // Configure routes var router = routes(postHandlers); // Create the HTTP server return vertx.createHttpServer() // Handle every request using the router .requestHandler(router) // Start listening .rxListen(8888) // to Completable .ignoreElement() ;} Now you can run the application. mvn clean compile exec:java Get the source codes from my github, if you are still using the RxJava 2, there also includes a RxJava 2 version. &lt;hr&gt;&lt;p&gt;Building a Vertx application with RxJava 3 API Bindings was originally published in Nerd For Tech on Medium, where people are continuing the conversation by highlighting and responding to this story.&lt;/p&gt;","headline":"Building a Vertx application with RxJava 3 API Bindings","mainEntityOfPage":{"@type":"WebPage","@id":"/blog/2021/building-a-vertx-application-with-rxjava-3-api-bindings/"},"url":"/blog/2021/building-a-vertx-application-with-rxjava-3-api-bindings/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body
+  class="fixed-top-nav ">
+
+  <!-- Header -->
+
+  <header>
+
+    <!-- Nav Bar -->
+    <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top">
+    <div class="container">
+      
+      <a class="navbar-brand title font-weight-lighter" href="/">
+       <span class="font-weight-bold">Hantsy</span>   Bai
+      </a>
+      
+      <!-- Navbar Toggle -->
+      <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar top-bar"></span>
+        <span class="icon-bar middle-bar"></span>
+        <span class="icon-bar bottom-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-nowrap">
+          <!-- About -->
+          <li class="nav-item ">
+            <a class="nav-link" href="/">
+              about
+              
+            </a>
+          </li>
+          
+          <!-- Blog -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/blog/">
+              blog
+              
+            </a>
+          </li>
+          
+          <!-- Other pages -->
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/projects/">
+                projects
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/publications/">
+                publications
+                
+              </a>
+          </li>
+          
+          
+          
+          <li class="nav-item ">
+              <a class="nav-link" href="/service/">
+                service
+                
+              </a>
+          </li>
+          
+          
+          
+            <div class = "toggle-container">
+              <a id = "light-toggle">
+                  <i class="fas fa-moon"></i>
+                  <i class="fas fa-sun"></i>
+              </a>
+            </div>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+</header>
+
+
+  <!-- Content -->
+
+  <div class="container mt-5">
+    
+
+<div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Building a Vertx application with RxJava 3 API Bindings</h1>
+    <p class="post-meta">July 23, 2021</p>
+  </header>
+
+  <article class="post-content">
+    <p>Eclipse Vertx has a great codegen mechanism to bring its <em>Event Loop</em> based asynchronous programming model to diverse platforms, including other asynchronous libraries, such as <a href="https://github.com/ReactiveX/RxJava">RxJava2/3</a> and <a href="https://smallrye.io/smallrye-mutiny/">SmallRye Mutiny</a> and different languages, such as Kotlin, Kotlin Coroutines, and even Node/Typescript, PHP etc.</p><figure><img alt="" src="https://cdn-images-1.medium.com/max/1024/1*xUpUuE_39Cz_fbfa_G6okQ.jpeg" /><figcaption>Photo by <a href="https://unsplash.com/@justin73?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Mèng Jiǎ</a> on <a href="https://unsplash.com/s/photos/china-landscape?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></figcaption></figure><p>In this post, we will refactor the RESTful APIs we have done in <a href="https://itnext.io/building-restful-apis-with-eclipse-vertx-4ce89d8eeb74">the last post</a> and reimplement it with RxJava 3. RxJava 3 fully implements <a href="http://www.reactive-streams.org/">Reactive Steams specification</a>.</p><p>Open your browser, go to <a href="https://start.vertx.io">Vertx Starter</a>, create a Vertx project skeleton. Do not forget to add <em>RxJava 3</em> to the dependencies.</p><p>If you are working on an existing project, add the <em>rxjava3</em> dependency directly.</p><pre>&lt;dependency&gt;<br>    &lt;groupId&gt;io.vertx&lt;/groupId&gt;<br>    &lt;artifactId&gt;vertx-rx-java3&lt;/artifactId&gt;<br>&lt;/dependency&gt;</pre><p>Import the project source codes into your IDE, eg. Intellij IDEA.</p><p>Firstly let’s have a look at MainVerticle.</p><pre>import io.vertx.rxjava3.core.AbstractVerticle;<br>import io.vertx.rxjava3.ext.web.Router;<br>import io.vertx.rxjava3.ext.web.RoutingContext;<br>import io.vertx.rxjava3.ext.web.handler.BodyHandler;<br>import io.vertx.rxjava3.ext.web.validation.ValidationHandler;<br>import io.vertx.rxjava3.json.schema.SchemaParser;<br>import io.vertx.rxjava3.json.schema.SchemaRouter;<br>import io.vertx.rxjava3.pgclient.PgPool;<br>// other imports</pre><pre>@Slf4j<br>public class MainVerticle extends AbstractVerticle {</pre><pre>    @Override<br>    public Completable rxStart() {}<br>    <br>     //create routes<br>    private Router routes(PostsHandler handlers) {}<br>    <br>    private PgPool pgPool() {}<br>}</pre><p>As you see, we import all essential classes from io.vertx.rxjava3, and use RxJava 3 API instead of the Vertx built-in Future and Promise. In this implementation, we override the rxStart which return a RxJava Completable.</p><p>Ok, let’s move to the PostRepository class.</p><pre>import io.reactivex.rxjava3.core.Flowable;<br>import io.reactivex.rxjava3.core.Single;<br>import io.vertx.rxjava3.pgclient.PgPool;<br>import io.vertx.rxjava3.sqlclient.Row;<br>import io.vertx.rxjava3.sqlclient.RowSet;<br>import io.vertx.rxjava3.sqlclient.SqlResult;<br>import io.vertx.rxjava3.sqlclient.Tuple;<br>// other imports...</pre><pre>@Slf4j<br>public class PostRepository {</pre><pre>    private static Function&lt;Row, Post&gt; MAPPER = (row) -&gt;<br>        Post.of(<br>            row.getUUID(&quot;id&quot;),<br>            row.getString(&quot;title&quot;),<br>            row.getString(&quot;content&quot;),<br>            row.getLocalDateTime(&quot;created_at&quot;)<br>        );<br></pre><pre>    private final PgPool client;</pre><pre>    private PostRepository(PgPool _client) {<br>        this.client = _client;<br>    }</pre><pre>    //factory method<br>    public static PostRepository create(PgPool client) {<br>        return new PostRepository(client);<br>    }</pre><pre>    public Flowable&lt;Post&gt; findAll() {<br>        return this.client<br>            .query(&quot;SELECT * FROM posts&quot;)<br>            .rxExecute()<br>            .flattenAsFlowable(<br>                rows -&gt; StreamSupport.stream(rows.spliterator(), false)<br>                    .map(MAPPER)<br>                    .collect(Collectors.toList())<br>            );<br>    }<br></pre><pre>    public Single&lt;Post&gt; findById(UUID id) {<br>        Objects.requireNonNull(id, &quot;id can not be null&quot;);<br>        return client.preparedQuery(&quot;SELECT * FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id))<br>            .map(RowSet::iterator)<br>            .flatMap(iterator -&gt; iterator.hasNext() ? Single.just(MAPPER.apply(iterator.next())) : Single.error(new PostNotFoundException(id)));<br>    }</pre><pre>    public Single&lt;UUID&gt; save(Post data) {<br>        return client.preparedQuery(&quot;INSERT INTO posts(title, content) VALUES ($1, $2) RETURNING (id)&quot;)<br>            .rxExecute(Tuple.of(data.getTitle(), data.getContent()))<br>            .map(rs -&gt; rs.iterator().next().getUUID(&quot;id&quot;));<br>    }</pre><pre>    public Single&lt;Integer&gt; saveAll(List&lt;Post&gt; data) {<br>        var tuples = data.stream()<br>            .map(d -&gt; Tuple.of(d.getTitle(), d.getContent()))<br>            .collect(Collectors.toList());</pre><pre>        return client.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;)<br>            .rxExecuteBatch(tuples)<br>            .map(SqlResult::rowCount);<br>    }</pre><pre>    public Single&lt;Integer&gt; update(Post data) {<br>        return client.preparedQuery(&quot;UPDATE posts SET title=$1, content=$2 WHERE id=$3&quot;)<br>            .rxExecute(Tuple.of(data.getTitle(), data.getContent(), data.getId()))<br>            .map(SqlResult::rowCount);<br>    }</pre><pre>    public Single&lt;Integer&gt; deleteAll() {<br>        return client.query(&quot;DELETE FROM posts&quot;).rxExecute()<br>            .map(SqlResult::rowCount);<br>    }</pre><pre>    public Single&lt;Integer&gt; deleteById(UUID id) {<br>        Objects.requireNonNull(id, &quot;id can not be null&quot;);<br>        return client.preparedQuery(&quot;DELETE FROM posts WHERE id=$1&quot;).rxExecute(Tuple.of(id))<br>            .map(SqlResult::rowCount);<br>    }</pre><pre>}</pre><p>In this class, we use a RxJava 3 API based PgPool instead which wraps the original Vertx PgPool and add extra RxJava 3 APIs support. All methods are similar to the former Vertx version, here we use a rxExecute method to execute the SQL query and the returned result is switched to the RxJava 3 world.</p><p>Let’s have a look at the PostsHandler.</p><pre>import io.vertx.rxjava3.ext.web.RoutingContext;<br>//other imports</pre><pre>@Slf4j<br>class PostsHandler {</pre><pre>    PostRepository posts;</pre><pre>    private PostsHandler(PostRepository _posts) {<br>        this.posts = _posts;<br>    }</pre><pre>    //factory method<br>    public static PostsHandler create(PostRepository posts) {<br>        return new PostsHandler(posts);<br>    }</pre><pre>    public void all(RoutingContext rc) {<br>//        var params = rc.queryParams();<br>//        var q = params.get(&quot;q&quot;);<br>//        var limit = params.get(&quot;limit&quot;) == null ? 10 : Integer.parseInt(params.get(&quot;q&quot;));<br>//        var offset = params.get(&quot;offset&quot;) == null ? 0 : Integer.parseInt(params.get(&quot;offset&quot;));<br>//        LOGGER.log(Level.INFO, &quot; find by keyword: q={0}, limit={1}, offset={2}&quot;, new Object[]{q, limit, offset});<br>        this.posts.findAll().takeLast(10).toList()<br>            .subscribe(<br>                data -&gt; rc.response().end(Json.encode(data))<br>            );<br>    }</pre><pre>    public void get(RoutingContext rc) throws PostNotFoundException {<br>        var params = rc.pathParams();<br>        var id = params.get(&quot;id&quot;);<br>        var uuid = UUID.fromString(id);<br>        this.posts.findById(uuid)<br>            .subscribe(<br>                post -&gt; rc.response().end(Json.encode(post)),<br>                throwable -&gt; rc.fail(404, throwable)<br>            );</pre><pre>    }<br></pre><pre>    public void save(RoutingContext rc) {<br>        //rc.getBodyAsJson().mapTo(PostForm.class)<br>        var body = rc.getBodyAsJson();<br>        log.info(&quot;request body: {0}&quot;, body);<br>        var form = body.mapTo(CreatePostCommand.class);<br>        this.posts<br>            .save(Post.builder()<br>                .title(form.getTitle())<br>                .content(form.getContent())<br>                .build()<br>            )<br>            .subscribe(<br>                savedId -&gt; rc.response()<br>                    .putHeader(&quot;Location&quot;, &quot;/posts/&quot; + savedId)<br>                    .setStatusCode(201)<br>                    .end()</pre><pre>            );<br>    }</pre><pre>    public void update(RoutingContext rc) {<br>        var params = rc.pathParams();<br>        var id = params.get(&quot;id&quot;);<br>        var body = rc.getBodyAsJson();<br>        log.info(&quot;\npath param id: {}\nrequest body: {}&quot;, id, body);<br>        var form = body.mapTo(CreatePostCommand.class);<br>        this.posts.findById(UUID.fromString(id))<br>            .flatMap(<br>                post -&gt; {<br>                    post.setTitle(form.getTitle());<br>                    post.setContent(form.getContent());</pre><pre>                    return this.posts.update(post);<br>                }<br>            )<br>            .subscribe(<br>                data -&gt; rc.response().setStatusCode(204).end(),<br>                throwable -&gt; rc.fail(404, throwable)<br>            );</pre><pre>    }</pre><pre>    public void delete(RoutingContext rc) {<br>        var params = rc.pathParams();<br>        var id = params.get(&quot;id&quot;);</pre><pre>        var uuid = UUID.fromString(id);<br>        this.posts.findById(uuid)<br>            .flatMap(<br>                post -&gt; this.posts.deleteById(uuid)<br>            )<br>            .subscribe(<br>                data -&gt; rc.response().setStatusCode(204).end(),<br>                throwable -&gt; rc.fail(404, throwable)<br>            );</pre><pre>    }</pre><pre>}</pre><p>In the subscribe method, use the RxJava 3 specific RoutingContext to send response.</p><p>Refactor the DataInitializer to use the RxJava 3 API bindings.</p><pre>@Slf4j<br>public class DataInitializer {</pre><pre>    private PgPool client;</pre><pre>    public DataInitializer(PgPool client) {<br>        this.client = client;<br>    }</pre><pre>    public static DataInitializer create(PgPool client) {<br>        return new DataInitializer(client);<br>    }</pre><pre>    public void run() {<br>        log.info(&quot;Data initialization is starting...&quot;);</pre><pre>        Tuple first = Tuple.of(&quot;Hello Quarkus&quot;, &quot;My first post of Quarkus&quot;);<br>        Tuple second = Tuple.of(&quot;Hello Again, Quarkus&quot;, &quot;My second post of Quarkus&quot;);</pre><pre>        client<br>            .rxWithTransaction(<br>                (SqlConnection tx) -&gt; tx.query(&quot;DELETE FROM posts&quot;).rxExecute()<br>                    .flatMap(result -&gt; tx.preparedQuery(&quot;INSERT INTO posts (title, content) VALUES ($1, $2)&quot;).rxExecuteBatch(List.of(first, second)))<br>                    .toMaybe()<br>            )<br>            .flatMapSingle(d -&gt; client.query(&quot;SELECT * FROM posts&quot;).rxExecute())<br>            .subscribe(<br>                (data) -&gt; {<br>                    data.forEach(row -&gt; {<br>                        log.info(&quot;saved row: {}&quot;, row.toJson());<br>                    });<br>                },<br>                err -&gt; log.warn(&quot;failed to initializing: {}&quot;, err.getMessage())<br>            );<br>    }<br>}</pre><p>The complete codes of the rxStart method in the MainVerticle class.</p><pre>@Override<br>public Completable rxStart() {<br>    log.info(&quot;Starting HTTP server...&quot;);<br>    InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE);</pre><pre>    //Create a PgPool instance<br>    var pgPool = pgPool();</pre><pre>    //Creating PostRepository<br>    var postRepository = PostRepository.create(pgPool);</pre><pre>    //Creating PostHandler<br>    var postHandlers = PostsHandler.create(postRepository);</pre><pre>    // Initializing the sample data<br>    var initializer = DataInitializer.create(pgPool);<br>    initializer.run();</pre><pre>    // Configure routes<br>    var router = routes(postHandlers);</pre><pre>    // Create the HTTP server<br>    return vertx.createHttpServer()<br>        // Handle every request using the router<br>        .requestHandler(router)<br>        // Start listening<br>        .rxListen(8888)<br>        // to Completable<br>        .ignoreElement()<br>        ;<br>}</pre><p>Now you can run the application.</p><pre>mvn clean compile exec:java</pre><p>Get the <a href="https://github.com/hantsy/vertx-sandbox/tree/master/rxjava3">source codes from my github</a>, if you are still using the RxJava 2, there also includes a <a href="https://github.com/hantsy/vertx-sandbox/tree/master/rxjava2">RxJava 2 version</a>.</p><img src="https://medium.com/_/stat?event=post.clientViewed&referrerSource=full_rss&postId=e373077d7002" width="1" height="1" alt=""><hr><p><a href="https://medium.com/nerd-for-tech/building-a-vertx-application-with-rxjava-3-api-bindings-e373077d7002">Building a Vertx application with RxJava 3 API Bindings</a> was originally published in <a href="https://medium.com/nerd-for-tech">Nerd For Tech</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+
+  </article>
+
+  
+
+</div>
+
+  </div>
+
+  <!-- Footer -->
+
+  
+<footer class="fixed-bottom">
+  <div class="container mt-0">
+    &copy; Copyright 2022 Hantsy  Bai.
+    <span class="mr-auto"></span>
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+
+    
+    
+
+  </div>
+</footer>
+
+
+
+</body>
+
+<!-- Bootsrap & MDB scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.4.4/umd/popper.min.js" integrity="sha512-eUQ9hGdLjBjY3F41CScH3UX+4JDSI9zXeroz7hJ+RteoCaY+GP/LDoM8AO+Pt+DRFw3nXqsjh9Zsts8hnYv8/A==" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js" integrity="sha512-Mug9KHKmroQFMLm93zGrjhibM2z2Obg9l6qFG2qKjXEXkMp/VDkI4uju9m4QKPjWSwQ6O2qzZEnJDEeCw0Blcw==" crossorigin="anonymous"></script>
+
+
+<!-- Mansory & imagesLoaded -->
+<script defer src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script defer src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+<script defer src="/assets/js/mansory.js" type="text/javascript"></script>
+
+
+
+
+
+<!-- Load Common JS -->
+<script src="/assets/js/common.js"></script>
+
+
+</html>
