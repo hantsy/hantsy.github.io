@@ -37,7 +37,8 @@ jobs:
         bundler-cache: true
     - name: Install deps
       run: |
-        gem install jekyll bundler
+        gem install jekyll -v 4.3.3
+        gem install bundler
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
     - name: Setup deploy options
