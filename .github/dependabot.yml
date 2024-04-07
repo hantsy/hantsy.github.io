@@ -9,11 +9,9 @@ updates:
     directory: "/" 
     schedule:
       interval: "daily"
-    target-branch: "source"
   - package-ecosystem: "bundler" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
-    target-branch: "source"
     labels:
       - "dependencies"  
