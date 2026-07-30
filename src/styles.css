@@ -1,10 +1,4 @@
-/* Custom variables — supplement Material's purple-green theme */
-:root {
-  --max-width: 800px;
-  --bg-color: #303030;
-  --card-bg: #424242;
-}
-
+/* Ensure dark theme always applies */
 html {
   scroll-behavior: smooth;
 }
@@ -12,10 +6,12 @@ html {
 body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   margin: 0;
+  background: #303030;
+  color: #fff;
 }
 
 .container {
-  max-width: var(--max-width);
+  max-width: 800px;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -120,6 +116,10 @@ mat-toolbar + .container,
   margin-right: 0.5rem;
 }
 
+/* Ensure mat-card text is readable */
+mat-card a { color: #ce93d8; }
+mat-card-subtitle { color: rgba(255,255,255,0.6) !important; }
+
 /* === Blog Cards === */
 .blog-list {
   display: flex;
@@ -160,18 +160,25 @@ mat-toolbar + .container,
 .post-content {
   font-size: 1.05rem;
   line-height: 1.85;
+  color: rgba(255,255,255,0.87);
+}
+.post-content h1, .post-content h2, .post-content h3,
+.post-content h4, .post-content h5, .post-content h6 {
+  color: #fff;
 }
 .post-content h2 { margin: 2rem 0 0.75rem; }
 .post-content h3 { margin: 1.75rem 0 0.5rem; }
 .post-content p { margin-bottom: 1rem; }
 .post-content ul, .post-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
 .post-content li { margin-bottom: 0.25rem; margin-left: 1rem; }
+.post-content a { color: #ce93d8; }
 .post-content blockquote {
   border-left: 4px solid #ce93d8;
   padding: 0.5rem 1rem;
   margin: 1rem 0;
   background: rgba(206, 147, 216, 0.1);
   border-radius: 0 6px 6px 0;
+  color: rgba(255,255,255,0.8);
 }
 .post-content pre {
   background: #1e1e1e;
@@ -180,22 +187,27 @@ mat-toolbar + .container,
   overflow-x: auto;
   margin-bottom: 1rem;
   font-size: 0.9rem;
+  color: #e0e0e0;
 }
 .post-content code {
   background: rgba(255, 255, 255, 0.1);
   padding: 0.15rem 0.35rem;
   border-radius: 3px;
   font-size: 0.9em;
+  color: #ce93d8;
 }
 .post-content pre code {
   background: transparent;
   padding: 0;
+  color: #e0e0e0;
 }
 .post-content img {
   max-width: 100%;
   border-radius: 6px;
   margin: 1rem 0;
 }
+.post-content figure { margin: 1rem 0; }
+.post-content figcaption { color: rgba(255,255,255,0.5); font-size: 0.9em; }
 
 /* === Tutorials === */
 .tutorial-list {
