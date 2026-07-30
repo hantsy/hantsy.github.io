@@ -49,7 +49,7 @@ import { BlogService, MediumPost } from '../../services/blog.service';
                 @if (post.categories.length) {
                   <div class="post-tags">
                     @for (cat of post.categories.slice(0, 4); track cat) {
-                      <mat-chip class="post-tag-chip" [style.background]="tagColor(cat)" [style.color]="'#fff'">{{ cat }}</mat-chip>
+                      <mat-chip class="post-tag-chip" [style.background]="tagColor(cat)" [style.color]="tagTextColor(cat)">{{ cat }}</mat-chip>
                     }
                   </div>
                 }
@@ -137,7 +137,9 @@ import { BlogService, MediumPost } from '../../services/blog.service';
     .post-tag-chip {
       font-size: 0.7rem !important;
       min-height: 22px !important;
-      --mdc-chip-container-shape-radius: 4px;
+      --mdc-chip-container-shape-radius: 20px;
+      --mdc-chip-elevated-container-color: transparent !important;
+      --mdc-chip-label-text-color: inherit !important;
     }
     .post-title {
       font-size: 1.2rem;
@@ -176,19 +178,30 @@ export default class BlogIndexPage implements OnInit {
   loading = signal(true);
 
   private readonly palette = [
-    '#3f51b5','#e91e63','#009688','#ff5722','#673ab7',
-    '#00bcd4','#8bc34a','#ff9800','#795548','#607d8b',
-    '#2196f3','#f44336','#4caf50','#9c27b0','#cddc39',
+    '#e8eaf6','#fce4ec','#e0f2f1','#fbe9e7','#ede7f6',
+    '#e0f7fa','#f1f8e9','#fff3e0','#efebe9','#eceff1',
+    '#e3f2fd','#ffebee','#e8f5e9','#f3e5f5','#f9fbe7',
   ];
 
   private tagColorMap = new Map<string, string>();
 
+  private readonly darkText = [
+    '#283593','#880e4f','#00695c','#bf360c','#4527a0',
+    '#00838f','#558b2f','#e65100','#4e342e','#37474f',
+    '#0d47a1','#b71c1c','#1b5e20','#6a1b9a','#827717',
+  ];
+
   tagColor(tag: string): string {
     if (!this.tagColorMap.has(tag)) {
-      const c = this.palette[this.tagColorMap.size % this.palette.length];
-      this.tagColorMap.set(tag, c);
+      const i = this.tagColorMap.size % this.palette.length;
+      this.tagColorMap.set(tag, this.palette[i]);
     }
     return this.tagColorMap.get(tag)!;
+  }
+
+  tagTextColor(tag: string): string {
+    const i = [...(this.tagColorMap.keys())].indexOf(tag);
+    return i >= 0 ? '#' + this.darkText[i % this.darkText.length] : '#333';
   }
 
   constructor(private blogService: BlogService) {}
