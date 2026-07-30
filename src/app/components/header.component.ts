@@ -17,29 +17,10 @@ import { MatMenuModule } from '@angular/material/menu';
       <span class="spacer"></span>
 
       <nav class="desktop-nav">
-        <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
-          <mat-icon>home</mat-icon> Home
-        </a>
-        <a mat-button routerLink="/tutorials" routerLinkActive="active-link">
-          <mat-icon>menu_book</mat-icon> Tutorials
-        </a>
-        <a mat-button routerLink="/blog" routerLinkActive="active-link">
-          <mat-icon>rss_feed</mat-icon> Blog
-        </a>
+        <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <a mat-button routerLink="/tutorials" routerLinkActive="active-link">Tutorials</a>
+        <a mat-button routerLink="/blog" routerLinkActive="active-link">Blog</a>
       </nav>
-
-      <a mat-icon-button href="https://github.com/hantsy" target="_blank" rel="noopener" aria-label="GitHub">
-        <mat-icon>code</mat-icon>
-      </a>
-      <a mat-icon-button href="https://twitter.com/hantsy" target="_blank" rel="noopener" aria-label="Twitter">
-        <mat-icon>alternate_email</mat-icon>
-      </a>
-      <a mat-icon-button href="https://www.linkedin.com/in/hantsy" target="_blank" rel="noopener" aria-label="LinkedIn">
-        <mat-icon>work</mat-icon>
-      </a>
-      <a mat-icon-button href="https://medium.com/@hantsy" target="_blank" rel="noopener" aria-label="Medium">
-        <mat-icon>article</mat-icon>
-      </a>
 
       <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMenu" aria-label="Menu">
         <mat-icon>menu</mat-icon>
@@ -47,15 +28,9 @@ import { MatMenuModule } from '@angular/material/menu';
     </mat-toolbar>
 
     <mat-menu #mobileMenu="matMenu">
-      <a mat-menu-item routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon>home</mat-icon> Home
-      </a>
-      <a mat-menu-item routerLink="/tutorials" routerLinkActive="active-link">
-        <mat-icon>menu_book</mat-icon> Tutorials
-      </a>
-      <a mat-menu-item routerLink="/blog" routerLinkActive="active-link">
-        <mat-icon>rss_feed</mat-icon> Blog
-      </a>
+      <a mat-menu-item routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a mat-menu-item routerLink="/tutorials" routerLinkActive="active-link">Tutorials</a>
+      <a mat-menu-item routerLink="/blog" routerLinkActive="active-link">Blog</a>
     </mat-menu>
   `,
   styles: [`
