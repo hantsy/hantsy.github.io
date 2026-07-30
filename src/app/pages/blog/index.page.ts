@@ -3,13 +3,14 @@ import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BlogService, MediumPost } from '../../services/blog.service';
 
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [DatePipe, MatCardModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [DatePipe, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule, MatProgressSpinnerModule],
   template: `
     <header class="page-header">
       <h1>Blog</h1>
@@ -29,25 +30,39 @@ import { BlogService, MediumPost } from '../../services/blog.service';
     }
 
     @if (!loading()) {
-      <div class="blog-list">
+      <div class="post-grid">
         @for (post of mediumPosts(); track post.link) {
-          <a [href]="post.link" target="_blank" rel="noopener" class="card-link">
-            <mat-card class="mat-elevation-z2 medium-card"
-              [style.background-image]="post.thumbnail ? 'url(' + post.thumbnail + ')' : ''">
-              <div class="card-overlay">
-                <div class="card-text">
-                  <h2>{{ post.title }}</h2>
-                  <div class="card-meta">
-                    <mat-icon inline style="font-size:1rem;width:1rem;height:1rem">calendar_today</mat-icon>
-                    {{ post.pubDate | date:'longDate' }}
-                    @if (post.creator) { · {{ post.creator }} }
+          <a [href]="post.link" target="_blank" rel="noopener" class="post-card-link">
+            <div class="post-card mat-elevation-z1">
+              <!-- Thumbnail -->
+              <div class="post-thumb">
+                @if (post.thumbnail) {
+                  <img [src]="post.thumbnail" alt="" loading="lazy" />
+                } @else {
+                  <div class="post-thumb-placeholder">
+                    <mat-icon>article</mat-icon>
                   </div>
-                  @if (post.summary) {
-                    <p class="card-summary">{{ post.summary }}</p>
-                  }
-                </div>
+                }
               </div>
-            </mat-card>
+              <!-- Content -->
+              <div class="post-body">
+                @if (post.categories?.length) {
+                  <div class="post-tags">
+                    <mat-chip class="post-tag-chip">{{ post.categories[0] }}</mat-chip>
+                  </div>
+                }
+                <h2 class="post-title">{{ post.title }}</h2>
+                <div class="post-meta">
+                  <mat-icon class="meta-icon">calendar_today</mat-icon>
+                  <span>{{ post.pubDate | date:'MMM d, y' }}</span>
+                  <span class="meta-dot">·</span>
+                  <span>{{ post.creator }}</span>
+                </div>
+                @if (post.summary) {
+                  <p class="post-summary">{{ post.summary }}</p>
+                }
+              </div>
+            </div>
           </a>
         }
 
@@ -58,21 +73,107 @@ import { BlogService, MediumPost } from '../../services/blog.service';
     }
   `,
   styles: [`
-    .card-link { text-decoration:none;color:inherit;display:block; }
-    .medium-card {
-      min-height:200px;background-size:cover;background-position:center;
-      position:relative;border-radius:12px;overflow:hidden;
-      transition: transform .2s,box-shadow .2s;
+    /* Grid */
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.75rem;
     }
-    .medium-card:hover { transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15); }
-    .card-overlay {
-      background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.75) 100%);
-      min-height:200px;display:flex;flex-direction:column;justify-content:flex-end;
+
+    /* Card */
+    .post-card-link { text-decoration: none; color: inherit; }
+    .post-card {
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      transition: transform .25s, box-shadow .25s;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
-    .card-text { padding:1.5rem; }
-    .card-text h2 { color:#fff;margin:0 0 .5rem;font-size:1.3rem;line-height:1.3; }
-    .card-meta { color:rgba(255,255,255,.8);font-size:.85rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.25rem; }
-    .card-summary { color:rgba(255,255,255,.9);margin:0;margin-top:.75rem;font-size:.95rem;line-height:1.5; }
+    .post-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.12);
+    }
+
+    /* Thumbnail */
+    .post-thumb {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+    .post-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .4s;
+    }
+    .post-card:hover .post-thumb img { transform: scale(1.04); }
+    .post-thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #3f51b5, #7986cb);
+      color: #fff;
+    }
+    .post-thumb-placeholder mat-icon { font-size: 48px; width: 48px; height: 48px; }
+
+    /* Body */
+    .post-body {
+      padding: 1.25rem 1.25rem 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .post-tags { margin-bottom: 0.5rem; }
+    .post-tag-chip {
+      font-size: 0.7rem !important;
+      min-height: 22px !important;
+      background: rgba(63,81,181,.08) !important;
+      color: #3f51b5 !important;
+    }
+    .post-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 0 0 0.5rem;
+      color: #212121;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .post-card:hover .post-title { color: #3f51b5; }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 0.75rem;
+    }
+    .meta-icon { font-size: 14px; width: 14px; height: 14px; }
+    .meta-dot { font-weight: 700; }
+
+    .post-summary {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #666;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      .post-grid { grid-template-columns: 1fr; }
+      .post-thumb { height: 160px; }
+    }
   `],
 })
 export default class BlogIndexPage implements OnInit {
