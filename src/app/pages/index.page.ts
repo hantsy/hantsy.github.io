@@ -34,11 +34,8 @@ import { MatIconModule } from '@angular/material/icon';
         <a mat-raised-button color="accent" [href]="profile.cvUrl" target="_blank">
           <mat-icon>description</mat-icon> Download CV
         </a>
-        <a mat-stroked-button color="primary" [href]="profile.linkedinUrl" target="_blank" rel="noopener">
-          <mat-icon>work</mat-icon> LinkedIn
-        </a>
-        <a mat-stroked-button color="primary" [href]="profile.githubUrl" target="_blank" rel="noopener">
-          <mat-icon>code</mat-icon> GitHub Projects
+        <a mat-stroked-button color="primary" href="mailto:hantsy@gmail.com">
+          <mat-icon>email</mat-icon> hantsy&#64;gmail.com
         </a>
       </div>
     </div>
@@ -56,14 +53,14 @@ import { MatIconModule } from '@angular/material/icon';
     <h2 class="section-heading standalone"><mat-icon inline>design_services</mat-icon> Professional Services</h2>
     <div class="service-grid">
       @for (service of profile.services; track service.title) {
-        <mat-card class="mat-elevation-z2 service-card">
-          <mat-card-header>
-            <div mat-card-avatar class="service-avatar">
-              <mat-icon>{{ service.icon }}</mat-icon>
+        <mat-card class="mat-elevation-z2 service-card" [class]="'card-' + service.icon">
+          <mat-card-content>
+            <div class="svc-icon-wrap">
+              <mat-icon class="svc-icon">{{ service.icon }}</mat-icon>
             </div>
-            <mat-card-title>{{ service.title }}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content><p>{{ service.description }}</p></mat-card-content>
+            <h3 class="svc-title">{{ service.title }}</h3>
+            <p class="svc-desc">{{ service.description }}</p>
+          </mat-card-content>
         </mat-card>
       }
     </div>
@@ -79,7 +76,6 @@ import { MatIconModule } from '@angular/material/icon';
     .hero-name { font-size:2.4rem;font-weight:300;margin:0 0 .5rem;letter-spacing:-.5px; }
     .hero-tagline { font-size:1.1rem;color:rgba(0,0,0,.55);max-width:520px;margin:0 auto 1.25rem; }
 
-    /* Social brand buttons */
     .hero-social { display:flex;gap:.5rem;justify-content:center;margin-bottom:1.5rem; }
     .social-btn {
       display:inline-flex;align-items:center;justify-content:center;
@@ -108,14 +104,27 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     /* Service cards */
-    .service-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:3rem; }
-    .service-card { border-radius:12px;transition:transform .2s,box-shadow .2s; }
-    .service-card:hover { transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.12); }
-    .service-avatar {
-      background:#3f51b5;color:#fff;display:flex;align-items:center;justify-content:center;
-      border-radius:50%;width:44px;height:44px;
+    .service-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin-bottom:3rem; }
+    .service-card { border-radius:14px;text-align:center;padding:1.5rem 1rem;transition:transform .25s,box-shadow .25s;position:relative;overflow:hidden; }
+    .service-card::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:5px;
     }
-    .service-avatar mat-icon { font-size:24px;width:24px;height:24px; }
+    .service-card.card-devices::before { background:linear-gradient(90deg,#3f51b5,#7986cb); }
+    .service-card.card-lightbulb::before { background:linear-gradient(90deg,#e91e63,#f06292); }
+    .service-card.card-rocket_launch::before { background:linear-gradient(90deg,#ff5722,#ff8a65); }
+    .service-card:hover { transform:translateY(-4px);box-shadow:0 10px 32px rgba(0,0,0,.15); }
+
+    .svc-icon-wrap {
+      width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      margin:0 auto 1rem;
+    }
+    .service-card.card-devices .svc-icon-wrap { background:rgba(63,81,181,.1);color:#3f51b5; }
+    .service-card.card-lightbulb .svc-icon-wrap { background:rgba(233,30,99,.1);color:#e91e63; }
+    .service-card.card-rocket_launch .svc-icon-wrap { background:rgba(255,87,34,.1);color:#ff5722; }
+    .svc-icon { font-size:32px;width:32px;height:32px; }
+
+    .svc-title { font-size:1.15rem;font-weight:600;margin:0 0 .5rem; }
+    .svc-desc { font-size:.95rem;color:rgba(0,0,0,.6);line-height:1.6;margin:0; }
 
     @media(max-width:768px) {
       .hero-name { font-size:1.8rem; }
