@@ -46,7 +46,7 @@ import { BlogService, MediumPost } from '../../services/blog.service';
               </div>
               <!-- Content -->
               <div class="post-body">
-                @if (post.categories?.length) {
+                @if (post.categories.length) {
                   <div class="post-tags">
                     <mat-chip class="post-tag-chip">{{ post.categories[0] }}</mat-chip>
                   </div>
