@@ -86,9 +86,10 @@ async function main(): Promise<void> {
 
     // Move description into the body and remove it from frontmatter
     const desc = attrs.description;
-    if (desc && desc !== body.trim()) {
+    if (desc) {
       delete attrs.description;
-      fs.writeFileSync(filepath, serializeFrontmatter(attrs, desc), 'utf-8');
+      const newBody = desc || attrs.title || body;
+      fs.writeFileSync(filepath, serializeFrontmatter(attrs, newBody), 'utf-8');
       updated++;
     }
 
