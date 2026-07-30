@@ -3,6 +3,7 @@ dist/
 .tmp/
 .vite/
 .angular/
+public/content/
 *.log
 .DS_Store
 Thumbs.db

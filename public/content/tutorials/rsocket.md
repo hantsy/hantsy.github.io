@@ -1,8 +1,0 @@
----
-title: "RSocket By Example"
-year: "2019"
-url: "https://hantsy.github.io/rsocket-sample/"
-type: "book"
----
-
-Tips of using RSocket and Spring RSocket
