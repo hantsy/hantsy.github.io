@@ -5,7 +5,8 @@
   "description": "Hantsy's personal blog - built with Angular",
   "scripts": {
     "dev": "ng serve",
-    "build": "npm run content:index && ng build",
+    "build": "npm run enrich:tutorials && npm run content:index && ng build",
+    "enrich:tutorials": "npx tsx scripts/enrich-tutorials.ts",
     "preview": "npx serve dist/browser",
     "content:index": "npx tsx scripts/generate-content-index.ts"
   },
