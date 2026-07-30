@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { XMLParser } from 'fast-xml-parser';
 
 export interface MediumPost {
   title: string;
@@ -11,29 +12,74 @@ export interface MediumPost {
 
 @Injectable({ providedIn: 'root' })
 export class BlogService {
-  private readonly MEDIUM_RSS =
-    'https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@hantsy';
+  private readonly MEDIUM_RSS = 'https://medium.com/feed/@hantsy';
+
+  private readonly CORS_PROXIES = [
+    (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url: string) =>
+      `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`,
+  ];
 
   async fetchMediumFeed(): Promise<MediumPost[]> {
-    try {
-      const response = await fetch(this.MEDIUM_RSS);
-      if (!response.ok) return [];
-      const data = await response.json();
+    // Try each proxy until one works
+    for (const proxyFn of this.CORS_PROXIES) {
+      try {
+        const proxyUrl = proxyFn(this.MEDIUM_RSS);
+        const response = await fetch(proxyUrl);
+        if (!response.ok) continue;
 
-      if (data.status !== 'ok' || !data.items) return [];
+        const text = await response.text();
 
-      return data.items.map((item: any) => ({
-        title: item.title || '',
-        link: item.link || '',
-        pubDate: item.pubDate || '',
-        creator: item.author || 'Hantsy',
-        summary: this.stripHtml(item.description || '').substring(0, 300),
-        categories: item.categories || [],
-      }));
-    } catch {
-      console.warn('Could not fetch Medium feed. Showing local posts only.');
-      return [];
+        // rss2json returns JSON, others return XML
+        if (proxyUrl.includes('rss2json')) {
+          return this.parseRss2JsonResponse(text);
+        }
+        return this.parseXmlResponse(text);
+      } catch {
+        continue;
+      }
     }
+
+    console.warn('All CORS proxies failed. Showing local posts only.');
+    return [];
+  }
+
+  private parseXmlResponse(xml: string): MediumPost[] {
+    const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '' });
+    const parsed = parser.parse(xml);
+    const items: any[] = parsed?.rss?.channel?.item || [];
+
+    return items.map((item: any) => this.mapItem(item));
+  }
+
+  private parseRss2JsonResponse(json: string): MediumPost[] {
+    const data = JSON.parse(json);
+    if (data.status !== 'ok' || !data.items) return [];
+    return data.items.map((item: any) => ({
+      title: item.title || '',
+      link: item.link || '#',
+      pubDate: item.pubDate || '',
+      creator: item.author || 'Hantsy',
+      summary: this.stripHtml(item.description || '').substring(0, 300),
+      categories: item.categories || [],
+    }));
+  }
+
+  private mapItem(item: any): MediumPost {
+    const description = item['content:encoded'] || item.description || '';
+    return {
+      title: item.title || 'Untitled',
+      link: item.link || '#',
+      pubDate: item.pubDate || '',
+      creator: item['dc:creator'] || 'Hantsy',
+      summary: this.stripHtml(description).substring(0, 300),
+      categories: item.category
+        ? Array.isArray(item.category)
+          ? item.category
+          : [item.category]
+        : [],
+    };
   }
 
   private stripHtml(html: string): string {
