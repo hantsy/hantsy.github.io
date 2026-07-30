@@ -47,11 +47,11 @@ import { BlogService, MediumPost } from '../../services/blog.service';
               <!-- Content -->
               <div class="post-body">
                 @if (post.categories.length) {
-                  <div class="post-tags">
+                  <mat-chip-set class="post-tags" aria-label="Categories">
                     @for (cat of post.categories.slice(0, 4); track cat) {
-                      <mat-chip class="post-tag-chip" [style.background]="tagColor(cat)" [style.color]="tagTextColor(cat)">{{ cat }}</mat-chip>
+                      <mat-chip-row class="post-tag-chip" [style.background]="tagColor(cat)" [style.color]="tagTextColor(cat)">{{ cat }}</mat-chip-row>
                     }
-                  </div>
+                  </mat-chip-set>
                 }
                 <h2 class="post-title">{{ post.title }}</h2>
                 <div class="post-meta">
@@ -133,13 +133,14 @@ import { BlogService, MediumPost } from '../../services/blog.service';
       flex-direction: column;
       justify-content: center;
     }
-    .post-tags { margin-bottom: 0.5rem;display:flex;gap:.35rem;flex-wrap:wrap; }
+    .post-tags { margin-bottom: 0.5rem; }
     .post-tag-chip {
+      --mdc-chip-container-shape-radius: 999px;
+      --mdc-chip-container-height: 24px;
+    }
+    .post-tag-chip .mdc-evolution-chip__text-label {
       font-size: 0.7rem !important;
-      min-height: 22px !important;
-      --mdc-chip-container-shape-radius: 20px;
-      --mdc-chip-elevated-container-color: transparent !important;
-      --mdc-chip-label-text-color: inherit !important;
+      font-weight: 500 !important;
     }
     .post-title {
       font-size: 1.2rem;
