@@ -1,53 +1,46 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ContentService, ParsedContent, TutorialMeta } from '../services/content.service';
+import { TutorialsData } from '../services/tutorials.resolver';
 
 @Component({
   selector: 'app-tutorials',
   standalone: true,
-  imports: [MatCardModule, MatProgressSpinnerModule],
+  imports: [RouterOutlet, MatCardModule, MatProgressSpinnerModule],
   template: `
     <header class="page-header">
       <h1>Tutorials</h1>
       <p class="page-description">Publications, papers, and tutorials — grouped by year.</p>
     </header>
 
-    @if (loading()) {
-      <div style="display:flex;justify-content:center;padding:3rem"><mat-spinner diameter="40"/></div>
-    }
-
-    @if (!loading()) {
-      @if (groupedTutorials().length > 0) {
-        <div class="timeline">
-          @for (group of groupedTutorials(); track group.year) {
-            <div class="timeline-row">
-              <!-- Year marker + dot on the left -->
-              <div class="timeline-left">
-                <span class="year-badge">{{ group.year }}</span>
-              </div>
-              <div class="timeline-dot"></div>
-              <!-- Card on the right with all entries for this year -->
-              <mat-card class="mat-elevation-z1 timeline-card">
-                <mat-card-content>
-                  @for (tutorial of group.items; track tutorial.slug) {
-                    <div class="tutorial-entry">
-                      <a [href]="tutorial.attributes.url" target="_blank" rel="noopener" class="tutorial-link">
-                        {{ tutorial.attributes.title }}
-                      </a>
-                      @if (tutorial.content) {
-                        <p class="tutorial-desc">{{ tutorial.content }}</p>
-                      }
-                    </div>
-                  }
-                </mat-card-content>
-              </mat-card>
+    @if (groupedTutorials().length > 0) {
+      <div class="timeline">
+        @for (group of groupedTutorials(); track group.year) {
+          <div class="timeline-row">
+            <div class="timeline-left">
+              <span class="year-badge">{{ group.year }}</span>
             </div>
-          }
-        </div>
-      } @else {
-        <div class="empty-state">Tutorials and publications coming soon.</div>
-      }
+            <div class="timeline-dot"></div>
+            <mat-card class="mat-elevation-z1 timeline-card">
+              <mat-card-content>
+                @for (tutorial of group.items; track tutorial.slug) {
+                  <div class="tutorial-entry">
+                    <a [href]="tutorial.attributes.url" target="_blank" rel="noopener" class="tutorial-link">
+                      {{ tutorial.attributes.title }}
+                    </a>
+                    @if (tutorial.content) {
+                      <p class="tutorial-desc">{{ tutorial.content }}</p>
+                    }
+                  </div>
+                }
+              </mat-card-content>
+            </mat-card>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">Tutorials and publications coming soon.</div>
     }
   `,
   styles: [`
@@ -75,26 +68,20 @@ import { ContentService, ParsedContent, TutorialMeta } from '../services/content
     .tutorial-desc { display:block;font-size:.9rem;color:rgba(0,0,0,.65);margin-top:4px;line-height:1.5; }
   `],
 })
-export default class TutorialsPage implements OnInit {
-  groupedTutorials = signal<{ year: number; items: ParsedContent<TutorialMeta>[] }[]>([]);
-  loading = signal(true);
+export default class TutorialsPage {
+  groupedTutorials = signal<TutorialsData>(
+    (history.state as any)?.tutorials ?? /* fallback */ []
+  );
 
-  constructor(private contentService: ContentService) {}
-
-  async ngOnInit(): Promise<void> {
-    try {
-      const tutorials = await this.contentService.getTutorials();
-      const grouped = new Map<number, ParsedContent<TutorialMeta>[]>();
-      for (const t of tutorials) {
-        const year = t.attributes.year || 0;
-        if (!grouped.has(year)) grouped.set(year, []);
-        grouped.get(year)!.push(t);
-      }
-      this.groupedTutorials.set(
-        Array.from(grouped.entries())
-          .sort(([a],[b]) => b - a)
-          .map(([year,items]) => ({year,items}))
-      );
-    } finally { this.loading.set(false); }
+  constructor(route: ActivatedRoute) {
+    // Use preloaded resolver data if available (most navigations)
+    const snap = route.snapshot;
+    if (snap.data['tutorials']) {
+      this.groupedTutorials.set(snap.data['tutorials']);
+    }
+    // Also subscribe for future navigations where resolver re-runs
+    route.data.subscribe((data) => {
+      if (data['tutorials']) this.groupedTutorials.set(data['tutorials']);
+    });
   }
 }
