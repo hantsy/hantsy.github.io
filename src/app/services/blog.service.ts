@@ -86,10 +86,13 @@ export class BlogService {
     };
   }
 
-  /** Extract the src from the first <img> tag. */
+  /** Extract the src from the first <figure> or <img> tag. */
   private firstImage(html: string): string {
-    const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-    return m ? m[1] : '';
+    // Medium wraps images in <figure><img .../></figure>
+    const fig = html.match(/<figure[^>]*>[\s\S]*?<img[^>]+src=["']([^"']+)["']/i);
+    if (fig) return fig[1];
+    const img = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return img ? img[1] : '';
   }
 
   /** Extract text from the first <p> tag, stripping inner HTML. */
