@@ -35,9 +35,7 @@ import { ContentService, ParsedContent, TutorialMeta } from '../services/content
                       <a [href]="tutorial.attributes.url" target="_blank" rel="noopener" class="tutorial-link">
                         {{ tutorial.attributes.title }}
                       </a>
-                      @if (tutorial.attributes.description) {
-                        <span class="tutorial-desc">{{ tutorial.attributes.description }}</span>
-                      }
+                      <p class="tutorial-desc">{{ tutorial.attributes.description || '' }}</p>
                     </div>
                   }
                 </mat-card-content>
@@ -72,7 +70,7 @@ import { ContentService, ParsedContent, TutorialMeta } from '../services/content
     .tutorial-entry + .tutorial-entry { border-top:1px solid rgba(0,0,0,.08); }
     .tutorial-link { font-weight:500;font-size:1rem;color:#3f51b5;text-decoration:none; }
     .tutorial-link:hover { text-decoration:underline; }
-    .tutorial-desc { display:block;font-size:.85rem;color:rgba(0,0,0,.55);margin-top:2px; }
+    .tutorial-desc { display:block;font-size:.9rem;color:rgba(0,0,0,.65);margin-top:4px;line-height:1.5; }
   `],
 })
 export default class TutorialsPage implements OnInit {
