@@ -7,6 +7,7 @@ export interface MediumPost {
   pubDate: string;
   creator: string;
   summary: string;
+  thumbnail: string;
   categories: string[];
 }
 
@@ -22,7 +23,6 @@ export class BlogService {
   ];
 
   async fetchMediumFeed(): Promise<MediumPost[]> {
-    // Try each proxy until one works
     for (const proxyFn of this.CORS_PROXIES) {
       try {
         const proxyUrl = proxyFn(this.MEDIUM_RSS);
@@ -31,7 +31,6 @@ export class BlogService {
 
         const text = await response.text();
 
-        // rss2json returns JSON, others return XML
         if (proxyUrl.includes('rss2json')) {
           return this.parseRss2JsonResponse(text);
         }
@@ -41,45 +40,63 @@ export class BlogService {
       }
     }
 
-    console.warn('All CORS proxies failed. Showing local posts only.');
+    console.warn('All CORS proxies failed.');
     return [];
   }
+
+  // --- Parse helpers ---
 
   private parseXmlResponse(xml: string): MediumPost[] {
     const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '' });
     const parsed = parser.parse(xml);
     const items: any[] = parsed?.rss?.channel?.item || [];
-
-    return items.map((item: any) => this.mapItem(item));
+    return items.map((item: any) => this.mapItem(item['content:encoded'] || item.description || '', item));
   }
 
   private parseRss2JsonResponse(json: string): MediumPost[] {
     const data = JSON.parse(json);
     if (data.status !== 'ok' || !data.items) return [];
-    return data.items.map((item: any) => ({
-      title: item.title || '',
-      link: item.link || '#',
-      pubDate: item.pubDate || '',
-      creator: item.author || 'Hantsy',
-      summary: this.stripHtml(item.description || '').substring(0, 300),
-      categories: item.categories || [],
-    }));
+    return data.items.map((item: any) => {
+      const html = item.description || item.content || '';
+      return {
+        title: item.title || '',
+        link: item.link || '#',
+        pubDate: item.pubDate || '',
+        creator: item.author || 'Hantsy',
+        summary: this.firstParagraph(html),
+        thumbnail: this.firstImage(html),
+        categories: item.categories || [],
+      };
+    });
   }
 
-  private mapItem(item: any): MediumPost {
-    const description = item['content:encoded'] || item.description || '';
+  private mapItem(html: string, item: any): MediumPost {
     return {
       title: item.title || 'Untitled',
       link: item.link || '#',
       pubDate: item.pubDate || '',
       creator: item['dc:creator'] || 'Hantsy',
-      summary: this.stripHtml(description).substring(0, 300),
+      summary: this.firstParagraph(html),
+      thumbnail: this.firstImage(html),
       categories: item.category
         ? Array.isArray(item.category)
           ? item.category
           : [item.category]
         : [],
     };
+  }
+
+  /** Extract the src from the first <img> tag. */
+  private firstImage(html: string): string {
+    const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return m ? m[1] : '';
+  }
+
+  /** Extract text from the first <p> tag, stripping inner HTML. */
+  private firstParagraph(html: string): string {
+    const m = html.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+    if (!m) return this.stripHtml(html).substring(0, 280);
+    return this.stripHtml(m[1]).substring(0, 280);
   }
 
   private stripHtml(html: string): string {
