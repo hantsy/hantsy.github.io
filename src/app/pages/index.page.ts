@@ -110,8 +110,7 @@ import { MatIconModule } from '@angular/material/icon';
       content:'';position:absolute;top:0;left:0;right:0;height:5px;
     }
     .service-card.card-devices::before { background:linear-gradient(90deg,#3f51b5,#7986cb); }
-    .service-card.card-lightbulb::before { background:linear-gradient(90deg,#e91e63,#f06292); }
-    .service-card.card-rocket_launch::before { background:linear-gradient(90deg,#ff5722,#ff8a65); }
+    .service-card.card-psychology::before { background:linear-gradient(90deg,#e91e63,#f06292); }
     .service-card:hover { transform:translateY(-4px);box-shadow:0 10px 32px rgba(0,0,0,.15); }
 
     .svc-icon-wrap {
@@ -119,8 +118,7 @@ import { MatIconModule } from '@angular/material/icon';
       margin:0 auto 1rem;
     }
     .service-card.card-devices .svc-icon-wrap { background:rgba(63,81,181,.1);color:#3f51b5; }
-    .service-card.card-lightbulb .svc-icon-wrap { background:rgba(233,30,99,.1);color:#e91e63; }
-    .service-card.card-rocket_launch .svc-icon-wrap { background:rgba(255,87,34,.1);color:#ff5722; }
+    .service-card.card-psychology .svc-icon-wrap { background:rgba(233,30,99,.1);color:#e91e63; }
     .svc-icon { font-size:32px;width:32px;height:32px; }
 
     .svc-title { font-size:1.15rem;font-weight:600;margin:0 0 .5rem; }

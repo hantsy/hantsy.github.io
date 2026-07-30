@@ -31,19 +31,13 @@ I believe in remote-first work, engineering culture over endless meetings, conti
       icon: 'devices',
       title: 'Application Development',
       description:
-        'Full-stack development with Jakarta EE, Spring Boot, MicroProfile, Quarkus, Angular, and cloud-native technologies — from prototype to production.',
+        'Full-stack development across the entire Java ecosystem — Jakarta EE, Spring Boot, MicroProfile, Quarkus — and modern frontends with Angular. I take projects from concept to production, with clean code, solid testing, and cloud-native deployment.',
     },
     {
-      icon: 'lightbulb',
-      title: 'Technical Consulting',
+      icon: 'psychology',
+      title: 'Consulting Services',
       description:
-        'Architecture review, code audits, technology selection, performance tuning, and migration strategy for enterprise Java applications.',
-    },
-    {
-      icon: 'rocket_launch',
-      title: 'Startup Team Coaching',
-      description:
-        'Agile coaching, engineering culture building, code review practices, and hands-on mentoring for early-stage development teams.',
+        'I help teams ship better software through architecture reviews, code audits, technology selection, and performance tuning. Whether you need a one-time deep dive or ongoing mentorship, I work alongside your engineers to raise the bar on code quality, agile practices, and engineering culture.',
     },
   ],
 
