@@ -95,11 +95,25 @@ export class BlogService {
     return img ? img[1] : '';
   }
 
-  /** Extract text from the first <p> tag, stripping inner HTML. */
+  /** Extract text from the first <p> tag, truncating at a sentence boundary. */
   private firstParagraph(html: string): string {
     const m = html.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
-    if (!m) return this.stripHtml(html).substring(0, 280);
-    return this.stripHtml(m[1]).substring(0, 280);
+    const raw = m ? this.stripHtml(m[1]) : this.stripHtml(html);
+    return this.truncateToSentence(raw, 260);
+  }
+
+  /** Truncate text to end at the last . or ? within the limit, falling back to last space. */
+  private truncateToSentence(text: string, limit: number): string {
+    if (text.length <= limit) return text;
+    const slice = text.substring(0, limit);
+    // Try to break at a sentence-ending punctuation
+    const lastDot = slice.lastIndexOf('.');
+    const lastQ = slice.lastIndexOf('?');
+    const breakAt = Math.max(lastDot, lastQ);
+    if (breakAt > limit * 0.5) return slice.substring(0, breakAt + 1);
+    // Fallback: break at last space
+    const lastSpace = slice.lastIndexOf(' ');
+    return (lastSpace > 0 ? slice.substring(0, lastSpace) : slice) + '…';
   }
 
   private stripHtml(html: string): string {
