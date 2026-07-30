@@ -16,58 +16,67 @@ import { BlogService, MediumPost } from '../../services/blog.service';
       </p>
     </header>
 
-    <div class="blog-list">
-      <!-- Local markdown posts -->
-      @for (post of localPosts(); track post.slug) {
-        <article class="blog-card">
-          <h2>
-            <a [routerLink]="['/blog', post.slug]">{{ post.attributes.title }}</a>
-          </h2>
-          <div class="blog-meta">
-            <time>{{ post.attributes.date | date:'longDate' }}</time>
-            @if (post.attributes.tags?.length) {
-              · @for (tag of post.attributes.tags; track tag) {
-                <span>{{ tag }}</span>
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="empty-state"><p>Loading posts...</p></div>
+    }
+
+    <!-- Posts -->
+    @if (!loading()) {
+      <div class="blog-list">
+        <!-- Local markdown posts -->
+        @for (post of localPosts(); track post.slug) {
+          <article class="blog-card">
+            <h2>
+              <a [routerLink]="['/blog', post.slug]">{{ post.attributes.title }}</a>
+            </h2>
+            <div class="blog-meta">
+              <time>{{ post.attributes.date | date:'longDate' }}</time>
+              @if (post.attributes.tags?.length) {
+                · @for (tag of post.attributes.tags; track tag) {
+                  <span>{{ tag }}</span>
+                }
               }
+            </div>
+            @if (post.attributes.description) {
+              <p class="blog-excerpt">{{ post.attributes.description }}</p>
             }
-          </div>
-          @if (post.attributes.description) {
-            <p class="blog-excerpt">{{ post.attributes.description }}</p>
-          }
-        </article>
-      }
+          </article>
+        }
 
-      <!-- Medium RSS posts -->
-      @for (post of mediumPosts(); track post.link) {
-        <article class="blog-card">
-          <h2>
-            <a [href]="post.link" target="_blank" rel="noopener">{{ post.title }}</a>
-            <span class="blog-source">Medium</span>
-          </h2>
-          <div class="blog-meta">
-            <time>{{ post.pubDate | date:'longDate' }}</time>
-            @if (post.creator) {
-              · {{ post.creator }}
+        <!-- Medium RSS posts -->
+        @for (post of mediumPosts(); track post.link) {
+          <article class="blog-card">
+            <h2>
+              <a [href]="post.link" target="_blank" rel="noopener">{{ post.title }}</a>
+              <span class="blog-source">Medium</span>
+            </h2>
+            <div class="blog-meta">
+              <time>{{ post.pubDate | date:'longDate' }}</time>
+              @if (post.creator) {
+                · {{ post.creator }}
+              }
+            </div>
+            @if (post.summary) {
+              <p class="blog-excerpt">{{ post.summary }}</p>
             }
-          </div>
-          @if (post.summary) {
-            <p class="blog-excerpt">{{ post.summary }}</p>
-          }
-        </article>
-      }
-    </div>
-
-    <!-- Empty state -->
-    @if (localPosts().length === 0 && mediumPosts().length === 0) {
-      <div class="empty-state">
-        <p>No blog posts yet. Check back soon!</p>
+          </article>
+        }
       </div>
+
+      <!-- Empty state (only after loading finishes) -->
+      @if (localPosts().length === 0 && mediumPosts().length === 0) {
+        <div class="empty-state">
+          <p>No blog posts yet. Check back soon!</p>
+        </div>
+      }
     }
   `,
 })
 export default class BlogIndexPage implements OnInit {
   localPosts = signal<ParsedContent<PostMeta>[]>([]);
   mediumPosts = signal<MediumPost[]>([]);
+  loading = signal(true);
 
   constructor(
     private contentService: ContentService,
@@ -75,7 +84,15 @@ export default class BlogIndexPage implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.localPosts.set(await this.contentService.getBlogPosts());
-    this.mediumPosts.set(await this.blogService.fetchMediumFeed());
+    try {
+      const [local, medium] = await Promise.all([
+        this.contentService.getBlogPosts(),
+        this.blogService.fetchMediumFeed(),
+      ]);
+      this.localPosts.set(local);
+      this.mediumPosts.set(medium);
+    } finally {
+      this.loading.set(false);
+    }
   }
 }
