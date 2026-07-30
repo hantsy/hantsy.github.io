@@ -37,8 +37,6 @@ import { ContentService, ParsedContent, TutorialMeta } from '../services/content
                       </a>
                       @if (tutorial.content) {
                         <p class="tutorial-desc">{{ tutorial.content }}</p>
-                      } @else if (tutorial.attributes.description) {
-                        <p class="tutorial-desc">{{ tutorial.attributes.description }}</p>
                       }
                     </div>
                   }

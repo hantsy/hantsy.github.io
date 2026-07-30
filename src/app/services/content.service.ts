@@ -16,7 +16,6 @@ export interface PostMeta {
 export interface TutorialMeta {
   title: string;
   year: number;
-  description?: string;
   url?: string;
   type?: string;
 }
