@@ -48,7 +48,9 @@ import { BlogService, MediumPost } from '../../services/blog.service';
               <div class="post-body">
                 @if (post.categories.length) {
                   <div class="post-tags">
-                    <mat-chip class="post-tag-chip">{{ post.categories[0] }}</mat-chip>
+                    @for (cat of post.categories.slice(0, 4); track cat) {
+                      <mat-chip class="post-tag-chip" [style.background]="tagColor(cat)" [style.color]="'#fff'">{{ cat }}</mat-chip>
+                    }
                   </div>
                 }
                 <h2 class="post-title">{{ post.title }}</h2>
@@ -131,12 +133,11 @@ import { BlogService, MediumPost } from '../../services/blog.service';
       flex-direction: column;
       justify-content: center;
     }
-    .post-tags { margin-bottom: 0.5rem; }
+    .post-tags { margin-bottom: 0.5rem;display:flex;gap:.35rem;flex-wrap:wrap; }
     .post-tag-chip {
       font-size: 0.7rem !important;
       min-height: 22px !important;
-      background: rgba(63,81,181,.08) !important;
-      color: #3f51b5 !important;
+      --mdc-chip-container-shape-radius: 4px;
     }
     .post-title {
       font-size: 1.2rem;
@@ -173,6 +174,22 @@ import { BlogService, MediumPost } from '../../services/blog.service';
 export default class BlogIndexPage implements OnInit {
   mediumPosts = signal<MediumPost[]>([]);
   loading = signal(true);
+
+  private readonly palette = [
+    '#3f51b5','#e91e63','#009688','#ff5722','#673ab7',
+    '#00bcd4','#8bc34a','#ff9800','#795548','#607d8b',
+    '#2196f3','#f44336','#4caf50','#9c27b0','#cddc39',
+  ];
+
+  private tagColorMap = new Map<string, string>();
+
+  tagColor(tag: string): string {
+    if (!this.tagColorMap.has(tag)) {
+      const c = this.palette[this.tagColorMap.size % this.palette.length];
+      this.tagColorMap.set(tag, c);
+    }
+    return this.tagColorMap.get(tag)!;
+  }
 
   constructor(private blogService: BlogService) {}
 
