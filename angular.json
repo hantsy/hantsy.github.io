@@ -23,14 +23,15 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "@angular/material/prebuilt-themes/purple-green.css"
             ],
             "scripts": []
           },
           "configurations": {
             "production": {
               "budgets": [
-                { "type": "initial", "maximumWarning": "500kB", "maximumError": "1MB" }
+                { "type": "initial", "maximumWarning": "700kB", "maximumError": "1.2MB" }
               ],
               "outputHashing": "all"
             },
