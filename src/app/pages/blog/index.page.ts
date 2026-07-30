@@ -72,7 +72,7 @@ import { BlogService, MediumPost } from '../../services/blog.service';
     .card-text { padding:1.5rem; }
     .card-text h2 { color:#fff;margin:0 0 .5rem;font-size:1.3rem;line-height:1.3; }
     .card-meta { color:rgba(255,255,255,.8);font-size:.85rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.25rem; }
-    .card-summary { color:rgba(255,255,255,.9);margin:0;font-size:.95rem;line-height:1.5; }
+    .card-summary { color:rgba(255,255,255,.9);margin:0;margin-top:.75rem;font-size:.95rem;line-height:1.5; }
   `],
 })
 export default class BlogIndexPage implements OnInit {
