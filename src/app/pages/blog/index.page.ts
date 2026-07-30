@@ -75,9 +75,9 @@ import { BlogService, MediumPost } from '../../services/blog.service';
   styles: [`
     /* Grid */
     .post-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
     /* Card */
@@ -88,18 +88,18 @@ import { BlogService, MediumPost } from '../../services/blog.service';
       background: #fff;
       transition: transform .25s, box-shadow .25s;
       display: flex;
-      flex-direction: column;
-      height: 100%;
+      flex-direction: row;
     }
     .post-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0,0,0,.12);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.1);
     }
 
     /* Thumbnail */
     .post-thumb {
-      width: 100%;
-      height: 180px;
+      width: 260px;
+      min-height: 180px;
+      flex-shrink: 0;
       overflow: hidden;
       background: #f0f0f0;
     }
@@ -113,6 +113,7 @@ import { BlogService, MediumPost } from '../../services/blog.service';
     .post-thumb-placeholder {
       width: 100%;
       height: 100%;
+      min-height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -123,10 +124,11 @@ import { BlogService, MediumPost } from '../../services/blog.service';
 
     /* Body */
     .post-body {
-      padding: 1.25rem 1.25rem 1.5rem;
+      padding: 1.25rem 1.5rem 1.5rem;
       flex: 1;
       display: flex;
       flex-direction: column;
+      justify-content: center;
     }
     .post-tags { margin-bottom: 0.5rem; }
     .post-tag-chip {
@@ -136,15 +138,11 @@ import { BlogService, MediumPost } from '../../services/blog.service';
       color: #3f51b5 !important;
     }
     .post-title {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 600;
       line-height: 1.4;
       margin: 0 0 0.5rem;
       color: #212121;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
     .post-card:hover .post-title { color: #3f51b5; }
 
@@ -164,15 +162,11 @@ import { BlogService, MediumPost } from '../../services/blog.service';
       line-height: 1.6;
       color: #666;
       margin: 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
 
-    @media (max-width: 768px) {
-      .post-grid { grid-template-columns: 1fr; }
-      .post-thumb { height: 160px; }
+    @media (max-width: 680px) {
+      .post-card { flex-direction: column; }
+      .post-thumb { width: 100%; height: 180px; min-height: unset; }
     }
   `],
 })
