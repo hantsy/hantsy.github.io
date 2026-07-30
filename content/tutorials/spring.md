@@ -6,4 +6,4 @@ type: "book"
 description: "Last updated 6 years ago"
 ---
 
-Building RESTful APIs with Spring WebMVC
+Last updated 6 years ago

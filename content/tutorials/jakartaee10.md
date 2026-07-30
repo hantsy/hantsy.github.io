@@ -6,4 +6,4 @@ type: "string"
 description: "Jakarta EE 10 was released finally on September 2022, it is a big update since Eclipse Foundation hands over the development work from Oracle."
 ---
 
-Migrating to Jakarta EE 10
+Jakarta EE 10 was released finally on September 2022, it is a big update since Eclipse Foundation hands over the development work from Oracle.

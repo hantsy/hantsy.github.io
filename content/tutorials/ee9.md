@@ -6,4 +6,4 @@ type: "book"
 description: "Tips of upgrading to Jakarta EE 9"
 ---
 
-Upgrade to Jakarta EE 9
+Tips of upgrading to Jakarta EE 9

@@ -6,4 +6,4 @@ type: "book"
 description: "For Java developers, Micronaut is a relatedly new framework. It provides more concise APIs to building modern cloud-native applications."
 ---
 
-Micronaut by Example
+For Java developers, Micronaut is a relatedly new framework. It provides more concise APIs to building modern cloud-native applications.
