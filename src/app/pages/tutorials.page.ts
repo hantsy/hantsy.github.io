@@ -1,13 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TutorialsData } from '../services/tutorials.resolver';
 
 @Component({
   selector: 'app-tutorials',
   standalone: true,
-  imports: [RouterOutlet, MatCardModule, MatProgressSpinnerModule],
+  imports: [MatCardModule],
   template: `
     <header class="page-header">
       <h1>Tutorials</h1>
