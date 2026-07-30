@@ -14,12 +14,8 @@ export const routes: Routes = [
   },
   {
     path: 'blog',
-    loadComponent: () => import('./pages/blog/index.page'),
+    loadComponent: () => import('./pages/blog.page'),
     resolve: { posts: blogResolver },
-  },
-  {
-    path: 'blog/:slug',
-    loadComponent: () => import('./pages/blog/[slug].page'),
   },
   {
     path: '**',

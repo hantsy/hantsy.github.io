@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MediumPost } from '../../services/blog.service';
+import { MediumPost } from '../services/blog.service';
 
 @Component({
   selector: 'app-blog',
