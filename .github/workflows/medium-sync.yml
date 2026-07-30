@@ -1,45 +1,36 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
-# For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
+name: Medium RSS Sync
 
-name: rss
-# Scheduled workflows are only exectued on default branch.
-# https://stackoverflow.com/questions/63436541/github-action-workflow-schedule-not-working-on-non-default-branch
 on:
   schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron: "0 1 * * *"
+    - cron: "0 1,12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  rss:
+  sync:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-        with: 
-          ref: source
-      - name: Set up Ruby
-        # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
-        # change this to (see https://github.com/ruby/setup-ruby#versioning):
-        # uses: ruby/setup-ruby@v1
-        uses: ruby/setup-ruby@6148f408d35df04b0189be5e64c1458377b8ae13
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          ruby-version: 2.7
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - name: Import Medium Feed
-        run: |
-          gem install jekyll-import
-          ruby -r rubygems -e 'require "jekyll-import";
-            JekyllImport::Importers::RSS.run({
-              "source" => "https://medium.com/feed/@hantsy"
-            })'
-      - uses: EndBug/add-and-commit@v9.0.1
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync Medium RSS
+        run: npx tsx scripts/sync-medium.ts
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
         with:
           author_name: github-actions
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
-          branch: source
-          add: "*.html"
+          message: 'sync medium rss posts'
+          add: 'src/content/blog/*.md'
