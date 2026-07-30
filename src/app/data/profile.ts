@@ -42,19 +42,19 @@ Currently, I live in Guangzhou, China.`,
   availability: 'I am available for new opportunities.',
   services: [
     {
-      icon: '💻',
+      icon: 'devices',
       title: 'Application Development',
       description:
         'Full-stack application development with Jakarta EE, Spring Boot, MicroProfile, Quarkus, Angular, and cloud-native technologies.',
     },
     {
-      icon: '🎯',
+      icon: 'lightbulb',
       title: 'Technical Consulting',
       description:
         'Architecture review, code audits, technology selection, performance tuning, and migration strategies for enterprise Java applications.',
     },
     {
-      icon: '🚀',
+      icon: 'rocket_launch',
       title: 'Startup Team Coaching',
       description:
         'Agile coaching, engineering culture building, code review practices, and mentoring for startup development teams.',
