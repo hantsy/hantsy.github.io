@@ -31,13 +31,13 @@ I believe in remote-first work, engineering culture over endless meetings, conti
       icon: 'devices',
       title: 'Application Development',
       description:
-        'Full-stack development across the entire Java ecosystem — Jakarta EE, Spring Boot, MicroProfile, Quarkus — and modern frontends with Angular. I take projects from concept to production, with clean code, solid testing, and cloud-native deployment.',
+        'End-to-end development with Jakarta EE, Spring Boot, MicroProfile, Quarkus, and Angular — from prototype to cloud-native production.',
     },
     {
       icon: 'psychology',
       title: 'Consulting Services',
       description:
-        'I help teams ship better software through architecture reviews, code audits, technology selection, and performance tuning. Whether you need a one-time deep dive or ongoing mentorship, I work alongside your engineers to raise the bar on code quality, agile practices, and engineering culture.',
+        'Architecture review, code audits, tech stack selection, performance tuning, and hands-on mentoring to help your team ship better software.',
     },
   ],
 
