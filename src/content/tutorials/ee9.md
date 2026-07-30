@@ -5,4 +5,4 @@ url: "https://hantsy.github.io/jakartaee9-starter-boilerplate/"
 type: "book"
 ---
 
-Tips of upgrading to Jakarta EE 9
+A collection of tips for upgrading to Jakarta EE 9
