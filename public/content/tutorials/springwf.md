@@ -6,4 +6,4 @@ type: "book"
 description: "A collection of tutorials and code snippets for Spring WebFlux and the reactive Spring ecosystem."
 ---
 
-Spring WebFlux By Example
+A collection of tutorials and code snippets for Spring WebFlux and the reactive Spring ecosystem.

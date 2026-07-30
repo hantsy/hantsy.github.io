@@ -6,4 +6,4 @@ type: "book"
 description: "A collection of docs with code snippets to demonstrate the usage of Quarkus framework"
 ---
 
-Quarkus By Example
+A collection of docs with code snippets to demonstrate the usage of Quarkus framework

@@ -6,4 +6,4 @@ type: "book"
 description: "Playground of helidon framework"
 ---
 
-Helidon By Example
+Playground of helidon framework

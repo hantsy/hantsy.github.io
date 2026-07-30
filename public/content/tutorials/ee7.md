@@ -6,4 +6,4 @@ type: "book"
 description: "Java EE 7 sandbox"
 ---
 
-Java EE 7 Developer's Notes
+Java EE 7 sandbox

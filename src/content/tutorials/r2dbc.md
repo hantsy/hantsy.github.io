@@ -6,4 +6,4 @@ type: "book"
 description: "Tips of using Spring R2dbc and Spring Data R2dbc"
 ---
 
-Spring R2dbc By Example
+Tips of using Spring R2dbc and Spring Data R2dbc

@@ -6,4 +6,4 @@ type: "book"
 description: "Tips of using RSocket and Spring RSocket"
 ---
 
-RSocket By Example
+Tips of using RSocket and Spring RSocket

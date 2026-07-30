@@ -6,4 +6,4 @@ type: "book"
 description: "Sample codes to demonstrate new features of Spring 4.x - hantsy/spring4-sandbox"
 ---
 
-Spring 4 Developer's Notes
+Sample codes to demonstrate new features of Spring 4.x - hantsy/spring4-sandbox

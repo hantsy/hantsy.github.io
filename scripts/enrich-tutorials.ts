@@ -72,21 +72,23 @@ async function main(): Promise<void> {
     const { attrs, body } = parsed;
     if (!attrs.url) continue;
 
-    // Skip if already has a meaningful description (more than just a journal name)
-    if (attrs.description && attrs.description.length > 40) {
-      console.log(`  ${file}: already has description, skipping`);
-      continue;
+    // Fetch description if missing or too short
+    if (!attrs.description || attrs.description.length <= 40) {
+      console.log(`  ${file}: fetching ${attrs.url}...`);
+      const desc = await fetchMeta(attrs.url);
+      if (desc) {
+        attrs.description = desc;
+        console.log(`    → ${desc.substring(0, 80)}...`);
+      } else {
+        console.log(`    → no description found`);
+      }
     }
 
-    console.log(`  ${file}: fetching ${attrs.url}...`);
-    const desc = await fetchMeta(attrs.url);
-    if (desc) {
-      attrs.description = desc;
-      fs.writeFileSync(filepath, serializeFrontmatter(attrs, body), 'utf-8');
-      console.log(`    → ${desc.substring(0, 80)}...`);
+    // Use the description as the body content, fall back to title
+    const newBody = attrs.description || attrs.title || body;
+    if (newBody !== body.trim()) {
+      fs.writeFileSync(filepath, serializeFrontmatter(attrs, newBody), 'utf-8');
       updated++;
-    } else {
-      console.log(`    → no description found`);
     }
 
     // Be nice to servers

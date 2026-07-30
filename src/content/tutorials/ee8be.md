@@ -6,4 +6,4 @@ type: "book"
 description: "Java EE 8 brings a plenty of new features which are valuable to build modern applications."
 ---
 
-Jakarta EE 8 By Example
+Java EE 8 brings a plenty of new features which are valuable to build modern applications.

@@ -6,4 +6,4 @@ type: "book"
 description: "Step-by-step guide of creating RESTful APIs using NestJS and Typescript"
 ---
 
-Building RESTful APIs with NestJS
+Step-by-step guide of creating RESTful APIs using NestJS and Typescript

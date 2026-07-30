@@ -35,7 +35,11 @@ import { ContentService, ParsedContent, TutorialMeta } from '../services/content
                       <a [href]="tutorial.attributes.url" target="_blank" rel="noopener" class="tutorial-link">
                         {{ tutorial.attributes.title }}
                       </a>
-                      <p class="tutorial-desc">{{ tutorial.attributes.description || '' }}</p>
+                      @if (tutorial.content) {
+                        <p class="tutorial-desc">{{ tutorial.content }}</p>
+                      } @else if (tutorial.attributes.description) {
+                        <p class="tutorial-desc">{{ tutorial.attributes.description }}</p>
+                      }
                     </div>
                   }
                 </mat-card-content>
