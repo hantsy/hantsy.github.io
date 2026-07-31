@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { marked } from 'marked';
-import { parseFrontmatter } from '../utils/frontmatter';
+import matter from 'gray-matter';
 
 export interface PostMeta {
   title: string;
@@ -82,11 +82,11 @@ export class ContentService {
   }
 
   private parseFrontmatter<T>(raw: string): ParsedContent<T> {
-    const { attrs, body } = parseFrontmatter(raw);
+    const { data, content } = matter(raw);
     return {
-      attributes: attrs as T,
-      content: body,
-      html: marked.parse(body || raw) as string,
+      attributes: data as T,
+      content,
+      html: marked.parse(content) as string,
       slug: '',
     };
   }

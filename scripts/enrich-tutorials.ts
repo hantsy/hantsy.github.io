@@ -6,23 +6,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import matter from 'gray-matter';
 
 const TUTORIALS_DIR = path.resolve(import.meta.dirname, '..', 'src', 'content', 'tutorials');
-
-function parseFrontmatter(raw: string): { attrs: Record<string, string>; body: string } | null {
-  const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-  if (!m) return null;
-  const attrs: Record<string, string> = {};
-  for (const line of m[1].split('\n')) {
-    const fm = line.match(/^(\w+):\s*(.*)$/);
-    if (!fm) continue;
-    let val = fm[2].trim();
-    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'")))
-      val = val.slice(1, -1);
-    attrs[fm[1]] = val;
-  }
-  return { attrs, body: m[2] };
-}
 
 function serializeFrontmatter(attrs: Record<string, string>, body: string): string {
   const lines = ['---'];
@@ -66,10 +52,7 @@ async function main(): Promise<void> {
   for (const file of files) {
     const filepath = path.join(TUTORIALS_DIR, file);
     const raw = fs.readFileSync(filepath, 'utf-8');
-    const parsed = parseFrontmatter(raw);
-    if (!parsed) continue;
-
-    const { attrs, body } = parsed;
+    const { data: attrs, content: body } = matter(raw) as { data: Record<string, string>; content: string };
     if (!attrs.url) continue;
 
     // Fetch description if missing or too short
