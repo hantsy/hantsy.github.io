@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeaderComponent } from './components/header.component';
@@ -16,7 +17,8 @@ export class AppComponent {
   loading = signal(false);
 
   constructor() {
-    this.router.events.subscribe((event) => {
+    const destroyRef = inject(DestroyRef);
+    this.router.events.pipe(takeUntilDestroyed(destroyRef)).subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.loading.set(true);
       } else if (

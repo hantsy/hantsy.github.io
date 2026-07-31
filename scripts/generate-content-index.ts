@@ -43,15 +43,26 @@ function copyContentFiles(srcDir: string, publicDir: string): string[] {
 function main(): void {
   console.log('Generating content indexes...\n');
 
+  // Copy subdirectory content (blog/, tutorials/)
   for (const dir of CONTENT_DIRS) {
     console.log(`Processing: ${dir.src}`);
     const files = copyContentFiles(dir.src, dir.public);
-
-    // Write index.json
     const indexPath = path.join(dir.public, 'index.json');
     fs.writeFileSync(indexPath, JSON.stringify(files, null, 2));
     console.log(`  Index: ${indexPath} (${files.length} files)\n`);
   }
+
+  // Copy root-level content files (e.g. profile.md)
+  const rootSrc = 'src/content';
+  const rootPublic = 'public/content';
+  ensureDir(rootPublic);
+  const rootFiles = fs.readdirSync(rootSrc)
+    .filter((f) => f.endsWith('.md') && !fs.statSync(path.join(rootSrc, f)).isDirectory());
+  for (const file of rootFiles) {
+    fs.copyFileSync(path.join(rootSrc, file), path.join(rootPublic, file));
+    console.log(`  Copied root: ${file}`);
+  }
+  if (rootFiles.length > 0) console.log();
 
   console.log('Done.');
 }

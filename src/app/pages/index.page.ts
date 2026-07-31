@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { ProfileService, ProfileData } from '../data/profile';
+import { ProfileData } from '../data/profile';
 
 @Component({
   selector: 'app-home',
@@ -12,10 +13,11 @@ import { ProfileService, ProfileData } from '../data/profile';
   styleUrls: ['./index.page.css'],
 })
 export default class HomePage {
-  private profileService = inject(ProfileService);
   profile = signal<ProfileData | null>(null);
 
-  constructor() {
-    this.profileService.load().then((p) => this.profile.set(p));
+  constructor(route: ActivatedRoute) {
+    route.data.subscribe((data) => {
+      if (data['profile']) this.profile.set(data['profile']);
+    });
   }
 }

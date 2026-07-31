@@ -26,18 +26,21 @@ export default class BlogIndexPage {
     '#00838f','#558b2f','#e65100','#4e342e','#37474f',
     '#0d47a1','#b71c1c','#1b5e20','#6a1b9a','#827717',
   ];
-  private tagColorMap = new Map<string, string>();
+  private tagColorMap = new Map<string, { bg: string; text: string }>();
 
   tagColor(tag: string): string {
-    if (!this.tagColorMap.has(tag)) {
-      const i = this.tagColorMap.size % this.palette.length;
-      this.tagColorMap.set(tag, this.palette[i]);
-    }
-    return this.tagColorMap.get(tag)!;
+    return this.ensureTag(tag).bg;
   }
 
   tagTextColor(tag: string): string {
-    const i = [...this.tagColorMap.keys()].indexOf(tag);
-    return i >= 0 ? '#' + this.darkText[i % this.darkText.length] : '#333';
+    return this.ensureTag(tag).text;
+  }
+
+  private ensureTag(tag: string): { bg: string; text: string } {
+    if (!this.tagColorMap.has(tag)) {
+      const i = this.tagColorMap.size % this.palette.length;
+      this.tagColorMap.set(tag, { bg: this.palette[i], text: '#' + this.darkText[i] });
+    }
+    return this.tagColorMap.get(tag)!;
   }
 }

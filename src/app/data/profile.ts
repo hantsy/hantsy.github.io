@@ -22,26 +22,29 @@ export interface ProfileData {
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private data: ProfileData | null = null;
+  private loading: Promise<ProfileData> | null = null;
 
   constructor(private http: HttpClient) {}
 
   async load(): Promise<ProfileData> {
     if (this.data) return this.data;
+    if (this.loading) return this.loading;
 
-    const raw = await firstValueFrom(
-      this.http.get('/content/profile.md', { responseType: 'text' })
-    );
+    this.loading = (async () => {
+      const raw = await firstValueFrom(
+        this.http.get('/content/profile.md', { responseType: 'text' })
+      );
+      this.data = this.parseMarkdown(raw);
+      return this.data;
+    })();
 
-    const parsed = this.parseMarkdown(raw);
-    this.data = parsed;
-    return parsed;
+    return this.loading;
   }
 
   private parseMarkdown(raw: string): ProfileData {
-    const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+    const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
     const frontmatter = match ? match[1] : '';
     const body = (match ? match[2] : raw).trim();
-
     const attrs = this.parseYaml(frontmatter);
 
     return {
@@ -58,29 +61,32 @@ export class ProfileService {
 
   private parseYaml(yaml: string): Record<string, any> {
     const result: Record<string, any> = {};
-    const lines = yaml.split('\n');
+    const lines = yaml.split(/\r?\n/);
     let i = 0;
 
     while (i < lines.length) {
       const line = lines[i];
       if (!line.trim()) { i++; continue; }
 
-      // Array key
       const arrayMatch = line.match(/^(\w[\w-]*):\s*$/);
       if (arrayMatch) {
         const key = arrayMatch[1];
         const items: any[] = [];
         i++;
-        while (i < lines.length && lines[i].match(/^\s+-\s/)) {
+        while (i < lines.length) {
+          const itemMatch = lines[i].match(/^\s+-\s+(.*)/);
+          if (!itemMatch) {
+            if (!lines[i].trim()) { i++; continue; } // skip blank lines in arrays
+            break;
+          }
           const item: Record<string, any> = {};
-          const itemLine = lines[i].replace(/^\s+-\s+/, '');
-          const itemKey = itemLine.match(/^(\w+):\s*(.*)/);
+          const itemVal = itemMatch[1];
+          const itemKey = itemVal.match(/^(\w+):\s*(.*)/);
           if (itemKey) {
             item[itemKey[1]] = this.unquote(itemKey[2]);
           }
-          // Read indented sub-fields
           i++;
-          while (i < lines.length && lines[i].match(/^\s{4,}\w/)) {
+          while (i < lines.length && lines[i].match(/^\s{2,}\w/)) {
             const sub = lines[i].trim().match(/^(\w+):\s*(.*)/);
             if (sub) item[sub[1]] = this.unquote(sub[2]);
             i++;
@@ -91,7 +97,6 @@ export class ProfileService {
         continue;
       }
 
-      // Simple key: value
       const keyMatch = line.match(/^(\w[\w-]*):\s*(.*)/);
       if (keyMatch) {
         result[keyMatch[1]] = this.unquote(keyMatch[2]);
