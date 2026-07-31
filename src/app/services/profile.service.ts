@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { parseFrontmatter } from '../utils/frontmatter';
+import { profileData } from '../data/profile';
 
 export interface Service {
   icon: string;
@@ -32,27 +32,13 @@ export class ProfileService {
     if (this.loading) return this.loading;
 
     this.loading = (async () => {
-      const raw = await firstValueFrom(
+      const bio = await firstValueFrom(
         this.http.get('/content/profile.md', { responseType: 'text' })
       );
-      this.data = this.parseMarkdown(raw);
+      this.data = { ...profileData, bio: bio.trim() };
       return this.data;
     })();
 
     return this.loading;
-  }
-
-  private parseMarkdown(raw: string): ProfileData {
-    const { attrs, body } = parseFrontmatter(raw);
-    return {
-      name: attrs['name'] || '',
-      tagline: attrs['tagline'] || '',
-      bio: body,
-      availability: attrs['availability'] || '',
-      services: attrs['services'] || [],
-      githubUrl: attrs['githubUrl'] || '',
-      cvUrl: attrs['cvUrl'] || '',
-      linkedinUrl: attrs['linkedinUrl'] || '',
-    };
   }
 }
