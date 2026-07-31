@@ -1,16 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
   <!-- Steam -->
-  <path d="M14 10 Q12 0 18 -2" fill="none" stroke="#8D6E63" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-  <path d="M32 10 Q32 -2 32 -4" fill="none" stroke="#8D6E63" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
-  <path d="M50 10 Q52 0 46 -2" fill="none" stroke="#8D6E63" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M12 6 Q10 -2 14 -4" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+  <path d="M24 6 Q24 -4 24 -6" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+  <path d="M36 6 Q38 -2 34 -4" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/>
   <!-- Handle -->
-  <path d="M56 28 Q70 28 70 40 Q70 52 56 50" fill="none" stroke="#6D4C41" stroke-width="4.5" stroke-linecap="round"/>
-  <!-- Cup body -->
-  <path d="M6 16 L6 50 Q6 58 14 58 L48 58 Q56 58 56 50 L56 16 Z" fill="#8D6E63"/>
-  <!-- Cup rim -->
-  <ellipse cx="31" cy="16" rx="25" ry="6" fill="#795548"/>
-  <!-- Coffee inside -->
-  <ellipse cx="31" cy="18" rx="21" ry="4" fill="#3E2723"/>
-  <!-- Highlight -->
-  <path d="M10 22 Q10 18 14 18 L14 54 Q10 54 10 50 Z" fill="rgba(255,255,255,0.12)"/>
+  <path d="M42 22 Q54 22 54 32 Q54 42 42 40" fill="none" stroke="#555" stroke-width="3" stroke-linecap="round"/>
+  <!-- Cup -->
+  <rect x="4" y="12" width="38" height="28" rx="4" fill="none" stroke="#555" stroke-width="3"/>
+  <!-- Coffee level -->
+  <line x1="4" y1="20" x2="42" y2="20" stroke="#555" stroke-width="3"/>
+  <!-- Hot surface -->
+  <path d="M8 20 Q16 18 24 20 Q32 22 40 20" fill="#555" stroke="none"/>
 </svg>
