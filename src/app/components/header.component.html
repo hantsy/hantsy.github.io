@@ -1,0 +1,34 @@
+<mat-toolbar color="primary" class="mat-elevation-z2">
+  <a mat-button class="brand" routerLink="/">
+    <span class="fw-bold">Hantsy</span>&nbsp;Bai
+  </a>
+  <span class="spacer"></span>
+
+  <nav class="desktop-nav">
+    <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+      <mat-icon>home</mat-icon> Home
+    </a>
+    <a mat-button routerLink="/tutorials" routerLinkActive="active-link">
+      <mat-icon>menu_book</mat-icon> Tutorials
+    </a>
+    <a mat-button routerLink="/blog" routerLinkActive="active-link">
+      <mat-icon>rss_feed</mat-icon> Blog
+    </a>
+  </nav>
+
+  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMenu" aria-label="Menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-menu #mobileMenu="matMenu">
+  <a mat-menu-item routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+    <mat-icon>home</mat-icon> Home
+  </a>
+  <a mat-menu-item routerLink="/tutorials" routerLinkActive="active-link">
+    <mat-icon>menu_book</mat-icon> Tutorials
+  </a>
+  <a mat-menu-item routerLink="/blog" routerLinkActive="active-link">
+    <mat-icon>rss_feed</mat-icon> Blog
+  </a>
+</mat-menu>

@@ -1,0 +1,33 @@
+<header class="page-header">
+  <h1>Tutorials</h1>
+  <p class="page-description">Publications, papers, and tutorials — grouped by year.</p>
+</header>
+
+@if (store.tutorials().length > 0) {
+  <div class="timeline">
+    @for (group of store.tutorials(); track group.year) {
+      <div class="timeline-row">
+        <div class="timeline-left">
+          <span class="year-badge">{{ group.year }}</span>
+        </div>
+        <div class="timeline-dot"></div>
+        <mat-card class="mat-elevation-z1 timeline-card">
+          <mat-card-content>
+            @for (tutorial of group.items; track tutorial.slug) {
+              <div class="tutorial-entry">
+                <a [href]="tutorial.attributes.url" target="_blank" rel="noopener" class="tutorial-link">
+                  {{ tutorial.attributes.title }}
+                </a>
+                @if (tutorial.content) {
+                  <p class="tutorial-desc">{{ tutorial.content }}</p>
+                }
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="empty-state">Tutorials and publications coming soon.</div>
+}

@@ -1,0 +1,10 @@
+@if (loading()) {
+  <div class="loading-overlay">
+    <mat-spinner diameter="56" strokeWidth="4" />
+  </div>
+}
+<app-header />
+<main class="container">
+  <router-outlet />
+</main>
+<app-footer />

@@ -5,14 +5,7 @@ import { MatDividerModule } from '@angular/material/divider';
   selector: 'app-footer',
   standalone: true,
   imports: [MatDividerModule],
-  template: `
-    <footer class="footer">
-      <mat-divider></mat-divider>
-      <p style="margin-top: 1rem;">
-        &copy; {{ year }} Hantsy Bai. Powered by Angular &amp; Angular Material.
-      </p>
-    </footer>
-  `,
+  templateUrl: './footer.component.html',
 })
 export class FooterComponent {
   year = new Date().getFullYear();

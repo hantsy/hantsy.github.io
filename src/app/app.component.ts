@@ -8,29 +8,8 @@ import { FooterComponent } from './components/footer.component';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, MatProgressSpinnerModule, HeaderComponent, FooterComponent],
-  template: `
-    @if (loading()) {
-      <div class="loading-overlay">
-        <mat-spinner diameter="56" strokeWidth="4" />
-      </div>
-    }
-    <app-header />
-    <main class="container">
-      <router-outlet />
-    </main>
-    <app-footer />
-  `,
-  styles: [`
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: rgba(255,255,255,.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  `],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   private router = inject(Router);

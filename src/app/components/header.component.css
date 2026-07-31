@@ -1,0 +1,7 @@
+.spacer { flex:1 1 auto; }
+.brand { font-size:1.15rem;letter-spacing:.5px; }
+.fw-bold { font-weight:700; }
+.desktop-nav { display:flex;align-items:center;gap:.25rem; }
+.desktop-nav .active-link { background:rgba(255,255,255,.15); }
+.mobile-menu-btn { display:none; }
+@media(max-width:768px) { .desktop-nav { display:none; } .mobile-menu-btn { display:inline-block; } }

@@ -1,3 +1,7 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+
 export interface Service {
   icon: string;
   title: string;
@@ -15,33 +19,94 @@ export interface ProfileData {
   linkedinUrl: string;
 }
 
-export const profileData: ProfileData = {
-  name: 'Hantsy Bai',
-  tagline: 'Independent Freelancer · Jakarta EE & Spring Expert · Open Source Contributor',
-  bio: `I'm a passionate independent freelancer based in Guangzhou, China, with over 20 years of hands-on experience in software engineering. My work centers on the Java ecosystem — Jakarta EE, Spring, MicroProfile, Quarkus — and modern frontend technologies like Angular.
+@Injectable({ providedIn: 'root' })
+export class ProfileService {
+  private data: ProfileData | null = null;
 
-I'm also an active blogger and open-source contributor. In 2012, I was honored to receive the JBoss Community Recognition Award from Red Hat (now part of IBM) at the JBoss User and Developer Conference in Boston.
+  constructor(private http: HttpClient) {}
 
-I believe in remote-first work, engineering culture over endless meetings, continuous learning, and the freedom to manage my own time.`,
+  async load(): Promise<ProfileData> {
+    if (this.data) return this.data;
 
-  availability: `I'm currently available for new projects and opportunities — feel free to reach out if you need help with application development, architecture consulting, or team coaching.`,
+    const raw = await firstValueFrom(
+      this.http.get('/content/profile.md', { responseType: 'text' })
+    );
 
-  services: [
-    {
-      icon: 'devices',
-      title: 'Application Development',
-      description:
-        'End-to-end development with Jakarta EE, Spring Boot, MicroProfile, Quarkus, and Angular — from prototype to cloud-native production.',
-    },
-    {
-      icon: 'psychology',
-      title: 'Consulting Services',
-      description:
-        'Architecture review, code audits, tech stack selection, performance tuning, and hands-on mentoring to help your team ship better software.',
-    },
-  ],
+    const parsed = this.parseMarkdown(raw);
+    this.data = parsed;
+    return parsed;
+  }
 
-  githubUrl: 'https://github.com/hantsy',
-  cvUrl: '/assets/pdf/cv.pdf',
-  linkedinUrl: 'https://www.linkedin.com/in/hantsy',
-};
+  private parseMarkdown(raw: string): ProfileData {
+    const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+    const frontmatter = match ? match[1] : '';
+    const body = (match ? match[2] : raw).trim();
+
+    const attrs = this.parseYaml(frontmatter);
+
+    return {
+      name: attrs['name'] || '',
+      tagline: attrs['tagline'] || '',
+      bio: body,
+      availability: attrs['availability'] || '',
+      services: attrs['services'] || [],
+      githubUrl: attrs['githubUrl'] || '',
+      cvUrl: attrs['cvUrl'] || '',
+      linkedinUrl: attrs['linkedinUrl'] || '',
+    };
+  }
+
+  private parseYaml(yaml: string): Record<string, any> {
+    const result: Record<string, any> = {};
+    const lines = yaml.split('\n');
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+      if (!line.trim()) { i++; continue; }
+
+      // Array key
+      const arrayMatch = line.match(/^(\w[\w-]*):\s*$/);
+      if (arrayMatch) {
+        const key = arrayMatch[1];
+        const items: any[] = [];
+        i++;
+        while (i < lines.length && lines[i].match(/^\s+-\s/)) {
+          const item: Record<string, any> = {};
+          const itemLine = lines[i].replace(/^\s+-\s+/, '');
+          const itemKey = itemLine.match(/^(\w+):\s*(.*)/);
+          if (itemKey) {
+            item[itemKey[1]] = this.unquote(itemKey[2]);
+          }
+          // Read indented sub-fields
+          i++;
+          while (i < lines.length && lines[i].match(/^\s{4,}\w/)) {
+            const sub = lines[i].trim().match(/^(\w+):\s*(.*)/);
+            if (sub) item[sub[1]] = this.unquote(sub[2]);
+            i++;
+          }
+          items.push(item);
+        }
+        result[key] = items;
+        continue;
+      }
+
+      // Simple key: value
+      const keyMatch = line.match(/^(\w[\w-]*):\s*(.*)/);
+      if (keyMatch) {
+        result[keyMatch[1]] = this.unquote(keyMatch[2]);
+      }
+      i++;
+    }
+
+    return result;
+  }
+
+  private unquote(s: string): string {
+    let v = s.trim();
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+      v = v.slice(1, -1);
+    }
+    return v;
+  }
+}
