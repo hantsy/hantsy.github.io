@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { marked } from 'marked';
+import { parseFrontmatter } from '../utils/frontmatter';
 
 export interface PostMeta {
   title: string;
@@ -81,65 +82,12 @@ export class ContentService {
   }
 
   private parseFrontmatter<T>(raw: string): ParsedContent<T> {
-    const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-    if (!match) {
-      return {
-        attributes: {} as T,
-        content: raw,
-        html: marked.parse(raw) as string,
-        slug: '',
-      };
-    }
-
-    const frontmatterStr = match[1];
-    const body = match[2];
-    const attributes = this.parseYamlLike<T>(frontmatterStr);
-
+    const { attrs, body } = parseFrontmatter(raw);
     return {
-      attributes,
+      attributes: attrs as T,
       content: body,
-      html: marked.parse(body) as string,
+      html: marked.parse(body || raw) as string,
       slug: '',
     };
-  }
-
-  private parseYamlLike<T>(yaml: string): T {
-    const obj: any = {};
-    const lines = yaml.split('\n');
-
-    for (const line of lines) {
-      const keyMatch = line.match(/^(\w[\w-]*):\s*(.*)$/);
-      if (!keyMatch) continue;
-
-      const key = keyMatch[1];
-      let value: any = keyMatch[2].trim();
-
-      // Array notation: [item1, item2]
-      if (value.startsWith('[') && value.endsWith(']')) {
-        value = value
-          .slice(1, -1)
-          .split(',')
-          .map((s: string) => s.trim().replace(/["']/g, ''));
-      }
-      // Quoted strings
-      else if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-      // Numbers
-      else if (/^\d+$/.test(value)) {
-        value = parseInt(value, 10);
-      }
-      // Empty
-      else if (value === '' || value === '~') {
-        value = undefined;
-      }
-
-      obj[key] = value;
-    }
-
-    return obj as T;
   }
 }
