@@ -34,12 +34,13 @@ import { FooterComponent } from './components/footer.component';
       gap: 1rem;
     }
     .loading-overlay mat-progress-bar {
-      width: 200px;
+      width: 320px;
     }
     .loading-text {
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       color: #888;
       margin: 0;
+      letter-spacing: 1px;
     }
   `],
 })
