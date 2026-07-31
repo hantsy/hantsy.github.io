@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { marked } from 'marked';
-import matter from 'gray-matter';
 
 export interface PostMeta {
   title: string;
@@ -82,7 +81,24 @@ export class ContentService {
   }
 
   private parseFrontmatter<T>(raw: string): ParsedContent<T> {
-    const { data, content } = matter(raw);
+    const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+    let data: any = {};
+    let content = raw;
+
+    if (match) {
+      content = match[2].trim();
+      for (const line of match[1].split(/\r?\n/)) {
+        const m = line.match(/^(\w[\w-]*):\s*(.*)/);
+        if (!m) continue;
+        let val: any = m[2].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'")))
+          val = val.slice(1, -1);
+        else if (/^\d+$/.test(val)) val = parseInt(val, 10);
+        else if (val === '' || val === '~') val = undefined;
+        data[m[1]] = val;
+      }
+    }
+
     return {
       attributes: data as T,
       content,
