@@ -25,23 +25,30 @@ import { FooterComponent } from './components/footer.component';
       left: 0;
       right: 0;
       z-index: 9999;
+      height: 3px;
     }
   `],
 })
 export class AppComponent {
   private router = inject(Router);
   loading = signal(false);
+  private showTimer: any = null;
+  private minDuration = 300; // keep bar visible at least 300ms so it's noticeable
 
   constructor() {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
-        this.loading.set(true);
+        clearTimeout(this.showTimer);
+        // Small debounce: don't flash the bar for sub-50ms navigations
+        this.showTimer = setTimeout(() => this.loading.set(true), 50);
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        this.loading.set(false);
+        clearTimeout(this.showTimer);
+        // Keep the bar visible for at least minDuration from show time
+        setTimeout(() => this.loading.set(false), this.minDuration);
       }
     });
   }
