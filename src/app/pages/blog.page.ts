@@ -1,11 +1,10 @@
-import { Component, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MediumPost } from '../services/blog.service';
+import { BlogStore } from '../stores/blog.store';
 
 @Component({
   selector: 'app-blog',
@@ -24,7 +23,7 @@ import { MediumPost } from '../services/blog.service';
     </header>
 
     <div class="post-grid">
-      @for (post of mediumPosts(); track post.link) {
+      @for (post of store.posts(); track post.link) {
         <a [href]="post.link" target="_blank" rel="noopener" class="post-card-link">
           <div class="post-card mat-elevation-z1">
             <div class="post-thumb">
@@ -59,7 +58,7 @@ import { MediumPost } from '../services/blog.service';
         </a>
       }
 
-      @if (mediumPosts().length === 0) {
+      @if (store.isEmpty()) {
         <div class="empty-state">Could not load Medium feed. Check back soon!</div>
       }
     </div>
@@ -97,7 +96,7 @@ import { MediumPost } from '../services/blog.service';
   `],
 })
 export default class BlogIndexPage {
-  mediumPosts = signal<MediumPost[]>([]);
+  readonly store = inject(BlogStore);
 
   private readonly palette = [
     '#e8eaf6','#fce4ec','#e0f2f1','#fbe9e7','#ede7f6',
@@ -122,14 +121,5 @@ export default class BlogIndexPage {
   tagTextColor(tag: string): string {
     const i = [...this.tagColorMap.keys()].indexOf(tag);
     return i >= 0 ? '#' + this.darkText[i % this.darkText.length] : '#333';
-  }
-
-  constructor(route: ActivatedRoute) {
-    if (route.snapshot.data['posts']) {
-      this.mediumPosts.set(route.snapshot.data['posts']);
-    }
-    route.data.subscribe((data) => {
-      if (data['posts']) this.mediumPosts.set(data['posts']);
-    });
   }
 }

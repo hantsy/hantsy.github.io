@@ -1,7 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { TutorialsData } from '../services/tutorials.resolver';
+import { TutorialsStore } from '../stores/tutorials.store';
 
 @Component({
   selector: 'app-tutorials',
@@ -13,9 +12,9 @@ import { TutorialsData } from '../services/tutorials.resolver';
       <p class="page-description">Publications, papers, and tutorials — grouped by year.</p>
     </header>
 
-    @if (groupedTutorials().length > 0) {
+    @if (store.tutorials().length > 0) {
       <div class="timeline">
-        @for (group of groupedTutorials(); track group.year) {
+        @for (group of store.tutorials(); track group.year) {
           <div class="timeline-row">
             <div class="timeline-left">
               <span class="year-badge">{{ group.year }}</span>
@@ -68,19 +67,5 @@ import { TutorialsData } from '../services/tutorials.resolver';
   `],
 })
 export default class TutorialsPage {
-  groupedTutorials = signal<TutorialsData>(
-    (history.state as any)?.tutorials ?? /* fallback */ []
-  );
-
-  constructor(route: ActivatedRoute) {
-    // Use preloaded resolver data if available (most navigations)
-    const snap = route.snapshot;
-    if (snap.data['tutorials']) {
-      this.groupedTutorials.set(snap.data['tutorials']);
-    }
-    // Also subscribe for future navigations where resolver re-runs
-    route.data.subscribe((data) => {
-      if (data['tutorials']) this.groupedTutorials.set(data['tutorials']);
-    });
-  }
+  readonly store = inject(TutorialsStore);
 }
