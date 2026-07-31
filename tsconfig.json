@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -11,7 +10,6 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
@@ -20,6 +18,7 @@
     "lib": ["ES2022", "dom"],
     "useDefineForClassFields": false,
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/app/*"],
       "@content/*": ["./src/content/*"]

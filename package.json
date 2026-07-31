@@ -11,16 +11,16 @@
     "content:index": "npx tsx scripts/generate-content-index.ts"
   },
   "dependencies": {
-    "@angular/animations": "^19.2.0",
-    "@angular/cdk": "^19.2.19",
-    "@angular/common": "^19.2.0",
-    "@angular/compiler": "^19.2.0",
-    "@angular/core": "^19.2.0",
-    "@angular/forms": "^19.2.25",
-    "@angular/material": "^19.2.19",
-    "@angular/platform-browser": "^19.2.0",
-    "@angular/router": "^19.2.0",
-    "@ngrx/signals": "^18.1.1",
+    "@angular/animations": "^22.0.0",
+    "@angular/cdk": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/router": "^22.0.0",
+    "@ngrx/signals": "^22.0.0-beta.0",
     "fast-xml-parser": "^5.10.1",
     "marked": "^15.0.0",
     "rxjs": "~7.8.0",
@@ -28,12 +28,12 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^19.2.0",
-    "@angular/cli": "^19.2.0",
-    "@angular/compiler-cli": "^19.2.0",
+    "@angular/build": "^22.0.0",
+    "@angular/cli": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "typescript": "~5.7.0"
+    "typescript": "~6.0.0"
   },
   "allowScripts": {
     "esbuild@0.28.0": true,
