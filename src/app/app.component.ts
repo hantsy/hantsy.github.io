@@ -10,7 +10,10 @@ import { FooterComponent } from './components/footer.component';
   imports: [RouterOutlet, MatProgressBarModule, HeaderComponent, FooterComponent],
   template: `
     @if (loading()) {
-      <mat-progress-bar mode="indeterminate" class="global-loader" />
+      <div class="loading-overlay">
+        <mat-progress-bar mode="indeterminate" />
+        <p class="loading-text">Loading...</p>
+      </div>
     }
     <app-header />
     <main class="container">
@@ -19,36 +22,41 @@ import { FooterComponent } from './components/footer.component';
     <app-footer />
   `,
   styles: [`
-    .global-loader {
+    .loading-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      inset: 0;
       z-index: 9999;
-      height: 3px;
+      background: rgba(255,255,255,.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .loading-overlay mat-progress-bar {
+      width: 200px;
+    }
+    .loading-text {
+      font-size: 0.9rem;
+      color: #888;
+      margin: 0;
     }
   `],
 })
 export class AppComponent {
   private router = inject(Router);
   loading = signal(false);
-  private showTimer: any = null;
-  private minDuration = 300; // keep bar visible at least 300ms so it's noticeable
 
   constructor() {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
-        clearTimeout(this.showTimer);
-        // Small debounce: don't flash the bar for sub-50ms navigations
-        this.showTimer = setTimeout(() => this.loading.set(true), 50);
+        this.loading.set(true);
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        clearTimeout(this.showTimer);
-        // Keep the bar visible for at least minDuration from show time
-        setTimeout(() => this.loading.set(false), this.minDuration);
+        this.loading.set(false);
       }
     });
   }
