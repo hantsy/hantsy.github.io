@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { inject } from '@angular/core';
 import { tutorialsResolver } from './services/tutorials.resolver';
 import { blogResolver } from './services/blog.resolver';
-import { ProfileService } from './data/profile';
+import { ProfileService } from './services/profile.service';
 
 export const routes: Routes = [
   {

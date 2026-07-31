@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { ProfileData } from '../data/profile';
+import { ProfileData } from '../services/profile.service';
 
 @Component({
   selector: 'app-home',
